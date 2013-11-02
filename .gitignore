@@ -1,0 +1,7 @@
+.project
+.externalToolBuilders
+.buildpath
+.settings/
+*.swp
+/assets
+/common/runtime/
