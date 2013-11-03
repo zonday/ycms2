@@ -1,14 +1,13 @@
 <?php
+/* @var $this SiteController */
+
+$this->pageTitle = '控制面板';
 $this->breadcrumbs = array(
-	'shouye'
+	'控制面板'
 );
 ?>
 <div class="page-header">
 	<h1>
-		Full Calendar
-		<small>
-			<i class="icon-double-angle-right"></i>
-			with draggable and editable events
-		</small>
+		<?php echo $this->pageTitle ?>
 	</h1>
 </div>

@@ -5,3 +5,5 @@
 *.swp
 /assets
 /common/runtime/
+*.sublime-project
+*.sublime-workspace

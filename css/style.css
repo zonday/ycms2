@@ -36,7 +36,32 @@ body {
 }
 
 .page-content {
-	padding: 8px 20px 24px;
+	padding: 9px 18px 18px;
+}
+
+.page-content h1 {
+	font-size: 24px;
+	font-weight: lighter;
+	margin: 9px 0;
+}
+
+.page-content h1 small {
+	font-size: 14px;
+	font-weight: normal;
+}
+
+.page-header {
+	margin-top: 0;
+	padding: 9px 0;
+}
+
+.page-header h1 {
+	float: left;
+	margin: 0;
+}
+
+.page-header .actions {
+	float: right;
 }
 
 .breadcrumbs  {

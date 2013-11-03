@@ -8,7 +8,10 @@ $default = array(
 	'timezone' => 'Asia/Shanghai',
 	'import' => array(
 		'common.components.*',
+		'common.components.behaviors.*',
+		'common.components.widgets.*',
 		'common.models.*',
+		'common.models.core.*',
 		'common.extensions.yiidebugtb.*',
 	),
 	'components' => array(
@@ -19,7 +22,7 @@ $default = array(
 		),
 		'urlManager' => array(
 			'urlFormat' => 'path',
-			'showScriptName' => false,
+			//'showScriptName' => false,
 			'urlSuffix' => '/',
 		),
 		'cache' => extension_loaded('apc') ?

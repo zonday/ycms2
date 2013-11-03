@@ -46,13 +46,14 @@
 								'itemOptions' => array('class' => 'nav-header')
 							),
 							array(
-								'label' => 'Home',
-								'url' => '#',
-								'itemOptions' => array('class' => 'active')
+								'label' => '首页',
+								'icon' => 'home',
+								'url' => array('site'),
 							),
-							array('label' => 'Library', 'url' => '#', 'items' => array(
-								array('label' => 'test', 'url' => '#'),
-							)),
+							array(
+								'label' => '用户', 
+								'url' => array('/auth/user'), 
+							),
 							array('label' => 'Applications', 'url' => '#'),
 							array(
 								'label' => 'Another list header',

@@ -3,7 +3,7 @@
  * 后台基础Controller
  * @author Yang <css3@qq.com>
  */
-class YBackendController extends CController
+class Controller extends CController
 {
 	/**
 	 * 餐单

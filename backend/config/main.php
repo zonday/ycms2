@@ -15,6 +15,13 @@ $default = array(
 		'application.controllers.*',
 		'application.models.*',
 	),
+
+	'modules' => array(
+		'auth' => array(
+			'class' => 'application.modules.auth.YAuthModule'
+		),
+	),
+
 	'components' => array(
 		'bootstrap' => array(
 			'class' => 'common.extensions.bootstrap.components.Bootstrap',
