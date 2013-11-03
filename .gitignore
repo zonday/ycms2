@@ -3,6 +3,7 @@
 .buildpath
 .settings/
 *.swp
+*~
 /assets
 /common/runtime/
 *.sublime-project

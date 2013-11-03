@@ -1,11 +1,7 @@
 <?php
 return array(
 	'components' => array(
-		'db' => array(
-			'connectionString' => 'mysql:host=127.0.0.1;dbname=ycms2',
-			'username' => 'root',
-			'password' => '',
-		)
+
 	),
 	'modules' => array(
 		'gii' => array(

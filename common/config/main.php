@@ -12,12 +12,14 @@ $default = array(
 		'common.components.widgets.*',
 		'common.models.*',
 		'common.models.core.*',
+		'common.helpers.*',
 		'common.extensions.yiidebugtb.*',
 	),
 	'components' => array(
 		'db' => array(
 			'schemaCachingDuration' => YII_DEBUG ? 0 : 86400000, // 1000 天
 			'enableParamLogging' => YII_DEBUG,
+			'emulatePrepare' => true,
 			'charset' => 'utf8',
 		),
 		'urlManager' => array(

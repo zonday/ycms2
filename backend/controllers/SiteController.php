@@ -1,15 +1,171 @@
 <?php
 /**
- * 后台站点Controller
+ * SiteController File
  * @author Yang <css3@qq.com>
+ */
+
+/**
+ * SiteController
+ *
+ * @author yang <css3@qq.com>
+ * @package backend.controllers
  */
 class SiteController extends Controller
 {
 	/**
-	 * 首页action
+	 * actions
+	 * @see CController::actions()
+	 * @return array
+	 */
+	public function actions()
+	{
+		return array(
+			'captcha'=>array(
+				'class'=>'CCaptchaAction',
+				'backColor'=>0xFFFFFF,
+			),
+		);
+	}
+
+	/**
+	 * 首页
 	 */
 	public function actionIndex()
 	{
 		$this->render('index');
+	}
+
+	/**
+	 * 登录
+	 */
+	public function actionLogin()
+	{
+		$this->layout = 'none';
+
+		$model = new LoginForm;
+
+		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form') {
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
+
+		if (isset($_POST['LoginForm'])) {
+			$model->attributes = $_POST['LoginForm'];
+			if ($model->validate() && $model->login()) {
+				$this->redirect(Yii::app()->getUser()->returnUrl);
+			}
+		}
+
+		$this->render('login', array('model' => $model));
+	}
+
+	/**
+	 * 忘记密码
+	 */
+	public function actionLostpassword()
+	{
+		$this->layout = 'none';
+
+		$model = new LostPasswordForm;
+
+		if(isset($_POST['LostPasswordForm'])) {
+			$model->attributes = $_POST['LostPasswordForm'];
+			if($model->validate() && $model->lostPassword()) {
+				$this->redirect(array('login'));
+			}
+		}
+
+		$this->render('lost-password',array('model'=>$model));
+	}
+
+	/**
+	 * 重置密码
+	 */
+	public function actionResetpassword()
+	{
+		$this->layout = 'none';
+
+		$model = new ResetPasswordForm;
+
+		if(isset($_POST['ResetPasswordForm'])) {
+			$model->attributes = $_POST['ResetPasswordForm'];
+			if($model->validate()) {
+				if (!$model->validateKey()) {
+					Yii::app()->getUser()->setFlash('error', '无效的KEY，请重新获取重置密码邮件');
+					$this->redirect(array('lostpassword'));
+				} elseif ($model->resetPassword()) {
+					Yii::app()->getUser()->setFlash('success', '重置密码成功');
+					$this->redirect(array('login'));
+				} else {
+					Yii::app()->getUser()->setFlash('error', '重置密码失败');
+				}
+			}
+		} else {
+			if (isset($_GET['login']))
+				$model->login = $_GET['login'];
+
+			if (isset($_GET['key']))
+				$model->key = $_GET['key'];
+
+			if (!$model->validateKey()) {
+				Yii::app()->getUser()->setFlash('error', '无效的KEY，请重新获取重置密码邮件');
+				$this->redirect(array('lostpassword'));
+			}
+		}
+
+		$this->render('reset-password',array('model' => $model));
+	}
+
+	/**
+	 * 激活认证电子邮件
+	 */
+	public function actionActivation()
+	{
+		$this->layout = 'none';
+		$key = $login = '';
+
+		if (isset($_GET['key']))
+			$key = $_GET['key'];
+
+		if (isset($_GET['login']))
+			$login = $_GET['login'];
+
+		$user = User::validateKey($key, $login);
+		if ($user) {
+			$result = $user->saveAttributes(array(
+				'status' => User::STATUS_NOMAL,
+				'activation_key' => '',
+			));
+		} else {
+			$resutl = false;
+		}
+
+		if ($result)
+			Yii::app()->getUser()->setFlash('success', '验证电子邮箱成功');
+		else
+			Yii::app()->getUser()->setFlash('error', '验证电子邮箱失败');
+
+		$this->redirect(array('login'));
+	}
+
+	/**
+	 * 退出action
+	 */
+	public function actionLogout()
+	{
+		Yii::app()->getUser()->logout();
+		$this->redirect(Yii::app()->homeUrl);
+	}
+
+	public function actionError()
+	{
+		$this->layout = 'none';
+
+		if($error = Yii::app()->errorHandler->error) {
+			if(Yii::app()->request->isAjaxRequest)
+				echo $error['message'];
+			else
+				$this->render('error', $error);
+		}
 	}
 }

@@ -14,6 +14,7 @@ $default = array(
 		'application.components.*',
 		'application.controllers.*',
 		'application.models.*',
+		'application.widgets.*',
 	),
 
 	'modules' => array(
@@ -26,6 +27,13 @@ $default = array(
 		'bootstrap' => array(
 			'class' => 'common.extensions.bootstrap.components.Bootstrap',
 			'responsiveCss' => true,
+			'fontAwesomeCss' => true,
+		),
+		'authManager' => array(
+			'class'=>'CDbAuthManager',
+			'itemTable' => '{{authitem}}',
+			'assignmentTable' => '{{authassignment}}',
+			'itemChildTable' => '{{authitemchild}}',
 		),
 	),
 );

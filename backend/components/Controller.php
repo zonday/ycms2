@@ -16,4 +16,16 @@ class Controller extends CController
 	 * @var array
 	 */
 	public $breadcrumbs = array();
+
+	/**
+	 * ajax验证模型
+	 * @param CActiveRecord $model
+	 */
+	protected function performAjaxValidation($model)
+	{
+		if (isset($_POST['ajax']) && $_POST['ajax'] === strtolower(__CLASS__ . '-form')) {
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
+	}
 }

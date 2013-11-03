@@ -41,28 +41,12 @@
 					array(
 						'type' => 'list',
 						'items' => array(
-							array(
-								'label' => 'List header',
-								'itemOptions' => array('class' => 'nav-header')
-							),
-							array(
-								'label' => '首页',
-								'icon' => 'home',
-								'url' => array('site'),
-							),
-							array(
-								'label' => '用户', 
-								'url' => array('/auth/user'), 
-							),
-							array('label' => 'Applications', 'url' => '#'),
-							array(
-								'label' => 'Another list header',
-								'itemOptions' => array('class' => 'nav-header')
-							),
-							array('label' => 'Profile', 'url' => '#'),
-							array('label' => 'Settings', 'url' => '#'),
-							'',
-							array('label' => 'Help', 'url' => '#'),
+							array('label' => '首页', 'url' => array('/site/index'), 'icon' => 'home'),
+							array('label' => '系统', 'itemOptions' => array('class' => 'nav-header')),
+							array('label' => '用户', 'url' => array('/user/index'), 'icon' => 'user'),
+							array('label' => '角色', 'url' => array('/role/index'), 'icon' => 'group'),
+							array('label' => '权限', 'url' => array('/permission/index'), 'icon' => 'lock'),
+							array('label' => '设置', 'url' => array('/site/setting'), 'icon' => 'cog'),
 						)
 					)
 				);
@@ -77,6 +61,7 @@
 						<?php endif?>
 					</div>
 					<div class="page-content">
+						<?php $this->widget('bootstrap.widgets.TbAlert'); ?>
 						<?php echo $content; ?>
 					</div> <!-- /.page-content -->
 				</div> <!-- /.main-content -->
