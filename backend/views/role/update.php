@@ -12,7 +12,7 @@ $this->breadcrumbs=array(
 ?>
 
 <div class="page-header">
-	<h1>更新角色</h1>
+	<h1><i class="icon-pencil"></i> 更新角色</h1>
 </div>
 
 <?php $this->renderPartial('_form', array('model' => $model)); ?>

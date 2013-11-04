@@ -9,6 +9,6 @@ $this->breadcrumbs=array(
 ?>
 
 <div class="page-header">
-	<h1><?php echo $this->pageTitle; ?></h1>
+	<h1><i class="icon-plus"></i> <?php echo $this->pageTitle; ?></h1>
 </div>
 <?php $this->renderPartial('_form', array('model' => $model)); ?>

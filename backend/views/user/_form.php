@@ -28,9 +28,31 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	<div class="form-actions">
 		<?php $this->widget('bootstrap.widgets.TbButton', array(
 			'buttonType'=>'submit',
+			'htmlOptions'=>array('name'=>'_save'),
 			'type'=>'primary',
-			'label'=>$model->isNewRecord ? '创建' : '保存',
+			'encodeLabel'=>false,
+			'label'=>$model->isNewRecord ? '<i class="icon-plus"></i> 创建' : '<i class="icon-save"></i> 保存',
 		)); ?>
+		<?php $this->widget('bootstrap.widgets.TbButton', array(
+			'buttonType'=>'submit',
+			'htmlOptions'=>array('name'=>'_addanother'),
+			'label'=>$model->isNewRecord ? '创建并增加另一个' : '保存并增加另一个',
+		)); ?>
+		<?php $this->widget('bootstrap.widgets.TbButton', array(
+			'buttonType'=>'submit',
+			'htmlOptions'=>array('name'=>'_continue'),
+			'label'=>$model->isNewRecord ? '创建并继续更新' : '保存并继续更新',
+		)); ?>
+		<?php
+		$this->widget('bootstrap.widgets.TbButton', array(
+			'buttonType'=>'submitLink',
+			'type'=>'danger',
+			'encodeLabel'=>false,
+			'htmlOptions'=>array('class'=>'pull-right', 'csrf'=>true,'submit'=>array('delete','id'=>$model->id),'confirm'=>'确定要删除这条数据吗?'),
+			'label'=>'<i class="icon-trash"></i> 删除',
+			'visible' => !$model->isNewRecord,
+		));
+		?>
 	</div>
 
 <?php $this->endWidget(); ?>

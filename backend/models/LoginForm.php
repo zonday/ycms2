@@ -1,7 +1,15 @@
 <?php
 /**
- * LoginForm  File
+ * LoginForm class file
+ *
  * @author Yang <css3@qq.com>
+ */
+
+/**
+ * LoginForm 登录表单模型
+ *
+ * @author Yang <css3@qq.com>
+ * @package backend.models
  */
 class LoginForm extends CFormModel
 {
@@ -63,6 +71,11 @@ class LoginForm extends CFormModel
 		);
 	}
 
+	/**
+	 * 验证密码
+	 * @param string $attribute
+	 * @param array $params
+	 */
 	public function authenticate($attribute, $params)
 	{
 		if (!$this->hasErrors()) {
@@ -81,6 +94,10 @@ class LoginForm extends CFormModel
 		}
 	}
 
+	/**
+	 * 登录
+	 * @return boolean
+	 */
 	public function login()
 	{
 		if ($this->_identity === null) {
@@ -88,7 +105,7 @@ class LoginForm extends CFormModel
 			$this->_identity->authenticate();
 		}
 
-		if ($this->_identity->errorCode === BackendUserIdentity::ERROR_NONE) {
+		if ($this->_identity->errorCode === UserIdentity::ERROR_NONE) {
 			$duration = $this->rememberMe ? 3600*24*30 : 0; //30天
 			Yii::app()->getUser()->login($this->_identity, $duration);
 			return true;

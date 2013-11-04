@@ -1,7 +1,15 @@
 <?php
 /**
- * LostPasswordForm File
+ * LostPasswordForm class file
+ *
  * @author Yang <css3@qq.com>
+ */
+
+/**
+ * LostPasswordForm 忘记密码表单模型
+ *
+ * @author Yang <css3@qq.com>
+ * @package backend.models
  */
 class LostPasswordForm extends CFormModel
 {

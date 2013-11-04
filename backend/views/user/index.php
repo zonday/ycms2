@@ -7,9 +7,9 @@ $this->breadcrumbs = array(
 );
 ?>
 <div class="page-header">
-	<h1>用户</h1>
-	<div class="actions">
-		<?php echo CHtml::link('<i class="icon-plus icon-white"></i> 创建用户', array('user/create'), array('class'=>'btn btn-primary')); ?>
+	<h1><i class="icon-user"></i> 用户</h1>
+	<div class="pull-right">
+		<?php echo CHtml::link('<i class="icon-plus icon-white"></i> 创建用户', array('create'), array('class'=>'btn btn-primary')); ?>
 	</div>
 </div>
 
@@ -85,7 +85,7 @@ foreach ($allRoleList as $name => $description) {
 		),
 		array(
 			'class'=>'bootstrap.widgets.TbButtonColumn',
-			'template'=>'{view} {update}',
+			'template'=>'{view} {update} {delete}',
 			'buttons' => array(
 				'delete' => array(
 					'visible' => '$data->id != User::SUPERADMIN_ID',

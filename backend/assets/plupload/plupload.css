@@ -1,0 +1,121 @@
+.drag-drop .drag-drop-area {
+	border: 4px dashed #DDDDDD;
+	height: 200px;
+}
+
+.drag-over .drag-drop-area {
+	border-color: #83B4D8;
+}
+
+.drag-drop .drag-drop-inside {
+	margin: 60px auto 0;
+	width: 250px;
+	text-align: center;
+}
+
+.drag-drop-inside p {
+	color: #aaa;
+}
+
+.drag-drop-inside p.drag-drop-info {
+	font-size: 20px;
+}
+
+.media-item {
+	margin-bottom: 10px;
+	word-wrap: break-word;
+	position: relative;
+}
+
+.media-item-actions {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+
+.media-item span {
+	margin-right: 5px;
+}
+
+.media-item-error {
+	color: #B94A48;
+}
+
+.media-container .progress {
+	margin-bottom: 10px;
+	position: relative;
+}
+
+.media-container .ui-draggable {
+	z-index: 100;
+}
+
+.media-container .ui-draggable-dragging {
+	z-index: 101;
+}
+
+.media-container .progress .percent {
+	position: absolute;
+	left: 5px;
+	font-weight: bold;
+}
+
+.media-container .alert {
+	margin-bottom: 10px;
+}
+
+.media-file-single .media-item,
+.media-file-multi .media-item {
+	border: 1px dashed #ccc;
+	background-color: #f8f8f8;
+	padding: 5px;
+}
+
+.media-file-container .progress {
+	margin-bottom: 0;
+	width: 40%;
+	float: right;
+}
+
+.media-image-multi img {
+	min-width: 150px;
+	min-height: 150px;
+}
+
+.media-image-multi .media-item {
+	float: left;
+	margin-right: 10px;
+	width: 160px;
+	height: 160px;
+}
+
+.media-image-multi .media-item-uploading {
+	width: 158px;
+	height: 158px;
+	text-align: center;
+	border: 1px dashed #ccc;
+	background-color: #f8f8f;
+}
+
+.media-image-multi .progress {
+	float: none;
+	width: 90%;
+	margin: 60px auto 10px;
+}
+
+.media-image-multi .media-item-error {
+	width: 107px;
+	height: 142px;
+}
+
+.drag-drop .media-trash-highlight {
+	border-color: red;
+}
+
+.drag-drop .media-trash-highlight .drag-drop-info {
+	color: red;
+}
+
+.media-item-actions a {
+	margin-right: 4px;
+}

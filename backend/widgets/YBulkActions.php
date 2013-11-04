@@ -57,7 +57,7 @@ $(document).on('click', '.checkbox-column input[type=checkbox]', function(e) {
 	}
 	$('button[name=doaction]').attr('disabled', disabled);
 });
-$('button[name=doaction]').click(function() {
+$(document).on('click', 'button[name=doaction]', function(e) {
 	if ($('#bulk-select').val() == 'delete') {
 		return window.confirm('确定要删除这些数据吗?');
 	}

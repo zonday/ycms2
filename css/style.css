@@ -28,11 +28,28 @@ body {
 	top: 40px;
 	bottom: 0;
 	padding-top: 40px;
+	transition: display 0.3s ease 0s;
+}
+
+.btn-layout-full {
+	position: fixed;
+	right: 18px;
+	top: 45px;
+	z-index: 101;
 }
 
 .main-content {
 	margin-left: 190px;
 	min-height: 100%;
+	transition: margin-left 0.3s ease 0s;
+}
+
+.layout-full .sidebar {
+	display: none;
+}
+
+.layout-full .main-content {
+	margin-left: 0;
 }
 
 .page-content {
@@ -72,8 +89,8 @@ body {
 	margin: 0;
 }
 
-.page-header .actions {
-	float: right;
+.page-header .pull-right {
+	margin-left: 9px;
 }
 
 .breadcrumbs  {
@@ -92,6 +109,10 @@ body {
 .grid-view {
 	padding-top: 0;
 	margin: 18px 0;
+}
+
+.grid-view td {
+	word-wrap: break-word;
 }
 
 .grid-view .actions {
@@ -137,8 +158,59 @@ body {
 	margin-left: 8px;
 }
 
+.grid-view .file-icon-column {
+	width: 60px;
+	text-align: center;
+}
+
+.grid-view .username-column,
+.grid-view .datetime-column {
+	width: 10em;
+}
+
+.grid-view .input-column > [name^=weight] {
+	width: 2em;
+}
+
+.grid-view .toggle-column {
+	width: 5em;
+}
+
+.grid-view .toggle-column i {
+	font-size: 1.5em;
+}
+
 .detail-view {
 	border: 1px solid #ddd;
+}
+
+.form-actions.fixed {
+	position: fixed;
+	z-index: 100;
+	bottom: 0;
+	margin-bottom: 0;
+}
+
+form .media-info .label {
+	margin-right: 10px;
+}
+
+.media-info .media-icon {
+	float: left;
+	margin-bottom: 10px;
+}
+
+.media-info .caption ul {
+	clear:left;
+	margin-left: 0;
+}
+
+.media-info .caption li {
+	margin-bottom: 5px;
+}
+
+.media-info .caption input.clone {
+	cursor: text;
 }
 
 body.none {

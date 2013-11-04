@@ -48,7 +48,14 @@ class UserController extends Controller
 
 			if ($model->save()) {
 				Yii::app()->getUser()->setFlash('success', '用户创建成功');
-				$this->redirect(array('view', 'id' => $model->id));
+				if (isset($_POST['_addanother'])) {
+					$url = array('create');
+				} elseif (isset($_POST['_continue'])) {
+					$url = array('update', $model->id);
+				} else {
+					$url = array('view', 'id'=>$model->id);
+				}
+				$this->redirect($url);
 			}
 		}
 
@@ -69,7 +76,14 @@ class UserController extends Controller
 
 			if ($model->save()) {
 				Yii::app()->getUser()->setFlash('success', '用户更新成功');
-				$this->redirect(array('view', 'id' => $model->id));
+				if (isset($_POST['_addanother'])) {
+					$url = array('create');
+				} elseif (isset($_POST['_continue'])) {
+					$url = array('update', $model->id);
+				} else {
+					$url = array('view', 'id'=>$model->id);
+				}
+				$this->redirect($url);
 			}
 		}
 
@@ -106,6 +120,28 @@ class UserController extends Controller
 		} else {
 			throw new CHttpException(403, '无效的请求，请重试');
 		}
+	}
+
+	/**
+	 * 个人资料
+	 */
+	public function actionProfile()
+	{
+		$model = $this->loadModel(Yii::app()->getUser()->id);
+		unset($model->password);
+
+		if(isset($_POST['User']))
+		{
+			$model->attributes=$_POST['User'];
+			if($model->save(array('username', 'nickname', 'password', 'password_repeat', 'email')))
+			{
+				Yii::app()->getUser()->nickname= $model->nickname;
+				Yii::app()->getUser()->setFlash('success', '个人资料已更新');
+				$this->redirect(array('profile'));
+			}
+		}
+
+		$this->render('profile', array('model'=>$model));
 	}
 
 	/**

@@ -20,7 +20,8 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 		<?php $this->widget('bootstrap.widgets.TbButton', array(
 			'buttonType'=>'submit',
 			'type'=>'primary',
-			'label'=>$model->isNewRecord ? '创建' : '保存',
+			'encodeLabel'=>false,
+			'label'=>$model->isNewRecord ? '<i class="icon-plus"></i> 创建' : '<i class="icon-save"></i> 保存',
 		)); ?>
 	</div>
 

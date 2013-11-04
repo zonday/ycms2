@@ -1,6 +1,6 @@
 <?php
 /**
- * User Class File
+ * User class file
  *
  * @author yang <css3@qq.com>
  */
@@ -228,7 +228,7 @@ class User extends CActiveRecord
 	 * @param string $password
 	 * @return boolean
 	 */
-	public static function validatePassword($password)
+	public function validatePassword($password)
 	{
 		return CPasswordHelper::verifyPassword($password, $this->password); //iis php5.2不支持
 	}

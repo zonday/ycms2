@@ -1,6 +1,7 @@
 <?php
 /**
- * SiteController File
+ * SiteController class File
+ *
  * @author Yang <css3@qq.com>
  */
 
@@ -149,7 +150,7 @@ class SiteController extends Controller
 	}
 
 	/**
-	 * 退出action
+	 * 退出
 	 */
 	public function actionLogout()
 	{
@@ -157,6 +158,9 @@ class SiteController extends Controller
 		$this->redirect(Yii::app()->homeUrl);
 	}
 
+	/**
+	 * 错误
+	 */
 	public function actionError()
 	{
 		$this->layout = 'none';
@@ -167,5 +171,38 @@ class SiteController extends Controller
 			else
 				$this->render('error', $error);
 		}
+	}
+
+	/**
+	 * 设置
+	 * @param string $category
+	 * @throws CHttpException
+	 */
+	public function actionSetting($category='general')
+	{
+		$categories = Setting::getCategories();
+		if (!isset($categories[$category]))
+			throw new CHttpException(404, '页面没有找到');
+
+		$model = new Setting();
+		$model->bindCategory($category);
+		if (isset($_POST['Setting'])) {
+			$model->attributes = $_POST['Setting'];
+			if ($model->save()) {
+				Yii::app()->getUser()->setFlash('success', '设置已更新');
+				$this->redirect(array('index'));
+			}
+		}
+		$this->render('setting', array('model'=>$model, 'category'=>$category, 'categories'=>$categories));
+	}
+
+	/**
+	 * 清空缓存
+	 */
+	public function actionFlushCache()
+	{
+		Yii::app()->getCache()->flush();
+		Yii::app()->getUser()->setFlash('success', '站点缓存已清空');
+		$this->redirect(array('setting'));
 	}
 }

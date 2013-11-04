@@ -5,6 +5,7 @@
 *.swp
 *~
 /assets
+/uploads
 /common/runtime/
 *.sublime-project
 *.sublime-workspace

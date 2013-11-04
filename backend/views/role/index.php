@@ -11,7 +11,7 @@ $this->breadcrumbs=array(
 ?>
 
 <div class="page-header">
-	<h1>角色</h1>
+	<h1><i class="icon-group"></i> 角色</h1>
 	<div class="actions">
 		<?php echo CHtml::link('<i class="icon-plus icon-white"></i> 创建角色', array('create'), array('class'=>'btn btn-primary')); ?>
 	</div>
@@ -46,7 +46,7 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 <?php $this->widget('bootstrap.widgets.TbButton', array(
 	'buttonType'=>'submit',
 	'htmlOptions'=>array('name'=>'saveWeight'),
-	'type'=>'primary',
+	'type'=>'secondary',
 	'label'=>'保存权重',
 ));
 ?>

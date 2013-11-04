@@ -24,6 +24,13 @@ $default = array(
 	),
 
 	'components' => array(
+		'crystal' => array(
+			'class' => 'YCrystalComponent',
+		),
+		'image' => array(
+			'class' => 'application.extensions.image.CImageComponent',
+			'driver' => 'GD',
+		),
 		'bootstrap' => array(
 			'class' => 'common.extensions.bootstrap.components.Bootstrap',
 			'responsiveCss' => true,

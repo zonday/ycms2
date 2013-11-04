@@ -185,7 +185,7 @@ class PermissionController extends Controller
 				'data' => $authItem->getData(),
 			);
 		}
-
+		$model->setType($authItem->getType());
 		$this->render('update', array('type' => $authItem->getType(), 'model' => $model));
 	}
 

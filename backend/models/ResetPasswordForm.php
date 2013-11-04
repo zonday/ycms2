@@ -1,7 +1,15 @@
 <?php
 /**
- * ResetPasswordForm File
+ * ResetPasswordForm class file
+ *
  * @author Yang <css3@qq.com>
+ */
+
+/**
+ * ResetPasswordForm 重置密码表单模型
+ *
+ * @author Yang <css3@qq.com>
+ * @package backend.models
  */
 class ResetPasswordForm extends CFormModel
 {
