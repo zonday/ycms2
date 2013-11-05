@@ -43,7 +43,7 @@ class TermController extends Controller
 				if (isset($_POST['_addanother'])) {
 					$url = array('create', 'taxonomy_id'=>$taxonomy_id);
 				} elseif (isset($_POST['_continue'])) {
-					$url = array('update', $model->id);
+					$url = array('update', 'id'=>$model->id);
 				} else {
 					$url = array('view', 'id'=>$model->id);
 				}
@@ -70,7 +70,7 @@ class TermController extends Controller
 				if (isset($_POST['_addanother'])) {
 					$url = array('create', 'taxonomy_id'=>$taxonomy_id);
 				} elseif (isset($_POST['_continue'])) {
-					$url = array('update', $model->id);
+					$url = array('update', 'id'=>$model->id);
 				} else {
 					$url = array('view', 'id'=>$model->id);
 				}

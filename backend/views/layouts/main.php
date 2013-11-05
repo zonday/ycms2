@@ -41,17 +41,7 @@
 					'bootstrap.widgets.TbMenu',
 					array(
 						'type' => 'list',
-						'items' => array(
-							array('label' => '首页', 'url' => array('/site/index'), 'icon' => 'fixed-width home'),
-							array('label' => '系统', 'itemOptions' => array('class' => 'nav-header')),
-							array('label' => '链接', 'url' => array('/link/index'), 'icon' => 'fixed-width link'),
-							array('label' => 'Banner', 'url' => array('/banner/index'), 'icon' => 'fixed-width picture'),
-							array('label' => '文件', 'url' => array('/file/index'), 'icon' => 'fixed-width file'),
-							array('label' => '用户', 'url' => array('/user/index'), 'icon' => 'fixed-width user'),
-							array('label' => '角色', 'url' => array('/role/index'), 'icon' => 'fixed-width group'),
-							array('label' => '权限', 'url' => array('/permission/index'), 'icon' => 'fixed-width lock'),
-							array('label' => '设置', 'url' => array('/site/setting'), 'icon' => 'fixed-width cog'),
-						)
+						'items' => $this->generateNavItems(),
 					)
 				);
 				?>

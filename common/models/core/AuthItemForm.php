@@ -6,8 +6,9 @@
  */
 
 /**
- * AuthItemForm Model
+ * AuthItemForm Model 权限表单模型
  *
+ * @see CAuthItem
  * @author Yang <css3@qq.com>
  * @package backend.models.core
  */

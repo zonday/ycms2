@@ -12,9 +12,9 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 
 	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>128)); ?>
 
-	<?php echo $form->textFieldRow($model,'slug',array('class'=>'span5','maxlength'=>128, 'hint'=>'“别名”是在 URL 中使用的别称，它可以令 URL 更美观。通常使用小写，只能包含字母，数字和连字符（-）。')); ?>
+	<?php echo $form->textFieldRow($model,'slug',array('class'=>'span5','maxlength'=>128, 'hint'=>'唯一标识符，只能包含字母，数字和连字符（-）')); ?>
 
-	<?php echo $form->dropDownListRow($model, 'hierarchy', $model->getHierarchyList(), array('class'=>'span2')); ?>
+	<?php echo $form->dropDownListRow($model, 'hierarchy', $model->getHierarchyList(), array('class'=>'span2', 'hint'=>'分类下的术语是否有继承关系')); ?>
 
 	<?php echo $form->textAreaRow($model,'description',array('rows'=>6, 'cols'=>50, 'class'=>'span8')); ?>
 

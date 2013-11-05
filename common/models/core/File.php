@@ -12,7 +12,7 @@
  * @property string $name
  * @property string $alt
  * @property string $description
- * @property int $status
+ * @property integer $status
  * @property string $create_time
  * @property string $update_time
  *

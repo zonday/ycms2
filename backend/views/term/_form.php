@@ -10,7 +10,7 @@
 
 	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>128)); ?>
 
-	<?php echo $form->textFieldRow($model,'slug',array('class'=>'span5','maxlength'=>128,'hint'=>'“别名”是在 URL 中使用的别称，它可以令 URL 更美观。通常使用小写，只能包含字母，数字和连字符（-）。')); ?>
+	<?php echo $form->textFieldRow($model,'slug',array('class'=>'span5','maxlength'=>128,'hint'=>'唯一标识符，只能包含字母，数字和连字符（-）')); ?>
 
 	<?php
 	if ($model->taxonomy->hierarchy != Taxonomy::HIERARCHY_DISABLED)

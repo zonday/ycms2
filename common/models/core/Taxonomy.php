@@ -84,7 +84,7 @@ class Taxonomy extends CActiveRecord
 			'name' => '名称',
 			'slug' => '别名',
 			'description' => '描述',
-			'hierarchy' => '术语层叠性',
+			'hierarchy' => '术语继承',
 			'weight' => '权重',
 		);
 	}

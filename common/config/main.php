@@ -2,6 +2,29 @@
 Yii::setPathOfAlias('root', __DIR__ . '/../..');
 Yii::setPathOfAlias('common', __DIR__ . '/../../common');
 
+$defaultSettings = array(
+		'general' => array(
+			'site_name' => array(
+				'label' => '站点名称',
+				'required' => true,
+			),
+			'site_keywords' => array(
+				'label' => '站点关键字',
+			),
+			'site_description' => array(
+				'label' => '站点描述',
+				'type' => 'textarea',
+			)
+		),
+		'system' => array(
+			'admin_email' => array(
+				'label' => '管理员Email',
+				'type' => 'email',
+				'required' => true,
+			),
+		)
+);
+
 $default = array(
 	'runtimePath' => __DIR__. '/../runtime',
 	'language' => 'zh_cn',
@@ -58,7 +81,11 @@ $default = array(
 				)
 			),
 		),
-	)
+	),
+
+	'params'=>array(
+		'settings' => CMap::mergeArray($defaultSettings, file_exists(__DIR__ . '/settings.php') ? require(__DIR__ . '/settings.php') : array())
+	),
 );
 
 return CMap::mergeArray(

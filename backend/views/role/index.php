@@ -12,7 +12,7 @@ $this->breadcrumbs=array(
 
 <div class="page-header">
 	<h1><i class="icon-group"></i> 角色</h1>
-	<div class="actions">
+	<div class="pull-right">
 		<?php echo CHtml::link('<i class="icon-plus icon-white"></i> 创建角色', array('create'), array('class'=>'btn btn-primary')); ?>
 	</div>
 </div>

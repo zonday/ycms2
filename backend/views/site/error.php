@@ -13,6 +13,6 @@ $this->pageTitle='Error';
 	</div>
 	<div class="error-actions">
 		<?php echo CHtml::link('<i class="icon-chevron-left icon-white"></i> 回到首页', array('site/index'), array('class'=>'btn btn-large btn-primary'))?>
-		<?php echo CHtml::link('<i class="icon-envelope"></i> 联系管理员', '#', array('class'=>'btn btn-large'))?>
+		<?php echo CHtml::link('<i class="icon-envelope"></i> 联系管理员', 'mailto:' . Setting::get('system', 'admin_email'), array('class'=>'btn btn-large'))?>
 	</div>
 </div>

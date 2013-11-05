@@ -51,7 +51,7 @@ class UserController extends Controller
 				if (isset($_POST['_addanother'])) {
 					$url = array('create');
 				} elseif (isset($_POST['_continue'])) {
-					$url = array('update', $model->id);
+					$url = array('update', 'id'=>$model->id);
 				} else {
 					$url = array('view', 'id'=>$model->id);
 				}
@@ -79,7 +79,7 @@ class UserController extends Controller
 				if (isset($_POST['_addanother'])) {
 					$url = array('create');
 				} elseif (isset($_POST['_continue'])) {
-					$url = array('update', $model->id);
+					$url = array('update', 'id'=>$model->id);
 				} else {
 					$url = array('view', 'id'=>$model->id);
 				}

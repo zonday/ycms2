@@ -62,6 +62,13 @@ body {
 	margin: 9px 0;
 }
 
+.page-content h3 {
+	font-size: 16px;
+	font-weight: normal;
+	line-height: 18px;
+	margin: 9px 0;
+}
+
 .page-content h1 small {
 	font-size: 14px;
 	font-weight: normal;
@@ -180,6 +187,14 @@ body {
 	font-size: 1.5em;
 }
 
+.grid-view .id-column {
+	width: 5em;
+}
+
+.grid-view .status-column {
+	width: 8em;
+}
+
 .detail-view {
 	border: 1px solid #ddd;
 }
@@ -191,8 +206,20 @@ body {
 	margin-bottom: 0;
 }
 
+form .alert {
+	margin-top: 10px;
+}
+
 form .media-info .label {
 	margin-right: 10px;
+}
+
+form .cke {
+	margin-bottom: 10px;
+}
+
+.filter-form .control-group {
+	margin-bottom: 5px;
 }
 
 .media-info .media-icon {
@@ -211,6 +238,10 @@ form .media-info .label {
 
 .media-info .caption input.clone {
 	cursor: text;
+}
+
+#form-side.affix {
+	top: 60px;
 }
 
 body.none {

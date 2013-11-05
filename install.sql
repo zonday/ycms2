@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- 主机: localhost
--- 生成日期: 2013 年 11 月 04 日 10:14
+-- 生成日期: 2013 年 11 月 05 日 08:47
 -- 服务器版本: 5.5.20
 -- PHP 版本: 5.3.10
 
@@ -13,6 +13,30 @@ SET time_zone = "+00:00";
 --
 -- 数据库: `ycms2`
 --
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `y_article`
+--
+
+CREATE TABLE IF NOT EXISTS `y_article` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `channel_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `excerpt` varchar(255) NOT NULL DEFAULT '',
+  `status` tinyint(4) NOT NULL DEFAULT '0',
+  `sticky` int(11) NOT NULL DEFAULT '0',
+  `promote` int(11) NOT NULL DEFAULT '0',
+  `create_time` int(11) NOT NULL DEFAULT '0',
+  `update_time` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `list` (`status`,`sticky`,`create_time`),
+  KEY `frontpage` (`status`,`promote`,`sticky`,`create_time`),
+  KEY `channel_id` (`channel_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -83,6 +107,30 @@ CREATE TABLE IF NOT EXISTS `y_banner` (
 -- --------------------------------------------------------
 
 --
+-- 表的结构 `y_channel`
+--
+
+CREATE TABLE IF NOT EXISTS `y_channel` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `model` varchar(64) NOT NULL,
+  `parent_id` int(10) unsigned NOT NULL,
+  `content` longtext NOT NULL,
+  `keywords` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `type` tinyint(4) NOT NULL DEFAULT '0',
+  `create_time` int(11) NOT NULL DEFAULT '0',
+  `update_time` int(11) NOT NULL DEFAULT '0',
+  `weight` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `list` (`weight`,`title`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
+
+-- --------------------------------------------------------
+
+--
 -- 表的结构 `y_file`
 --
 
@@ -102,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `y_file` (
   KEY `user_id` (`user_id`),
   KEY `status` (`status`),
   KEY `bundle` (`bundle`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=54 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=55 ;
 
 -- --------------------------------------------------------
 
@@ -144,6 +192,29 @@ CREATE TABLE IF NOT EXISTS `y_link` (
   KEY `list` (`weight`,`name`),
   KEY `update_time` (`update_time`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `y_node`
+--
+
+CREATE TABLE IF NOT EXISTS `y_node` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `channel_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `title` varchar(255) NOT NULL,
+  `excerpt` varchar(255) NOT NULL DEFAULT '',
+  `status` tinyint(4) NOT NULL DEFAULT '0',
+  `sticky` int(11) NOT NULL DEFAULT '0',
+  `promote` int(11) NOT NULL DEFAULT '0',
+  `create_time` int(11) NOT NULL DEFAULT '0',
+  `update_time` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `list` (`status`,`sticky`,`create_time`),
+  KEY `frontpage` (`status`,`promote`,`sticky`,`create_time`),
+  KEY `channel_id` (`channel_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -277,3 +348,4 @@ ALTER TABLE `y_authassignment`
 ALTER TABLE `y_authitemchild`
   ADD CONSTRAINT `y_authitemchild_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `y_authitem` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `y_authitemchild_ibfk_2` FOREIGN KEY (`child`) REFERENCES `y_authitem` (`name`) ON DELETE CASCADE ON UPDATE CASCADE;
+

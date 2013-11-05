@@ -27,22 +27,38 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 
 	private $_oldFileIds = array();
 
+	/**
+	 * 获取图片文件 根据模型中的image属性
+	 * @return File|null
+	 */
 	public function getImageFile()
 	{
 		if ($fileId = current($this->getFileIdsByField('image')))
 			return File::findFromCache($fileId);
 	}
 
+	/**
+	 * 获取图片文件列表 根据模型中的image属性
+	 * @return array
+	 */
 	public function getImageFiles()
 	{
 		return $this->getFilesByField('image');
 	}
 
+	/**
+	 * 获取附件列表 根据模型中的attachment属性
+	 * @return array
+	 */
 	public function getAttachmentFiles()
 	{
 		return $this->getFilesByField('attachment');
 	}
 
+	/**
+	 * 获取附件文件 根据模型中的attachment属性
+	 * @return File|null
+	 */
 	public function getAttachmentFile()
 	{
 		if ($fileId = current($this->getFileIdsByField('attachment')))
@@ -266,6 +282,11 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 		return $this->_files[$field];
 	}
 
+	/**
+	 * 解析ids
+	 * @param mixed $field
+	 * @return array
+	 */
 	public function parseIds($ids)
 	{
 		if ($ids && !is_array($ids)) {

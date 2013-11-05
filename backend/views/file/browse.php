@@ -4,8 +4,8 @@
 $this->pageTitle = '文件浏览';
 ?>
 
-<h1>文件浏览</h1>
-<div class="file-browse">
+<div class="container file-browse">
+<h2>文件浏览</h2>
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
 	'id'=>'file-grid',
 	'dataProvider'=>$model->search(),
@@ -17,10 +17,11 @@ $this->pageTitle = '文件浏览';
 			'value'=>'$data->getIcon()',
 			'filter'=>false,
 			'type'=>'raw',
-			'htmlOptions'=>array('class'=>'column-icon'),
+			'htmlOptions'=>array('class'=>'file-icon-column'),
 		),
 		array(
-			'name'=>'name',
+			'name'=>'filename',
+			'header'=>$model->getAttributeLabel('name'),
 			'type'=>'raw',
 			'value'=>'"<span>" . CHtml::encode($data->name) . "</span><br /><strong>" . strtoupper($data->getExt()). "</strong>"',
 		),
@@ -33,14 +34,14 @@ $this->pageTitle = '文件浏览';
 		array(
 			'name'=>'size',
 			'type'=>'size',
-			'headerHtmlOptions'=>array('class'=>'column-size'),
+			'headerHtmlOptions'=>array('class'=>'size-column'),
 			'filter'=>false,
 		),
 		array(
 			'name'=>'create_time',
+			'class'=>'YDatetimeColumn',
 			'type'=>'date',
 			'filter'=>YUtil::timeFilterList(),
-			'headerHtmlOptions'=>array('class'=>'column-datetime'),
 		),
 		array(
 			'type'=>'raw',

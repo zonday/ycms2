@@ -10,7 +10,7 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 
 	<?php //echo $form->errorSummary($model); ?>
 
-	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>64, 'hint'=>'唯一标识符，只能包含小写英文字母。')); ?>
+	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>64, 'hint'=>'唯一标识符，只能包含小写英文字母')); ?>
 
 	<?php echo $form->textFieldRow($model,'description',array('class'=>'span5','maxlength'=>128 )); ?>
 

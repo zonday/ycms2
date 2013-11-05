@@ -7,7 +7,5 @@ $this->breadcrumbs = array(
 );
 ?>
 <div class="page-header">
-	<h1>
-		<?php echo $this->pageTitle ?>
-	</h1>
+	<h1><i class="icon-dashboard"></i> 控制面板</h1>
 </div>

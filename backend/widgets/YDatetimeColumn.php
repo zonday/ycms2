@@ -47,7 +47,7 @@ class YDatetimeColumn extends CDataColumn
 
 		$formatValue = !$value ? $this->nullDisplay : $this->grid->getFormatter()->format($value, $this->type);
 		if ($value) {
-			echo '<abbr title="' . date('Y-m-d H:i:s', $value) . '">' . $formatValue .' </abbr>';
+			echo '<abbr title="' . (is_numeric($value) ? date('Y-m-d H:i:s', $value) : $value) . '">' . $formatValue .' </abbr>';
 		} else {
 			echo $formatValue;
 		}

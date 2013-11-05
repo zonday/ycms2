@@ -1,4 +1,16 @@
 <?php
+/**
+ * YUtil class file
+ *
+ * @author Yang <css3@qq.com>
+ */
+
+/**
+ * YUtil 帮助类
+ *
+ * @author Yang <css3@qq.com>
+ * @package common.helpers
+ */
 class YUtil
 {
 	/**
@@ -82,7 +94,14 @@ class YUtil
 		return '星期' . $str;
 	}
 
-	public static function mkdir($dst,array $options,$recursive)
+	/**
+	 * 生成文件夹
+	 * @param string $dst 目标
+	 * @param array $options 选项
+	 * @param boolean $recursive 是否递归
+	 * @return boolean
+	 */
+	public static function mkdir($dst, array $options, $recursive)
 	{
 		$prevDir=dirname($dst);
 		if($recursive && !is_dir($dst) && !is_dir($prevDir))
