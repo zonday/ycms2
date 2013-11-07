@@ -129,8 +129,8 @@ class Term extends CActiveRecord
 			return;
 		}
 
-		foreach ($this->getParentsAll() as $parent) {
-			if (in_array($parent->id, $parentIds)) {
+		foreach ($this->getChildrenAll() as $child) {
+			if (in_array($child->id, $parentIds)) {
 				$this->addError('parentIds', '父级关系不正确');
 				break;
 			}

@@ -22,17 +22,20 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 ?>
 <?php
 $this->widget('bootstrap.widgets.TbGridView', array(
-	'id'=>'post-grid',
+	'id'=>'channel-grid',
 	'dataProvider'=>new CArrayDataProvider($model->getTree(), array(
 		'pagination'=>array(
 			'pageSize'=>50,
 		),
 	)),
+	'rowHtmlOptionsExpression' => 'array("class"=>"level-" .$data->depth)',
 	'columns'=>array(
 		array(
 			'name'=>'title',
+			//'type'=>'raw',
 			'header'=>$model->getAttributeLabel('title'),
-			'value'=>'str_repeat(" — ", $data->depth) . $data->title',
+			'htmlOptions'=>array('class'=>'title-column'),
+			'value'=>'$data->title',
 		),
 		array(
 			'name'=>'name',

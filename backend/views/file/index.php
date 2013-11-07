@@ -24,6 +24,10 @@ $this->menu=array(
 </div>
 
 <?php
+if (isset($model->user_id)) {
+	echo '<p>上传者：' . ($model->user ? CHtml::encode($model->user->nickname) : '匿名用户') . CHtml::link('<i class="icon-remove-sign"></i>', array('index')). '</p>';
+	$model->user_id = $model->user ? $model->user->username : '匿名用户';
+}
 $form = $this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	'type'=>'horizontal',
 ));
@@ -67,7 +71,8 @@ $this->widget('bootstrap.widgets.TbExtendedGridView',array(
 		),
 		array(
 			'name'=>'user_id',
-			'value'=>'$data->user ? $data->user->nickname : "匿名用户"',
+			'value'=>'CHtml::link($data->user ? CHtml::encode($data->user->nickname) : "匿名用户", array("index", "File[user_id]" =>$data->user_id ))',
+			'type'=>'raw',
 			'headerHtmlOptions'=>array('class'=>'username-column'),
 			'htmlOptions'=>array('class'=>'username-column'),
 		),

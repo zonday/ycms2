@@ -190,7 +190,7 @@ class SiteController extends Controller
 			$model->attributes = $_POST['Setting'];
 			if ($model->save()) {
 				Yii::app()->getUser()->setFlash('success', '设置已更新');
-				$this->redirect(array('index'));
+				$this->redirect(array('setting'));
 			}
 		}
 		$this->render('setting', array('model'=>$model, 'category'=>$category, 'categories'=>$categories));

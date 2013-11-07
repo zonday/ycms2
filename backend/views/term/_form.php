@@ -19,7 +19,9 @@
 		if ($model->taxonomy->hierarchy == Taxonomy::HIERARCHY_MULTIPLE)
 			$htmlOptions['multiple'] = true;
 		$list = array('0'=>'根') + $model->generateTreeList();
-		echo $form->dropDownListRow($model, 'parentIds', $list, $htmlOptions);
+		$htmlOptions['data'] = $list;
+		echo $form->select2Row($model, 'parentIds', $htmlOptions);
+		//echo $form->dropDownListRow($model, 'parentIds', $list, $htmlOptions);
 	} else
 		echo $form->hiddenField($model, 'parentIds', array('value'=>0));
 	?>

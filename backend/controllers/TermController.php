@@ -94,7 +94,7 @@ class TermController extends Controller
 
 			if(!isset($_GET['ajax'])) {
 				$result && Yii::app()->getUser()->setFlash('success', '术语删除成功');
-				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('taxonomy/view', 'id' => $model->taxoonomy_id));
+				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('taxonomy/view', 'id' => $model->taxonomy_id));
 			}
 		} else {
 			throw new CHttpException(403, '无效的请求，请重试');

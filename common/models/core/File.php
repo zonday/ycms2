@@ -157,12 +157,11 @@ class File extends CActiveRecord
 		$criteria->compare('t.id',$this->id);
 		$criteria->compare('filename',$this->name,true);
 
-		if (is_numeric($this->user_id))
+		if (is_numeric($this->user_id)) {
 			$criteria->compare('user_id',$this->user_id);
-		else
-		{
+		} else {
 			$this->with('user');
-			$criteria->compare('user.nickname', $this->user_id, true);
+			$criteria->compare('user.username', $this->user_id, true);
 		}
 
 		if ($this->create_time)

@@ -4,7 +4,6 @@
 /* @var $form TbActiveForm */
 ?>
 
-<div class="form">
 <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'id'=>get_class($model) . '-form',
 )); ?>
@@ -86,11 +85,10 @@
 			'buttonType'=>'submitLink',
 			'type'=>'danger',
 			'encodeLabel'=>false,
-			'htmlOptions'=>array('class'=>'pull-right', 'csrf'=>true,'submit'=>array('delete','id'=>$model->id),'confirm'=>'确定要删除这条数据吗?'),
+			'htmlOptions'=>array('class'=>'pull-right', 'csrf'=>true,'submit'=>array('delete', 'channel'=>$channel->id, 'id'=>$model->id),'confirm'=>'确定要删除这条数据吗?'),
 			'label'=>'<i class="icon-trash"></i> 删除',
 			'visible' => !$model->isNewRecord,
 		));
 		?>
 	</div>
 <?php $this->endWidget(); ?>
-</div><!-- form -->

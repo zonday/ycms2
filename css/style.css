@@ -27,6 +27,7 @@ body {
 	width: 190px;
 	top: 40px;
 	bottom: 0;
+	left: 0;
 	padding-top: 40px;
 	transition: display 0.3s ease 0s;
 }
@@ -193,6 +194,38 @@ body {
 
 .grid-view .status-column {
 	width: 8em;
+}
+
+.grid-view tr.odd {
+	background-color: #fff;
+}
+
+.grid-view tr.even {
+	background-color: #f6f6f6;
+}
+
+.grid-view tr.level-1 .title-column {
+	text-indent: 1em;
+}
+
+.grid-view tr.level-2 .title-column {
+	text-indent: 2em;
+}
+
+.grid-view tr.level-3 .title-column {
+	text-indent: 3em;
+}
+
+.grid-view tr.level-4 .title-column {
+	text-indent: 4em;
+}
+
+.grid-view tr.level-5 .title-column {
+	text-indent: 5em;
+}
+
+.grid-view tr .icon-move {
+	cursor: move;
 }
 
 .detail-view {
