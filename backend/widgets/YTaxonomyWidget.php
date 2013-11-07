@@ -31,8 +31,8 @@ class YTaxonomyWidget extends CInputWidget
 		foreach ($model->prepareTaxonomies() as $taxonomy => $params) {
 			$htmlOptions = $this->htmlOptions;
 
-			if ($params['multiple'])
-				$htmlOptions['multiple']=true;
+			if ($params['many'] !== 1)
+				$htmlOptions['multiple'] = true;
 
 			if ($params['allowEmpty'])
 				$htmlOptions['empty']= '无';
@@ -42,38 +42,41 @@ class YTaxonomyWidget extends CInputWidget
 			else
 				$input = 'dropDownList';
 
-			if ($params['dynamic'])
+			if ($params['custom'])
 				$input = 'textField';
 
-			$attribute = "taxonomy[{$taxonomy}]";
+			$attribute = "termIds[{$taxonomy}]";
+
 			if ($params['cascade'] && $params['taxonomy']->hierarchy == Taxonomy::HIERARCHY_MULTIPLE) {
 				$list = CHtml::listData(Term::model()->getTree($params['taxonomy']->id, 0, 1), 'id', 'name');
-				$htmlOptions['multiple']=false;
+				$htmlOptions['many']=false;
 				CHtml::resolveNameID($model, $attribute, $htmlOptions);
 				$this->registerCascadeScript($htmlOptions['id'], $params['allowEmpty']);
-			} elseif ($params['channel']) {
-				$termSlug = $this->getOwner()->getChannel()->name;
-				$term = Term::model()->findFromCacheBySlug($termSlug, $params['taxonomy']->id);
-				if ($term)
-					$list = CHtml::listData(Term::model()->getTree($params['taxonomy']->id, $term->id), 'id', 'name');
-				else
-					$list = array();
 			} else {
 				$list = Term::model()->generateTreeList($params['taxonomy']->id);
 			}
-			if ($this->form->type == 'horizontal')
-			{
+
+			$errorClass = 'help-block' . ($model->hasErrors($attribute) ? ' error' : '');
+			if ($this->form->type == 'horizontal') {
 				echo '<div class="control-group">';
 				echo $form->labelEx($model, $attribute, array('label'=>$params['label'], 'class'=>'control-label'));
 				echo '<div class="controls">';
-				echo $form->$input($model, $attribute, $list, $htmlOptions);
-				echo $form->error($model, $attribute, array('class'=>'help-block'));
+				if ($params['custom']) {
+					echo $form->textField($model, $attribute, $htmlOptions);
+				} else {
+					echo $form->$input($model, $attribute, $list, $htmlOptions);
+				}
+
+				echo $form->error($model, $attribute, array('class'=>$errorClass));
 				echo '</div></div>';
-			} else
-			{
+			} else {
 				echo $form->labelEx($model, $attribute, array('label'=>$params['label']));
-				echo $form->$input($model, $attribute, $list, $htmlOptions);
-				echo $form->error($model, $attribute, array('class'=>'help-block'));
+				if ($params['custom']) {
+					echo $form->textField($model, $attribute, $htmlOptions);
+				} else {
+					echo $form->$input($model, $attribute, $list, $htmlOptions);
+				}
+				echo $form->error($model, $attribute, array('class'=>$errorClass));
 			}
 		}
 	}

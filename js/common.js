@@ -40,7 +40,7 @@
 			}
 		}, 100);
 
-
+		/*
 		setTimeout(function() {
 			var $formSide = $('#form-side');
 			if ($formSide.length == 0) {
@@ -55,6 +55,7 @@
 				}
 			});
 		}, 60);
+		*/
 
 		$('#btn-layout-full').toggle(function(){
 			$('body').addClass('layout-full');

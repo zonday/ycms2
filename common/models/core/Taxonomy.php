@@ -66,7 +66,7 @@ class Taxonomy extends CActiveRecord
 			array('name, slug', 'required'),
 			array('hierarchy, weight', 'numerical', 'integerOnly'=>true),
 			array('name, slug', 'length', 'max'=>255),
-			array('slug', 'match', 'pattern'=>'/^[a-z0-9\-]+$/', 'message'=>'{attribute} 只能包含小写英文和数字、-'),
+			array('slug', 'match', 'pattern'=>'/^[a-z][a-z0-9\-]+$/', 'message'=>'{attribute} 只能包含小写英文和数字、-'),
 			array('hierarchy', 'in', 'range'=>array_keys($this->getHierarchyList())),
 			array('slug', 'unique'),
 			array('description', 'filter', 'filter'=>array($obj=new CHtmlPurifier(),'purify')),
@@ -182,18 +182,24 @@ class Taxonomy extends CActiveRecord
 	 */
 	public static function findFromCache($idName)
 	{
-		if (is_numeric($idName))
-			$attribute = 'id';
-		else
-			$attribute = 'slug';
+		static $cache = array();
 
-		$cacheKey = "taxonomy_{$attribute}_{$idName}";
-		if (($model = Yii::app()->getCache()->get($cacheKey)) === false) {
-			$model = self::model()->findByAttributes(array($attribute => $idName));
-			Yii::app()->getCache()->set($cacheKey, $model);
+		if (!isset($cache[$idName])) {
+			if (is_numeric($idName))
+				$attribute = 'id';
+			else
+				$attribute = 'slug';
+
+			$cacheKey = "taxonomy_{$attribute}_{$idName}";
+			if (($model = Yii::app()->getCache()->get($cacheKey)) === false) {
+				$model = self::model()->findByAttributes(array($attribute => $idName));
+				Yii::app()->getCache()->set($cacheKey, $model);
+			}
+
+			$cache[$idName] = $model;
 		}
 
-		return $model;
+		return $cache[$idName];
 	}
 
 	/**

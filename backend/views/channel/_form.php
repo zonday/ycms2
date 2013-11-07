@@ -53,8 +53,8 @@
 			'buttonType'=>'submitLink',
 			'type'=>'danger',
 			'encodeLabel'=>false,
-			'htmlOptions'=>array('class'=>'pull-right', 'csrf'=>true,'submit'=>array('delete','id'=>$model->id),'confirm'=>'删除这个栏目将会导致该栏目下的所有内容将被删除！请谨慎操作！'),
-			'label'=>'<i class="icon-trash"></i> 删除',
+			'htmlOptions'=>array('class'=>'pull-right', 'csrf'=>true,'submit'=>array('delete','id'=>$model->id)),
+			'label'=>'<i class="icon-trash"></i> 移动至回收站',
 			'visible' => !$model->isNewRecord,
 		));
 		?>

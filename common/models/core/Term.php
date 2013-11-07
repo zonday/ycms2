@@ -62,7 +62,7 @@ class Term extends CActiveRecord
 			array('name', 'required'),
 			array('weight', 'numerical', 'integerOnly'=>true),
 			array('name, slug', 'length', 'max'=>255),
-			array('slug', 'match', 'pattern'=>'/^[a-z0-9\-]+$/', 'message'=>'{attribute} 只能包含小写英文和数字、-'),
+			array('slug', 'match', 'pattern'=>'/^[a-z][a-z0-9\-]+$/', 'message'=>'{attribute} 只能包含小写英文和数字、-'),
 			array('slug', 'unique', 'criteria'=>array('condition'=>'t.taxonomy_id=:taxonomy_id', 'params'=>array(':taxonomy_id'=>$this->taxonomy_id))),
 			array('description', 'filter', 'filter'=>array($obj=new CHtmlPurifier(),'purify')),
 			array('parentIds', 'validateParentIds'),
@@ -499,10 +499,10 @@ class Term extends CActiveRecord
 	 * @param integer|string 分类别名或id
 	 * @return array 保存后的术语ids
 	 */
-	public function dynamicTerms($termNames, $taxonomyIdName)
+	public static function custom($termNames, $taxonomyIdName, $maxCount=null)
 	{
-		if (!trim($termNames))
-			return;
+		if (is_string($termNames) && !trim($termNames))
+			return array();
 
 		if (!is_array($termNames))
 			$termNames = array_unique(preg_split('/\s*,\s*/', $termNames, -1, PREG_SPLIT_NO_EMPTY));
@@ -510,7 +510,11 @@ class Term extends CActiveRecord
 		if ($termNames === array())
 			return array();
 
-		$connection = $this->getDbConnection();
+		if (is_numeric($maxCount) && $maxCount > 0) {
+			$termNews = array_slice($array, 0, $maxCount);
+		}
+
+		$connection = self::model()->getDbConnection();
 
 		if (!$taxonomy = Taxonomy::findFromCache($taxonomyIdName))
 			return array();
@@ -541,7 +545,7 @@ class Term extends CActiveRecord
 		$newIds = array();
 
 		foreach ($insertNames as $name) {
-			$connection->insert('{{term}}', array(
+			$connection->createCommand()->insert('{{term}}', array(
 				'name' => $name,
 				'slug' => urlencode($name),
 				'taxonomy_id' => $taxonomy_id
@@ -549,11 +553,11 @@ class Term extends CActiveRecord
 
 			$lastInsertId = $connection->getLastInsertID();
 			$newIds[] = $lastInsertId;
-			$savedIds[] = $lastInserId;
+			$savedIds[] = $lastInsertId;
 		}
 
 		foreach ($newIds as $id) {
-			$connection->insert('{{term_hierarchy}}', array(
+			$connection->createCommand()->insert('{{term_hierarchy}}', array(
 				'term_id' => $id,
 				'parent_id' => 0,
 			));

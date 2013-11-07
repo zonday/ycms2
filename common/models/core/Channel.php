@@ -17,6 +17,7 @@
  * @property string $description
  * @property string $create_time
  * @property string $model
+ * @property integer $status
  * @property string $update_time
  *
  * @author Yang <css3@qq.com>
@@ -24,6 +25,9 @@
  */
 class Channel extends CActiveRecord
 {
+	const STATUS_DEFAULT = 0;
+
+	const STATUS_TRASH = 1;
 	/**
 	 * 类型空 封面
 	 * @var integer
@@ -310,6 +314,12 @@ class Channel extends CActiveRecord
 				if (!$hasChildren) {
 					reset($children[$parent]);
 				}
+			}
+		}
+
+		foreach ($tree as $index => $model) {
+			if ($model->status != $this->status) {
+				unset($tree[$index]);
 			}
 		}
 

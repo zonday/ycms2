@@ -36,13 +36,24 @@ class Article extends Node
 	{
 		return array(
 			array('content', 'filter', 'filter'=>array($obj=new CHtmlPurifier(),'purify')),
-			array('taxonomy, image', 'safe'),
+			array('termIds, image', 'safe'),
 		);
 	}
 
 	public function taxonomies()
 	{
-		return array();
+		return array(
+			'tags'=>array(
+				'label'=>'标签',
+				'many'=>true,
+				'allowEmpty'=>false,
+				'custom'=>true,
+			),
+			'news'=>array(
+				'label'=>'分类',
+				'many'=>true,
+				'allowEmpty'=>false,
+			),);
 	}
 
 	public function extraBehaviors(){
@@ -74,11 +85,5 @@ class Article extends Node
 			'image'=>'特色图',
 			'taxonomy'=>'分类',
 		);
-	}
-
-	public function afterSearch($criteria)
-	{
-		if (isset($this->YTaxonomyBehavior))
-			$this->searchByTaxonomy($criteria);
 	}
 }

@@ -41,9 +41,12 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 ));
 $actions = array(
 	'' => '批量操作',
+	'sticky'=>'置顶',
+	'unsticky'=>'取消置顶',
+	'promote'=>'推荐至首页',
+	'demote'=>'取消推荐至首页',
 	'public'=>'公开',
 	'draft'=>'待审核',
-	'trash'=>'回收站',
 	'delete' => '删除',
 );?>
 <?php $this->widget('bootstrap.widgets.TbExtendedGridView', array(
@@ -78,7 +81,6 @@ $actions = array(
 			'labelMap' => array(
 				Node::STATUS_DRAFT => 'warning',
 				Node::STATUS_PUBLIC => 'success',
-				Node::STATUS_TRASH => 'important',
 			),
 			'filter'=>$model->getStatusList(),
 		),

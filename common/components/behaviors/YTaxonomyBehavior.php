@@ -19,6 +19,8 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	 */
 	private $_terms;
 
+	private $_termIds;
+
 	/**
 	 * 对象的分类配置
 	 * @var array
@@ -34,16 +36,16 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 		static $cache = array();
 		$owner = $this->getOwner();
 		$className = get_class($owner);
+
 		if (!isset($cache[$className])) {
 			$taxonomies = array();
 			foreach ((array) $this->taxonomies as $key => $value) {
 				$default = array(
-					'multiple' => false,
-					'input' => 'select',
-					'dynamic' => false,
-					'allowEmpty' => true,
-					'cascade' => false,
-					'channel' => false,
+					'many' => false, //是否可以拥有多个分类, 可以限制个数
+					'input' => 'select', //input类型
+					'custom' => false, //允许自定义，例如动态输入标签
+					'allowEmpty' => true, //是否允许为空
+					'cascade' => false, //级联性
 				);
 
 				if (is_numeric($key)) {
@@ -57,11 +59,10 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 				if (!$taxonomy = Taxonomy::findFromCache($taxSlug))
 					continue;
 
-				if ($params['dynamic']) {
-					if (is_numeric($params['multiple']))
-						$params['multiple'] = max(1, abs(intval($params['multiple'])));
-					else
-						$params['multiple'] = true;
+				if (is_numeric($params['many'])) {
+					$params['many'] = max(1, intval($params['many']));
+				} else {
+					$params['many'] = $params['many'] ? true : false;
 				}
 
 				if (!isset($params['label'])) {
@@ -72,8 +73,8 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 						$params['label'] = $taxonomy->name;
 					}
 				}
+
 				$params['taxonomy'] = $taxonomy;
-				$params['isSelf'] = $owner->hasAttribute("{$taxSlug}_id"); //是否是模型自带字段（表中有这个字段）
 				$taxonomies[$taxSlug] = $params;
 			}
 			$cache[$className] = $taxonomies;
@@ -82,16 +83,18 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	}
 
 	/**
-	 * 设置分类
-	 * @param string $value
+	 * 设置术语ids
+	 * @param mixed $taxonomy
+	 * @param mixed $value
 	 */
-	public function setTaxonomy($taxonomy, $value=null)
+	public function setTermIds($taxonomy, $value=null)
 	{
 		$taxonomies = $this->prepareTaxonomies();
 		$owner = $this->getOwner();
+
 		if (is_array($taxonomy)) {
-			foreach ($taxonomy as $taxSlug => $terms) {
-				$this->setTaxonomy($taxSlug, $terms);
+			foreach ($taxonomy as $taxSlug => $value) {
+				$this->setTermIds($taxSlug, $value);
 			}
 			return;
 		} else {
@@ -101,75 +104,77 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 				$taxSlug = $taxonomy;
 			}
 
-			if (!isset($taxonomies[$taxSlug]))
-				throw new CException(sprintf('%s 没有分类 %s', get_class($owner), $taxSlug));
-
-			$params = $taxonomies[$taxSlug];
-			$value = (array) $value;
-
-			if ($params['isSelf']) {
-				$attribute = "{$taxSlug}_id";
-				$owner->$attribute = current($value);
-				$this->_terms[$taxSlug] = $value;
+			if (!isset($taxonomies[$taxSlug])) {
 				return;
 			}
 
-			if ($params['multiple'] !== true) {
-				$count = is_numeric($params['multiple']) ? $params['multiple'] : 1;
-				$value = array_slice($value, 0, $count);
+			if (is_string($value)) {
+				$value = trim($value);
 			}
 
-			if ($params['dynamic']) {
-				if (!isset($count))
-					$count = is_numeric($params['multiple']) ? $params['multiple'] : null;
-				$value = Term::dynamicTerms(current($value), $taxSlug, $count);
-			}
-
-			if (!isset($this->_terms[$taxSlug]))
-				$this->_terms[$taxSlug] = array();
-			$this->_terms[$taxSlug] = array_merge($this->_terms[$taxSlug], $value);
+			$this->_termIds[$taxSlug] = $value;
 		}
+	}
+
+	/**
+	 * 获取术语ids
+	 * @return array
+	 */
+	public function getTermIds() {
+		if (!isset($this->_termIds)) {
+			$taxonomies = $this->prepareTaxonomies();
+			$owner = $this->getOwner();
+
+			if ($owner->isNewRecord)
+				return array();
+
+			$this->_termIds = array();
+			$terms = $this->getTerms();
+			foreach ($taxonomies as $taxSlug => $params) {
+				if (!isset($terms[$taxSlug])) {
+					continue;
+				}
+
+				$ids = array();
+				foreach ($terms[$taxSlug] as $term) {
+					if ($params['custom']) {
+						$ids[] = $term->name;
+					} else {
+						$ids[] = $term->id;
+					}
+				}
+				if ($params['custom']) {
+					$this->_termIds[$taxSlug] = implode(',', $ids);
+				} else {
+					$this->_termIds[$taxSlug] = $ids;
+				}
+			}
+		}
+
+		return $this->_termIds;
 	}
 
 	/**
 	 * 获取分类
 	 * @param mixed $taxSlug
-	 * @return array|false|Term
+	 * @return mixed
 	 */
-	public function getTaxonomy($taxSlug=null, $edit=true)
+	public function getTaxonomy($taxSlug=null)
 	{
 		$taxonomies = $this->prepareTaxonomies();
 		$owner = $this->getOwner();
 
-		if ($taxSlug !== null && !isset($taxonomies[$taxSlug]))
+		if ($taxSlug !== null && !isset($taxonomies[$taxSlug])) {
 			throw new CException(sprintf('%s 没有分类 %s', get_class($owner), $taxSlug));
+		}
 
 		$terms = $this->getTerms();
-
-		foreach ($taxonomies as $tax => $params) {
-			if ($params['dynamic'] && isset($terms[$tax])) {
-				$values = $terms[$tax];
-
-				foreach ($values as $index => $term) {
-					if (!$term instanceof Term && $term = Term::findFromCache($term)) {
-						$values[$index] = $term;
-					}
-				}
-				if ($edit) {
-					$termNames = array();
-					foreach ($values as $term) {
-						$termNames[] = $term->name;
-					}
-					$terms[$tax] = implode(',', $termNames);
-				}
-			}
-		}
 
 		if ($taxSlug === null)
 			return $terms;
 		$params = $taxonomies[$taxSlug];
 		$terms = isset($terms[$taxSlug]) ? $terms[$taxSlug] : array();
-		return $params['multiple'] ? $terms : current($terms);
+		return $params['many'] ? $terms : current($terms);
 	}
 
 	/**
@@ -185,8 +190,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 			if ($owner->isNewRecord)
 				return array();
 
-			$termIds = $this->getTermIds();
-			$terms = Term::findFromCache($termIds);
+			$terms = Term::findFromCache($this->getTermIdsFromDb());
 			foreach ($terms as $term) {
 				if (!$taxonomy = Taxonomy::findFromCache($term->taxonomy_id))
 					continue;
@@ -199,27 +203,11 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	}
 
 	/**
-	 * 获取对象所有术语id缓存key
-	 * @return string
-	 */
-	public function getTermIdsCacheKey()
-	{
-		$className = get_class($this->getOwner());
-		$primaryKey = $this->getOwner()->getPrimaryKey();
-		return "{$className}_{$primaryKey}_termIds";
-	}
-
-	/**
-	 * 获取对象所有术语id
+	 * 从数据库中获取术语ids
 	 * @return array
 	 */
-	public function getTermIds($includeSelf=true)
+	public function getTermIdsFromDb()
 	{
-		$taxonomies = $this->prepareTaxonomies();
-		$owner = $this->getOwner();
-		if ($owner->isNewRecord)
-			return array();
-
 		$cacheKey = $this->getTermIdsCacheKey();
 		if (($termIds = Yii::app()->getCache()->get($cacheKey)) === false) {
 			$termIds = $owner->getDbConnection()
@@ -229,17 +217,18 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 				->queryColumn();
 			Yii::app()->getCache()->add($cacheKey, $termIds);
 		}
-
-		if ($includeSelf) {
-			foreach ($taxonomies as $taxSlug => $params) {
-				$attribute = "{$taxSlug}_id";
-				if ($params['isSelf']) {
-					$termIds[] = $owner->$attribute;
-				}
-			}
-		}
-
 		return $termIds;
+	}
+
+	/**
+	 * 获取对象所有术语id缓存key
+	 * @return string
+	 */
+	public function getTermIdsCacheKey()
+	{
+		$className = get_class($this->getOwner());
+		$primaryKey = $this->getOwner()->getPrimaryKey();
+		return "{$className}_{$primaryKey}_termIds";
 	}
 
 	/**
@@ -390,35 +379,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	 */
 	public function searchByTaxonomy($criteria=null)
 	{
-		$owner = $this->getOwner();
-		$termIds = array();
-		foreach ($this->getTerms() as $taxSlug => $terms) {
-			$attribute = $taxSlug . '_id';
-			if ($owner->hasAttribute($attribute)) {
-				foreach ((array) $terms as $term) {
-					if (is_object($term)) {
-						$value = $term->id;
-					} else {
-						$value = intval($term);
-					}
-
-					$owner->$attribute = $value;
-					if ($criteria && $value)
-						$criteria->compare( 't.'. $attribute, $value);
-				}
-				continue;
-			}
-
-			foreach ($terms as $term) {
-				if ($term instanceof Term) {
-					$termIds[$taxSlug][] = $term->id;
-				} else {
-					$termIds[$taxSlug][] = intval($term);
-				}
-			}
-		}
-
-		return $this->byAndTerm($termIds);
+		return $this->byAndTerm($this->getTermIds());
 	}
 
 	/**
@@ -474,25 +435,62 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	}
 
 	/**
+	 * 验证之前
+	 * @see CModelBehavior::beforeValidate()
+	 */
+	public function beforeValidate($event)
+	{
+		$taxonomies = $this->prepareTaxonomies();
+		$owner = $this->getOwner();
+
+		$termIds = $this->getTermIds();
+		foreach ($taxonomies as $taxSlug => $params) {
+			if (!$params['allowEmpty']) {
+				if (!isset($termIds[$taxSlug]) || ($params['custom'] && empty($termIds[$taxSlug]))) {
+					$owner->addError("termIds[{$taxSlug}]", $params['label'] . ' 不能为空白.');
+				}
+			}
+		}
+	}
+
+	/**
 	 * 对象保存之后
 	 * @see CActiveRecordBehavior::afterSave()
 	 */
 	public function afterSave($event)
 	{
 		$owner = $this->getOwner();
-		if (!isset($this->_terms))
+		if (!isset($this->_termIds))
 			return;
 
 		$newTermIds = array();
 		$taxonomies = $this->prepareTaxonomies();
-		foreach ($this->_terms as $taxSlug => $termIds) {
-			if (!isset($taxonomies[$taxSlug]) || $taxonomies[$taxSlug]['isSelf'] || !is_array($termIds))
+		foreach ($this->_termIds as $taxSlug => $value) {
+			if (!isset($taxonomies[$taxSlug]))
 				continue;
 
-			$newTermIds = array_merge($newTermIds, array_unique(array_map('intval', $termIds)));
+			$params = $taxonomies[$taxSlug];
+
+			if ($params['many'] === true) {
+				$count = null;
+			} elseif ($params['many'] === false) {
+				$count = 1;
+			} else {
+				$count = $params['many'];
+			}
+
+			if ($params['custom']) {
+				$ids = Term::custom($value, $taxSlug, $count);
+			} else {
+				$ids = array_unique(array_map('intval', (array) $value));
+				$ids = array_slice($ids, 0, $count);
+			}
+
+			$newTermIds = array_merge($newTermIds, $ids);
 		}
 
 		foreach ($newTermIds as $index => $id) {
+			//$id为0的删除
 			if (!$id) {
 				unset($newTermIds[$index]);
 			}
@@ -502,7 +500,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 		if ($owner->isNewRecord) {
 			$addTermIds = $newTermIds;
 		} else {
-			$oldTermIds = $this->getTermIds(false);
+			$oldTermIds = $this->getTermIdsFromDb();
 			$delTermIds = array_diff($oldTermIds, $newTermIds);
 			$addTermIds = array_diff($newTermIds, $oldTermIds);
 		}

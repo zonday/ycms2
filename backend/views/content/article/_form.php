@@ -37,7 +37,6 @@
 					$this->widget('YTaxonomyWidget', array(
 						'model'=>$model,
 						'form'=>$form,
-						'channel'=>$channel,
 					));
 				endif;
 				?>

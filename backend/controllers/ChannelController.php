@@ -116,15 +116,22 @@ class ChannelController extends Controller
 	/**
 	 * 首页
 	 */
-	public function actionIndex()
+	public function actionIndex($view=null)
 	{
 		$model=new Channel('search');
 		$model->unsetAttributes();
 		if(isset($_GET['Channel']))
 			$model->attributes=$_GET['Channel'];
 
+		if ($view == 'trash') {
+			$model->status = Channel::STATUS_TRASH;
+		} else {
+			$model->status = Channel::STATUS_DEFAULT;
+		}
+
 		$this->render('index',array(
-			'model'=>$model,
+			'model' => $model,
+			'view' => $view
 		));
 	}
 
@@ -136,8 +143,8 @@ class ChannelController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=Channel::model()->findByPk($id);
-		if($model===null)
+		$model = Channel::model()->findByPk($id);
+		if($model === null)
 			throw new CHttpException(404,'页面没有找到');
 		return $model;
 	}

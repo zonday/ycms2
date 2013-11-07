@@ -36,12 +36,6 @@ abstract class Node extends CActiveRecord
 	const STATUS_PUBLIC=1;
 
 	/**
-	 * 删除
-	 * @var integer
-	 */
-	const STATUS_TRASH=2;
-
-	/**
 	 * 用户id
 	 * @var integer
 	 */
@@ -67,7 +61,7 @@ abstract class Node extends CActiveRecord
 				array('title', 'length', 'max'=>255),
 				array('user_id, sticky, promote', 'numerical', 'integerOnly'=>true),
 				array('excerpt', 'filter', 'filter'=>array($obj=new CHtmlPurifier(),'purify')),
-				array('status', 'in', 'range'=>array_keys($this->getStatusList())),
+				array('status', 'in', 'range'=>array(self::STATUS_DRAFT, self::STATUS_PUBLIC)),
 				array('create_time', 'date', 'format'=>'yyyy-MM-dd HH:mm:ss'),
 			),$this->extraRules()
 		);
@@ -165,7 +159,6 @@ abstract class Node extends CActiveRecord
 		return array(
 			self::STATUS_DRAFT=>'待审核',
 			self::STATUS_PUBLIC=>'公开',
-			self::STATUS_TRASH=>'回收站',
 		);
 	}
 
@@ -349,7 +342,8 @@ abstract class Node extends CActiveRecord
 	 */
 	public function afterSearch($criteria)
 	{
-
+		if (isset($this->YTaxonomyBehavior))
+			$this->searchByTaxonomy($criteria);
 	}
 
 	/**
@@ -374,6 +368,42 @@ abstract class Node extends CActiveRecord
 			$this->status = $status;
 			$this->update('status');
 		}
+	}
+
+	/**
+	 * 批量置顶
+	 * @param mixed $ids
+	 */
+	public function bulkSticky($ids)
+	{
+		self::updateByPk($ids, array('sticky'=>1));
+	}
+
+	/**
+	 * 批量取消置顶
+	 * @param mixed $ids
+	 */
+	public function bulkUnsticky($ids)
+	{
+		self::updateByPk($ids, array('sticky'=>0));
+	}
+
+	/**
+	 * 批量推荐至首页
+	 * @param mixed $ids
+	 */
+	public function bulkPromote($ids)
+	{
+		self::updateByPk($ids, array('promote'=>1));
+	}
+
+	/**
+	 * 批量取消推荐值首页
+	 * @param mixed $ids
+	 */
+	public function bulkDemote($ids)
+	{
+		self::updateByPk($ids, array('promote'=>0));
 	}
 
 	public function init()

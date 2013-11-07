@@ -21,7 +21,8 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 $actions = array(
 	'' => '批量操作',
 	'delete' => '删除',
-);?>
+);
+?>
 <?php
 $this->widget('bootstrap.widgets.TbExtendedGridView',array(
 	'id'=>'file-grid',

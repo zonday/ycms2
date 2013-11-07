@@ -215,11 +215,6 @@ class ContentController extends Controller
 					$model->changeStatus(Node::STATUS_PUBLIC);
 				}
 				break;
-			case 'trash':
-				foreach ($staticModel->findAllByPk($ids) as $model) {
-					$model->changeStatus(Node::STATUS_TRASH);
-				}
-				break;
 			case 'delete':
 				foreach ($staticModel->findAllByPk($ids) as $model) {
 					if ($model->delete()) {
@@ -231,7 +226,7 @@ class ContentController extends Controller
 			default:
 				$method = 'bulk' . $action;
 				if (method_exists($staticModel, $method)) {
-					$model->$method($ids);
+					$staticModel->$method($ids);
 				}
 				break;
 		}
