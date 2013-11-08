@@ -44,10 +44,8 @@ class YBulkActions extends CComponent
 	 */
 	public function registerScript()
 	{
-		if (isset($this->actionButtons['delete'])) {
-			$cs = Yii::app()->getClientScript();
-			$js = <<<EOT
-
+		$cs = Yii::app()->getClientScript();
+		$js = <<<EOT
 $(document).on('click', '.checkbox-column input[type=checkbox]', function(e) {
 	var disabled;
 	if ($('.checkbox-column input:checked').length) {
@@ -57,6 +55,9 @@ $(document).on('click', '.checkbox-column input[type=checkbox]', function(e) {
 	}
 	$('button[name=doaction]').attr('disabled', disabled);
 });
+EOT;
+		if (isset($this->actionButtons['delete'])) {
+			$js .= <<<EOT
 $(document).on('click', 'button[name=doaction]', function(e) {
 	if ($('#bulk-select').val() == 'delete') {
 		return window.confirm('确定要删除这些数据吗?');
@@ -64,7 +65,7 @@ $(document).on('click', 'button[name=doaction]', function(e) {
 	return true;
 });
 EOT;
-			$cs->registerScript(__CLASS__, $js);
 		}
+		$cs->registerScript(__CLASS__, $js);
 	}
 }

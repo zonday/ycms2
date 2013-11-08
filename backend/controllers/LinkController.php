@@ -105,6 +105,7 @@ class LinkController extends Controller
 			}
 			Yii::app()->getUser()->setFlash('success', '保存权重成功');
 			$this->redirect(array('index'));
+			return;
 		}
 
 		if (isset($_POST['doaction'])) {

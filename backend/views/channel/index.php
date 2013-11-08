@@ -28,7 +28,6 @@ if ($view == 'trash') {
 	$actions = array(
 		'' => '批量操作',
 		'reset'=>'还原',
-		'delete' => '彻底删除',
 	);
 	echo CHtml::link('&lt;&lt;返回', array('index'), array('class'=>'btn'));
 } else {
@@ -74,13 +73,11 @@ $this->widget('bootstrap.widgets.TbExtendedGridView', array(
 			'name'=>'name',
 			'header'=>$model->getAttributeLabel('name'),
 		),
-		/*
 		array(
 			'name'=>'type',
 			'header'=>$model->getAttributeLabel('type'),
 			'value'=>'$data->typeList[$data->type]',
 		),
-		*/
 		array(
 			'name'=>'model',
 			'header'=>$model->getAttributeLabel('model'),

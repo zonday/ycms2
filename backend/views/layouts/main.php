@@ -55,7 +55,7 @@
 							)); ?><!-- breadcrumbs -->
 						<?php endif?>
 					</div>
-					<div class="page-content">
+					<div class="page-content container-fluid">
 						<?php $this->widget('bootstrap.widgets.TbAlert'); ?>
 						<?php echo $content; ?>
 					</div> <!-- /.page-content -->

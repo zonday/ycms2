@@ -50,6 +50,27 @@ class ContentController extends Controller
 	}
 
 	/**
+	 * 处理栏目内容单页面
+	 * @param mixed $channel
+	 */
+	public function actionChannel($channel)
+	{
+		$model = $this->getChannel();
+
+		if (isset($_POST['Channel']))
+		{
+			$model->attributes = $_POST['Channel'];
+			if ($model->save(true,array('title', 'content', 'keywords', 'description')))
+			{
+				Yii::app()->getUser()->setFlash('success', '更新页面内容成功。');
+				$this->redirect(array('channel', 'chanenl'=>$model->id));
+			}
+		}
+
+		$this->render('channel', array('model'=>$model));
+	}
+
+	/**
 	 * 管理内容
 	 * @param mixed $channel
 	 */

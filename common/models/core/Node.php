@@ -35,6 +35,13 @@ abstract class Node extends CActiveRecord
 	 */
 	const STATUS_PUBLIC=1;
 
+
+	/**
+	 * 回收站 （暂时没有用到）
+	 * @var integer
+	 */
+	const STATUS_TRASH=2;
+
 	/**
 	 * 用户id
 	 * @var integer
@@ -347,14 +354,6 @@ abstract class Node extends CActiveRecord
 	}
 
 	/**
-	 * 克隆
-	 */
-	public function __clone()
-	{
-		$this->attachBehaviors($this->behaviors());
-	}
-
-	/**
 	 * 改变状态
 	 * @param integer $status
 	 */
@@ -413,6 +412,7 @@ abstract class Node extends CActiveRecord
 			$this->create_time = date('Y-m-d H:i:s');
 		}
 	}
+
 
 	/**
 	 * 查找之后

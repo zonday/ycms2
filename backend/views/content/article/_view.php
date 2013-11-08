@@ -2,7 +2,18 @@
 	'data'=>$model,
 	'attributes'=>array(
 		'id',
+		array(
+			'name'=>'user_id',
+			'value'=>$model->user->nickname,
+		),
 		'title',
+		array(
+			'name'=>'excerpt',
+		),
+		array(
+			'name'=>'content',
+			'type'=>'raw',
+		),
 		array(
 			'name'=>'create_time',
 			'type'=>'datetime',
@@ -11,11 +22,6 @@
 			'name'=>'update_time',
 			'type'=>'datetime',
 		),
-		array(
-			'name'=>'user_id',
-			'value'=>$model->user->nickname,
-		),
-		'hits',
 		array(
 			'name'=>'sticky',
 			'type'=>'boolean',
@@ -27,14 +33,6 @@
 		array(
 			'name'=>'status',
 			'value'=>$model->statusList[$model->status],
-		),
-		array(
-			'name'=>'excerpt',
-			'type'=>'raw',
-		),
-		array(
-			'name'=>'content',
-			'type'=>'raw',
 		),
 	),
 )); ?>

@@ -84,14 +84,6 @@ $actions = array(
 			),
 			'filter'=>$model->getStatusList(),
 		),
-		/*
-		array(
-			'name'=>'hits',
-			'type'=>'raw',
-			'value'=>'"<span class=\"badge\">" . $data->hits . "</span>"',
-			'headerHtmlOptions'=>array('class'=>'column-hits'),
-		),
-		*/
 		array(
 			'name'=>'create_time',
 			'class'=>'YDatetimeColumn',

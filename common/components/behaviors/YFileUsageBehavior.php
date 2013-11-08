@@ -506,31 +506,6 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 	}
 
 	/**
-	 * 对象删除之前
-	 * @see CActiveRecordBehavior::beforeDelete()
-	 */
-	public function beforeDelete($event)
-	{
-		$owner = $this->getOwner();
-		$fields = $this->getUploadFields();
-
-		foreach ($fields as $field => $params) {
-			$resize = isset($params['resize']) ? $params['resize'] : true;
-
-			if (!empty($params['isAttachment'])) {
-				$resize = false;
-			}
-
-			if (($owner instanceof File) & $resize) {
-				$owner->attachBehavior('imageResize', array(
-					'class' => 'YImageResizeBehavior',
-				));
-				continue;
-			}
-		}
-	}
-
-	/**
 	 * 对象删除之后
 	 * @param CModelEvent $event
 	 */
@@ -547,12 +522,6 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 		$connection = $owner->getDbConnection();
 
 		foreach ($fields as $field => $params) {
-			$resize = isset($params['resize']) ? $params['resize'] : true;
-
-			if (!empty($params['isAttachment'])) {
-				$resize = false;
-			}
-
 			$fileIds = $this->getFileIdsByField($field);
 			if (!$params['isSelf']) {
 				$connection->createCommand()->delete('{{file_usage}}', array('and',
@@ -562,11 +531,6 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 			}
 
 			foreach (File::model()->findAllByPk($fileIds) as $file) {
-				if ($resize) {
-					$file->attachBehavior('imageResize', array(
-						'class'=>'YImageResizeBehavior',
-					));
-				}
 				$file->delete();
 			}
 

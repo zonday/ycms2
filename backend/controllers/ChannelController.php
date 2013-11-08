@@ -85,7 +85,7 @@ class ChannelController extends Controller
 	 * @param integer $id
 	 * @throws CHttpException
 	 */
-	public function _actionDelete($id)
+	public function actionDelete($id)
 	{
 		if(Yii::app()->request->isPostRequest) {
 			$result = $this->loadModel($id)->delete();
@@ -100,17 +100,41 @@ class ChannelController extends Controller
 	}
 
 	/**
-	 * 保存权重
+	 * 还原栏目
+	 * @param integer $id
+	 * @throws CHttpException
 	 */
-	public function actionSaveWeight()
+	public function actionReset($id)
 	{
-		$weights = isset($_POST['weight']) ? $_POST['weight'] : null;
-		foreach ((array) $weights as $id => $weight) {
-			Channel::updateWeightByPk($id, $weight);
+		if(Yii::app()->request->isPostRequest) {
+			$result = $this->loadModel($id)->changeStatus(Channel::STATUS_DEFAULT);
+
+			if(!isset($_GET['ajax'])) {
+				$result && Yii::app()->getUser()->setFlash('success', '栏目已还原');
+				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
+			}
+		} else {
+			throw new CHttpException(400,'无效的请求，请重试');
 		}
-		Channel::model()->deleteCache();
-		Yii::app()->getUser()->setFlash('success', '保存权重成功');
-		$this->redirect(array('index'));
+	}
+
+	/**
+	 * 回收栏目
+	 * @param integer $id
+	 * @throws CHttpException
+	 */
+	public function actionTrash($id)
+	{
+		if(Yii::app()->request->isPostRequest) {
+			$result = $this->loadModel($id)->changeStatus(Channel::STATUS_TRASH);
+
+			if(!isset($_GET['ajax'])) {
+				$result && Yii::app()->getUser()->setFlash('success', '栏目已移动至回收站');
+				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
+			}
+		} else {
+			throw new CHttpException(400,'无效的请求，请重试');
+		}
 	}
 
 	/**
@@ -118,6 +142,25 @@ class ChannelController extends Controller
 	 */
 	public function actionIndex($view=null)
 	{
+		if (isset($_POST['saveWeight'])) {
+			$weights = isset($_POST['weight']) ? $_POST['weight'] : null;
+			foreach ((array) $weights as $id => $weight) {
+				Channel::updateWeightByPk($id, $weight);
+			}
+			Yii::app()->getUser()->setFlash('success', '保存权重成功');
+			$this->redirect(array('index'));
+			return;
+		}
+
+		if (isset($_POST['doaction'])) {
+			$action = !empty($_POST['action']) ? $_POST['action'] : null;
+			$ids = !empty($_POST['ids']) ? $_POST['ids'] : null;
+			if ($action && $ids)
+				$this->processBulkAction($action, $ids);
+			$this->redirect(array('index'));
+			return;
+		}
+
 		$model=new Channel('search');
 		$model->unsetAttributes();
 		if(isset($_GET['Channel']))
@@ -147,5 +190,42 @@ class ChannelController extends Controller
 		if($model === null)
 			throw new CHttpException(404,'页面没有找到');
 		return $model;
+	}
+
+	/**
+	 * 批量处理
+	 * @param string $action
+	 * @param mxied $ids
+	 */
+	protected function processBulkAction($action, $ids)
+	{
+		$ids = (array) $ids;
+		$count = 0;
+		switch ($action) {
+			case 'reset':
+				foreach (Channel::model()->findAllByPk($ids) as $model) {
+					$model->changeStatus(Channel::STATUS_DEFAULT);
+				}
+				break;
+			case 'trash':
+				foreach (Channel::model()->findAllByPk($ids) as $model) {
+					$model->changeStatus(Channel::STATUS_TRASH);
+				}
+				break;
+			case 'delete':
+				foreach (Channel::model()->findAllByPk($ids) as $model) {
+					if ($model->delete()) {
+						$count++;
+					}
+				}
+				$message = sprintf('已删除%d个栏目', $count);
+				break;
+		}
+
+		if (!isset($message)) {
+			$message = '应用已执行';
+		}
+
+		Yii::app()->getUser()->setFlash('success', $message);
 	}
 }

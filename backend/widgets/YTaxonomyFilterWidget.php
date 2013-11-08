@@ -24,7 +24,7 @@ class YTaxonomyFilterWidget extends CWidget
 	 * @see CWidget::run()
 	 */
 	public function run() {
-		if (!isset($this->model))
+		if (!isset($this->model) || !isset($this->model->YTaxonomyBehavior))
 			return;
 
 		$data = array();

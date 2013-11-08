@@ -255,8 +255,8 @@ class YUploadWidget extends CInputWidget
 		$type = $this->_fileParams['type'];
 		$many = $this->_fileParams['many'];
 
-		$fileTypes = $this->model->fileUsage->getFileTypesByField($this->attribute);
-		$maxFileSize = strtolower($this->model->fileUsage->getFileMaxSizeByField($this->attribute));
+		$fileTypes = $this->model->getFileTypesByField($this->attribute);
+		$maxFileSize = strtolower($this->model->getFileMaxSizeByField($this->attribute));
 
 		list($name, $id) = $this->resolveNameID();
 

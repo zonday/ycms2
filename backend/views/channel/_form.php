@@ -12,7 +12,7 @@
 
 	<p class="help-block"><span class="required">*</span> 字段必填.</p>
 
-	<?php echo $form->errorSummary($model); ?>
+	<?php //echo $form->errorSummary($model); ?>
 
 	<?php echo $form->textFieldRow($model,'title',array('class'=>'span5','maxlength'=>64)); ?>
 
@@ -48,16 +48,6 @@
 			'htmlOptions'=>array('name'=>'_continue'),
 			'label'=>$model->isNewRecord ? '创建并继续更新' : '保存并继续更新',
 		)); ?>
-		<?php
-		$this->widget('bootstrap.widgets.TbButton', array(
-			'buttonType'=>'submitLink',
-			'type'=>'danger',
-			'encodeLabel'=>false,
-			'htmlOptions'=>array('class'=>'pull-right', 'csrf'=>true,'submit'=>array('delete','id'=>$model->id)),
-			'label'=>'<i class="icon-trash"></i> 移动至回收站',
-			'visible' => !$model->isNewRecord,
-		));
-		?>
 	</div>
 
 <?php $this->endWidget(); ?>

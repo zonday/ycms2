@@ -25,9 +25,16 @@
  */
 class Channel extends CActiveRecord
 {
+	/**
+	 * @var integer 状态缺省的
+	 */
 	const STATUS_DEFAULT = 0;
 
+	/**
+	 * @var integer 回收站中
+	 */
 	const STATUS_TRASH = 1;
+
 	/**
 	 * 类型空 封面
 	 * @var integer
@@ -108,12 +115,12 @@ class Channel extends CActiveRecord
 	{
 		$modelList = $this->getModelList();
 		if ($this->model && !isset($modelList[$this->model])) {
-			$this->addError('mdoel', '模型 选择不正确.');
+			$this->addError('mdoel', '模型选择不正确.');
 			return;
 		}
 
 		if ($this->type == self::TYPE_LIST && empty($this->model)) {
-			$this->addError('model', '类型为列表时，模型 不能为空.');
+			$this->addError('model', '类型为列表时，模型不能为空.');
 			return;
 		}
 	}
@@ -148,6 +155,7 @@ class Channel extends CActiveRecord
 			'name'=>'名称',
 			'keywords'=>'栏目关键字',
 			'description'=>'栏目描述',
+			'content'=>'内容',
 			'type'=>'类型',
 			'model'=>'模型',
 			'weight'=>'权重',
@@ -164,8 +172,8 @@ class Channel extends CActiveRecord
 	public static function getTypeList()
 	{
 		return array(
-			self::TYPE_EMPTY=>'空',
-			self::TYPE_PAGE=>'页面',
+			self::TYPE_EMPTY=>'封面',
+			self::TYPE_PAGE=>'单页面',
 			self::TYPE_LIST=>'列表',
 		);
 	}
@@ -174,7 +182,7 @@ class Channel extends CActiveRecord
 	 * 获取模型列表
 	 * @return array
 	 */
-	public function getModelList()
+	public static function getModelList()
 	{
 		if (isset(Yii::app()->params['modelList'])) {
 			return Yii::app()->params['modelList'];
@@ -250,11 +258,17 @@ class Channel extends CActiveRecord
 
 	/**
 	 * 根据父ID获取子节点
-	 * @param mixed $parent 为空则获取所有
+	 * @param mixed $parent -1获取所有 null 获取自己的
 	 * @return array
 	 */
 	public function getChildren($parent=null)
 	{
+		if ($parent === null) {
+			if ($this->isNewRecord)
+				return array();
+			$parent = $this->id;
+		}
+
 		static $children;
 		if (!isset($children) && ($children = Yii::app()->getCache()->get('channel_children')) === false) {
 			$children = array();
@@ -263,8 +277,16 @@ class Channel extends CActiveRecord
 			}
 			Yii::app()->getCache()->set('channel_children', $children);
 		}
+		return $parent === -1 ? $children : (isset($children[$parent]) ? $children[$parent] : array());
+	}
 
-		return $parent === null ? $children : (isset($children[$parent]) ? $children[$parent] : array());
+	/**
+	 * 是否有子节点
+	 * @return boolean
+	 */
+	public function hasChildren()
+	{
+		return $this->getChildren() ? true : false;
 	}
 
 	/**
@@ -275,7 +297,7 @@ class Channel extends CActiveRecord
 	 */
 	public function getTree($parent=0, $maxDepth=null)
 	{
-		$children = $this->getChildren($parent == 0 ? null : $parent);
+		$children = $this->getChildren($parent === 0 ? -1 : $parent);
 
 		if ($maxDepth === null ) {
 			$maxDepth = count($children);
@@ -332,7 +354,7 @@ class Channel extends CActiveRecord
 	 * @param string $spacer 分隔符 会按照深度
 	 * @return array
 	 */
-	public function getTreeList($parent=null, $spacer=' — ')
+	public function getTreeList($parent=-1, $spacer=' — ')
 	{
 		$list = array();
 		foreach ($this->getTree($parent) as $model) {
@@ -351,7 +373,7 @@ class Channel extends CActiveRecord
 		if (empty($value))
 			return;
 
-		$children = self::model()->getChildren();
+		$children = self::model()->getChildren(-1);
 
 		if (is_numeric($value))
 			$attribute = 'id';
@@ -418,7 +440,7 @@ class Channel extends CActiveRecord
 	 */
 	public function getWeightList()
 	{
-		$count = count($this->getChildren());
+		$count = count($this->getChildren(-1));
 		$range = range(-$count, $count);
 		return array_combine($range, $range);
 	}
@@ -434,13 +456,40 @@ class Channel extends CActiveRecord
 		$output = CHtml::link('<i class="icon-list"></i> 管理内容', array('/content/create','channel'=>$this->id), $htmlOptions);
 		if ($this->type == Channel::TYPE_LIST)
 			return $output . CHtml::link('<i class="icon-plus"></i> 创建内容', array('/content/create','channel'=>$this->id), $htmlOptions);
+		elseif ($this->type == Channel::TYPE_PAGE)
+			return $output . CHtml::link('<i class="icon-pencil"></i> 更新页面', array('/content/channel','channel'=>$this->id), $htmlOptions);
 		else
 			return $output;
 	}
 
+	/**
+	 * 删除缓存
+	 */
 	public function deleteCache()
 	{
 		Yii::app()->getCache()->delete('channel_children');
+	}
+
+	/**
+	 * 改变状态
+	 * @param integer $status
+	 * @return boolean
+	 */
+	public function changeStatus($status)
+	{
+		if (in_array($status, array(self::STATUS_DEFAULT, self::STATUS_TRASH))) {
+			if ($this->status != $status) {
+				$this->status = $status;
+				foreach ($this->getChildrenAll() as $child) {
+					$child->status = $status;
+					$child->update('status');
+				}
+				$this->update('status');
+				return;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -473,17 +522,32 @@ class Channel extends CActiveRecord
 	}
 
 	/**
+	 * 删除之前
+	 * @see CActiveRecord::beforeDelete()
+	 */
+	protected function beforeDelete()
+	{
+		if (parent::beforeDelete()) {
+			if ($this->hasChildren()) {
+				return false;
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * 删除之后
 	 * @see CActiveRecord::afterDelete()
 	 */
-	public function afterDelete()
+	protected function afterDelete()
 	{
 		parent::afterDelete();
 		$this->deleteCache();
-		$this->updateAll(array('parent_id'=>0), 'parent_id=:parent_id', array(':parent_id'=>$this->id));
 
 		if ($this->type == self::TYPE_LIST && class_exists($this->model, true)) {
-			CActiveRecord::model($this->model)->updateAll(array('status'=>Node::STATUS_TRASH), 'channel_id=:channel_id', array(':channel_id'=>$this->id));
+			CActiveRecord::model($this->model)->deleteAll('channel_id=:channel_id', array(':channel_id'=>$this->id));
 		}
 	}
 
@@ -491,7 +555,7 @@ class Channel extends CActiveRecord
 	 * 保存之后
 	 * @see CActiveRecord::afterSave()
 	 */
-	public function afterSave()
+	protected function afterSave()
 	{
 		parent::afterSave();
 		$this->deleteCache();

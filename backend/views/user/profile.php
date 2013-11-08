@@ -13,7 +13,6 @@ $this->breadcrumbs=array(
 <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	'id'=>'user-form',
 	'type'=>'horizontal',
-	'enableAjaxValidation'=>false,
 )); ?>
 
 	<p class="help-block"><span class="required">*</span> 字段必填.</p>

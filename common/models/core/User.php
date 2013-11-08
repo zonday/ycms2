@@ -47,6 +47,8 @@ class User extends CActiveRecord
 	 */
 	const SUPERADMIN_ID = 1;
 
+	const ANONYMOUS_NAME = '匿名用户';
+
 	/**
 	 * 确认密码
 	 * @var string
@@ -361,6 +363,69 @@ class User extends CActiveRecord
 		return $this->_roles;
 	}
 
+	/**
+	 * 取消账户
+	 * @param string $method
+	 */
+	public function cannel($method)
+	{
+		if (!in_array($method, array('block', 'block_unpublish', 'reassign', 'delete'))) {
+			return false;
+		}
+
+		$connection = $this->getDbConnection();
+
+		switch ($method) {
+			case 'block':
+				if ($this->status != self::STATUS_BLOCK) {
+					$this->status = self::STATUS_BLOCK;
+					$this->update('status');
+				}
+				return true;
+			case 'block_unpublish':
+				if ($this->status != self::STATUS_BLOCK) {
+					$this->status = self::STATUS_BLOCK;
+					$this->update('status');
+				}
+				foreach (Channel::getModelList() as $modelClass => $name) {
+					$staticModel = CActiveRecord::model($modelClass);
+					if (!$staticModel instanceof Node) {
+						continue;
+					}
+					$connection->createCommand()->update($staticModel->tableName(), array('status'=>Node::STATUS_DRAFT), 'user_id=:user_id', array(':user_id'=>$this->id));
+				}
+				return true;
+			case 'reassign':
+				if ($this->delete()) {
+					foreach (Channel::getModelList() as $modelClass => $name) {
+						$staticModel = CActiveRecord::model($modelClass);
+						if (!$staticModel instanceof Node) {
+							continue;
+						}
+						$connecton->crateCommand()->update($staticModel->tableName(), array('user_id'=>0), 'user_id=:user_id', array(':user_id'=>$this->id));
+					}
+					File::bulkUpdate(array('user_id'=>0), 'user_id=:user_id', array(':user_id'=>$this->id));
+					return true;
+				} else {
+					return false;
+				}
+			case 'delete':
+				if ($this->delete()) {
+					foreach (Channel::getModelList() as $modelClass => $name) {
+						$staticModel = CActiveRecord::model($modelClass);
+						if (!$staticModel instanceof Node) {
+							continue;
+						}
+						$connecton->crateCommand()->delete($staticModel->tableName(),'user_id=:user_id', array(':user_id'=>$this->id));
+					}
+					File::bulkDelete('user_id=:user_id', array(':user_id'=>$this->id));
+				} else {
+					return false;
+				}
+			default:
+				return false;
+		}
+	}
 	/**
 	 * 保存角色列表
 	 */

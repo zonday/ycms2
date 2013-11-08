@@ -70,7 +70,6 @@ $this->widget('bootstrap.widgets.TbExtendedGridView',array(
 			'toggleAction' => 'banner/toggle',
 			'checkedButtonLabel'=>'可见',
 			'uncheckedButtonLabel'=>'不可见',
-			'name' => 'visible',
 		),
 		array(
 			'name'=>'create_time',

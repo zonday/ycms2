@@ -13,8 +13,6 @@ $this->menu=array(
 	array('label'=>'栏目列表', 'url'=>array('index'), 'icon'=>'list'),
 	array('label'=>'创建栏目', 'url'=>array('create'), 'icon'=>'plus'),
 	array('label'=>'更新栏目', 'url'=>array('update', 'id'=>$model->id), 'icon'=>'pencil'),
-	array('label'=>'移动至回收站','url'=>'#', 'icon'=>'trash', 'linkOptions'=>array('csrf'=>true, 'submit'=>array('trash','id'=>$model->id))),
-	array('label'=>'彻底删除','url'=>'#', 'icon'=>'trash', 'linkOptions'=>array('csrf'=>true, 'submit'=>array('delete','id'=>$model->id),'confirm'=>'删除这个栏目将会导致该栏目下的所有内容将被删除！请谨慎操作！')),
 );
 ?>
 
@@ -27,13 +25,17 @@ $this->menu=array(
 		))?>
 	</div>
 </div>
-
 <?php $this->widget('bootstrap.widgets.TbDetailView', array(
 	'data'=>$model,
 	'attributes'=>array(
 		'id',
 		'title',
 		'name',
+		array(
+			'name'=>'content',
+			'type'=>'raw',
+			'visible'=>$model->type == Channel::TYPE_PAGE,
+		),
 		array(
 			'name'=>'type',
 			'value'=>$model->typeList[$model->type],

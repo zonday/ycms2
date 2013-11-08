@@ -210,6 +210,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	{
 		$cacheKey = $this->getTermIdsCacheKey();
 		if (($termIds = Yii::app()->getCache()->get($cacheKey)) === false) {
+			$owner = $this->getOwner();
 			$termIds = $owner->getDbConnection()
 				->createCommand(" SELECT term_id FROM {{term_object}} WHERE bundle=:bundle AND object_id = :object_id")
 				->bindValue(':bundle', get_class($owner))

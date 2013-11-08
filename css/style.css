@@ -54,7 +54,7 @@ body {
 }
 
 .page-content {
-	padding: 9px 18px 18px;
+	padding: 10px 20px 20px;
 }
 
 .page-content h1 {
@@ -162,69 +162,69 @@ body {
 	text-decoration: none;
 }
 
-.grid-view .bulk-actions button {
+table .bulk-actions button {
 	margin-left: 8px;
 }
 
-.grid-view .file-icon-column {
+table .file-icon-column {
 	width: 60px;
 	text-align: center;
 }
 
-.grid-view .username-column,
-.grid-view .datetime-column {
+table .username-column,
+table .datetime-column {
 	width: 10em;
 }
 
-.grid-view .input-column > [name^=weight] {
+table .input-column > [name^=weight] {
 	width: 2em;
 }
 
-.grid-view .toggle-column {
+table .toggle-column {
 	width: 5em;
 }
 
-.grid-view .toggle-column i {
+table .toggle-column i {
 	font-size: 1.5em;
 }
 
-.grid-view .id-column {
+table .id-column {
 	width: 5em;
 }
 
-.grid-view .status-column {
+table .status-column {
 	width: 8em;
 }
 
-.grid-view tr.odd {
+tr.odd {
 	background-color: #fff;
 }
 
-.grid-view tr.even {
+tr.even {
 	background-color: #f6f6f6;
 }
 
-.grid-view tr.level-1 .title-column {
+tr.level-1 .title-column {
 	text-indent: 1em;
 }
 
-.grid-view tr.level-2 .title-column {
+tr.level-2 .title-column {
 	text-indent: 2em;
 }
 
-.grid-view tr.level-3 .title-column {
+tr.level-3 .title-column {
 	text-indent: 3em;
 }
 
-.grid-view tr.level-4 .title-column {
+tr.level-4 .title-column {
 	text-indent: 4em;
 }
 
-.grid-view tr.level-5 .title-column {
+tr.level-5 .title-column {
 	text-indent: 5em;
 }
 
-.grid-view tr .icon-move {
+tr .icon-move {
 	cursor: move;
 }
 

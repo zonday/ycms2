@@ -39,6 +39,11 @@ $default = array(
 		'common.extensions.yiidebugtb.*',
 	),
 	'components' => array(
+		'format'=>array(
+			'datetimeFormat'=>'Y-m-d h:i:s',
+			'dateFormat'=>'Y-m-d',
+			'booleanFormat'=>array('否','是'),
+		),
 		'db' => array(
 			'schemaCachingDuration' => YII_DEBUG ? 0 : 86400000, // 1000 天
 			'enableParamLogging' => YII_DEBUG,

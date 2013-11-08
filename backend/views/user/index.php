@@ -85,9 +85,12 @@ foreach ($allRoleList as $name => $description) {
 		),
 		array(
 			'class'=>'bootstrap.widgets.TbButtonColumn',
-			'template'=>'{view} {update} {delete}',
+			'template'=>'{view} {update} {cannel}',
 			'buttons' => array(
-				'delete' => array(
+				'cannel' => array(
+					'label'=>'删除',
+					'icon'=>'trash',
+					'url'=>'Yii::app()->controller->createUrl("cannel", array("id"=>$data->id))',
 					'visible' => '$data->id != User::SUPERADMIN_ID',
 				)
 			)

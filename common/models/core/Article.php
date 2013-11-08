@@ -58,7 +58,7 @@ class Article extends Node
 
 	public function extraBehaviors(){
 		return array(
-			'fileUsage' => array(
+			'YFileUsageBehavior' => array(
 				'class' => 'YFileUsageBehavior',
 				'fields' => array(
 					'image' => array(

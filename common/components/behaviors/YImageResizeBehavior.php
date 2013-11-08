@@ -99,28 +99,6 @@ class YImageResizeBehavior extends CActiveRecordBehavior
 	}
 
 	/**
-	 * 模型删除之后
-	 * @see CActiveRecordBehavior::afterDelete()
-	 */
-	public function afterDelete($event)
-	{
-		$owner = $this->getOwner();
-		$sizes = isset($owner->meta['sizes']) ? $owner->meta['sizes'] : array();
-		foreach ($sizes as $name => $meta)
-		{
-			if ($name == File::IMAGE_ORIGIN) {
-				continue;
-			}
-
-			if (isset($meta['uri'])) {
-				$filePath = $owner->localPath($meta['uri']);
-				if (!@unlink($filePath))
-					Yii::log(sprintf('删除文件  %s 失败', $filePath));
-			}
-		}
-	}
-
-	/**
 	 * 缩放图片
 	 * @param string $filePath 文件路径
 	 * @param array $sizes 图片尺寸

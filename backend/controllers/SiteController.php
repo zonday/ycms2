@@ -42,7 +42,6 @@ class SiteController extends Controller
 	public function actionLogin()
 	{
 		$this->layout = 'none';
-
 		$model = new LoginForm;
 
 		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form') {
@@ -53,6 +52,7 @@ class SiteController extends Controller
 		if (isset($_POST['LoginForm'])) {
 			$model->attributes = $_POST['LoginForm'];
 			if ($model->validate() && $model->login()) {
+				User::model()->updateByPk(Yii::app()->getUser()->getId(), array('login_time'=>time()));
 				$this->redirect(Yii::app()->getUser()->returnUrl);
 			}
 		}

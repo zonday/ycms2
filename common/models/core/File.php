@@ -90,7 +90,7 @@ class File extends CActiveRecord
 				'updateAttribute' => 'update_time',
 				'setUpdateOnCreate' => true,
 			),
-			'fileUsage' => array(
+			'YFileUsageBehavior' => array(
 				'class' => 'YFileUsageBehavior',
 				'fields' => array(
 					'file' => array(
@@ -620,15 +620,21 @@ class File extends CActiveRecord
 	 */
 	public static function localPath($uri)
 	{
+		static $cache = array();
+
 		$directoryPath = self::directoryPath($uri);
 		if ($directoryPath === false)
 			return false;
 
-		$directory = realpath($directoryPath);
-		if ($directory === false)
+		if (!isset($cache[$directoryPath])) {
+			$directory = realpath($directoryPath);
+			$cache[$directoryPath] = $directory;
+		}
+
+		if ($cache[$directoryPath] === false)
 			return false;
 
-		$path = $directory . '/' . self::uriTarget($uri);
+		$path = $cache[$directoryPath] . '/' . self::uriTarget($uri);
 		return $path;
 	}
 
@@ -734,6 +740,69 @@ class File extends CActiveRecord
 	}
 
 	/**
+	 * 批量更新
+	 * @param array $columns
+	 * @param mixed $condition
+	 * @param array $params
+	 */
+	public static function bulkUpdate($columns, $condition='', $params=array())
+	{
+		$model = new self();
+		$connection = $model->getConnection();
+		$offset = 0;
+		$limit = 500;
+		while (
+			$ids = $connection->createCommand()
+				->select('id')
+				->from($model->tableName())
+				->where($condition, $params)
+				->limit($limit, $offset)
+				->queryColumn()
+		) {
+			$offset += $limit;
+			foreach ($ids as $id) {
+				$model->id = $id;
+				$model->deleteCache();
+			}
+		}
+		$connection->createCommand()->update($model->tableName(), $columns, $condition, $params);
+	}
+
+	/**
+	 * 批量删除
+	 * @param mixed $condition
+	 * @param array $params
+	 */
+	public static function bulkDelete($condition='', $params=array())
+	{
+		$self = new self();
+		$connection = $model->getConnection();
+		$offset = 0;
+		$limit = 50;
+		while (
+			$rows = $connection->createCommand()
+				->select('id, uri, meta')
+				->from($model->tableName())
+				->where($condition, $params)
+				->limit($limit, $offset)
+				->queryColumn()
+		) {
+			$offset += $limit;
+			$ids = array();
+			foreach ($rows as $row) {
+				$ids[] = $row['id'];
+				$model->id = $row['id'];
+				$model->uri = $row['uri'];
+				$model->meta = serialize($row['meta']);
+				$model->deleteCache();
+				$model->deleteFile();
+			}
+			$connection->createCommand()->delete('{{file_usage}}', array('in', 'file_id', $ids));
+		}
+		$connection->createCommand()->delete($model->tableName(), $condition, $params);
+	}
+
+	/**
 	 * 删除所有状态为 self::STATUS_TEMPORARY 的文件
 	 * @return integer 已删除的文件数目
 	 */
@@ -771,10 +840,24 @@ class File extends CActiveRecord
 	 */
 	protected function deleteFile()
 	{
-		$path = $this->getPath();
-		if (file_exists($path)) {
-			@unlink($path);
+		$sizes = isset($file->meta['sizes']) ? $file->meta['sizes'] : array();
+		foreach ($sizes as $name => $meta) {
+			if ($name == File::IMAGE_ORIGIN) {
+				continue;
+			}
+
+			if (isset($meta['uri']) && ($filePath = realpath(self::localPath($meta['uri'])))) {
+				if (!@unlink($filePath))
+					Yii::log(sprintf('删除文件  %s 失败', $filePath));
+			}
 		}
+
+		$filePath = $this->getPath();
+		if ($filePath) {
+			if (!@unlink($filePath))
+				Yii::log(sprintf('删除文件  %s 失败', $filePath));
+		}
+
 	}
 
 	/**

@@ -101,6 +101,9 @@ class Controller extends CController
 		$items = array();
 		$children = Channel::model()->getChildren($parent);
 		foreach ($children as $parent => $model) {
+			if ($model->status == Channel::STATUS_TRASH) {
+				continue;
+			}
 			if ($model->type == Channel::TYPE_LIST)
 				$url = array('/content/index', 'channel'=>$model->id);
 			elseif ($this->isOtherContent($model))
@@ -143,6 +146,7 @@ class Controller extends CController
 					array('label' => '内容', 'url'=>'#', 'items' => $this->getContentItems()),
 					array('label' => '栏目', 'url' => array('/channel/index')),
 					array('label' => '系统', 'itemOptions' => array('class' => 'nav-header')),
+					array('label' => '分类', 'url' => array('/taxonomy/index')),
 					array('label' => '链接', 'url' => array('/link/index'), 'icon' => 'fixed-width link'),
 					array('label' => 'Banner', 'url' => array('/banner/index'), 'icon' => 'fixed-width picture'),
 					array('label' => '文件', 'url' => array('/file/index'), 'icon' => 'fixed-width file'),

@@ -99,22 +99,31 @@ class UserController extends Controller
 		$this->render('view', array('model' => $this->loadModel($id)));
 	}
 
+	public function actionCannel($id)
+	{
+		$model = $this->loadModel($id);
+		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$method = isset($_POST['method']) ? $_POST['method'] : null;
+			if ($model->cannel($id, $method)) {
+				Yii::app()->getUser()->setFlash('success', '操作已执行');
+				$this->redirect(array('index'));
+			}
+		} else {
+			$this->render('cannel', array('model'=>$model));
+		}
+	}
+
 	/**
 	 * 删除用户
 	 * @param integer $id
 	 */
-	public function actionDelete($id)
+	public function _actionDelete($id)
 	{
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$result = $this->loadModel($id)->delete();
 
-			if ($result) {
-				if (!isset($_GET['ajax'])) {
-					Yii::app()->getUser()->setFlash('success', '用户删除成功');
-				}
-			}
-
 			if (!isset($_GET['ajax'])) {
+				$result && Yii::app()->getUser()->setFlash('success', '用户删除成功');;
 				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
 			}
 		} else {
