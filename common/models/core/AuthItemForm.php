@@ -66,7 +66,7 @@ class AuthItemForm extends CFormModel
 			return;
 
 		if (Yii::app()->getAuthManager()->getAuthItem($this->name))
-			$this->addError('name', '名称不是唯一的.');
+			$this->addError('name', $this->getAttributeLabel('name') . ' 不是唯一的.');
 	}
 
 	/**

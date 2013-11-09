@@ -39,6 +39,13 @@ $default = array(
 		'common.extensions.yiidebugtb.*',
 	),
 	'components' => array(
+		'mailer'=>array(
+			'class'=>'common.extensions.mailer.Mailer',
+			'host'=>'smtp.qq.com',
+			'username'=>'zhuanjiao.test@foxmail.com',
+			'password'=>'zhuanjiao.test',
+			'from'=>'zhuanjiao.test@foxmail.com'
+		),
 		'format'=>array(
 			'datetimeFormat'=>'Y-m-d h:i:s',
 			'dateFormat'=>'Y-m-d',

@@ -78,6 +78,7 @@ class Controller extends CController
 
 		$authItem .= ucfirst($controller->id);
 
+		$allow = true;
 		if( $user->checkAccess($authItem.'.*')!==true ) {
 			$authItem .= '.'.ucfirst($action->id);
 
@@ -174,7 +175,7 @@ class Controller extends CController
 			if (isset($item['items']) && is_array($item['items']))
 				$this->filterNavItems($item['items']);
 
-			if ($item['url'] === '#' || !is_array($item['url']) || !isset($item['url'][0]))
+			if (!isset($item['url']) || $item['url'] === '#' || !is_array($item['url']) || !isset($item['url'][0]))
 				continue;
 
 			$parts = explode('/', trim($item['url'][0], '/'));

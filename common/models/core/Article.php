@@ -62,9 +62,9 @@ class Article extends Node
 				'class' => 'YFileUsageBehavior',
 				'fields' => array(
 					'image' => array(
-						'location' => 'public://article/' . date('Y/m'),
+						'location' => 'public://article/' . date('Ym'),
 						'type' => 'image',
-						'sizes' => array(
+						'resize' => array(
 							'post-thumbnail'=>array(222, 157, true),
 						)
 					),

@@ -546,8 +546,12 @@ class Channel extends CActiveRecord
 		parent::afterDelete();
 		$this->deleteCache();
 
-		if ($this->type == self::TYPE_LIST && class_exists($this->model, true)) {
-			CActiveRecord::model($this->model)->deleteAll('channel_id=:channel_id', array(':channel_id'=>$this->id));
+		if ($this->type == self::TYPE_LIST && ($modelClass = $this->model)) {
+			$staticModel = CActiveRecord::model($modelClass);
+			if (!$staticModel instanceof Node) {
+				return;
+			}
+			$staticModel->bulkDelete('channel_id=:channel_id', array(':channel_id'=>$this->id));
 		}
 	}
 

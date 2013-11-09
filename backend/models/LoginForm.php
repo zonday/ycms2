@@ -84,9 +84,9 @@ class LoginForm extends CFormModel
 				if ($this->_identity->errorCode == UserIdentity::ERROR_ROLE_NOT_ALLOW) {
 					$this->addError('username', '无效的用户角色');
 				} elseif ($this->_identity->errorCode == UserIdentity::ERROR_USER_NOT_ACTIVATED) {
-					$this->addError('password', '用户未激活验证');
+					$this->addError('username', '用户未激活验证');
 				} elseif ($this->_identity->errorCode == UserIdentity::ERROR_USER_BLOCK) {
-					$this->addError('password', '用户已被禁用');
+					$this->addError('username', '用户已被禁用');
 				} else {
 					$this->addError('password','无效的用户名或密码');
 				}

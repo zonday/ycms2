@@ -97,6 +97,11 @@ body {
 	margin: 0;
 }
 
+.page-content h2 {
+	font-size: 24px;
+	font-weight: normal;
+}
+
 .page-header .pull-right {
 	margin-left: 9px;
 }
@@ -190,6 +195,10 @@ table .toggle-column i {
 
 table .id-column {
 	width: 5em;
+}
+
+table .checkbox-column input{
+	vertical-align: top;
 }
 
 table .status-column {

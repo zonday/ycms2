@@ -537,11 +537,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 		Yii::app()->getCache()->set($this->getTermIdsCacheKey(), $newTermIds);
 	}
 
-	/**
-	 * 对象删除之后
-	 * @see CActiveRecordBehavior::afterDelete()
-	 */
-	public function afterDelete($event)
+	public function deleteTermRelationship()
 	{
 		$owner = $this->getOwner();
 		$owner->getDbConnection()->createCommand()->delete('{{term_object}}', 'bundle=:bundle AND object_id=:object_id', array(
@@ -549,5 +545,14 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 			':object_id' => $owner->getPrimaryKey(),
 		));
 		Yii::app()->getCache()->delete($this->getTermIdsCacheKey());
+	}
+
+	/**
+	 * 对象删除之后
+	 * @see CActiveRecordBehavior::afterDelete()
+	 */
+	public function afterDelete($event)
+	{
+		$this->deleteTermRelationship();
 	}
 }

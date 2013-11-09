@@ -126,7 +126,7 @@ jQuery(function($) {
 
 				if (up._many === 1) {
 					if (sizes['post-thumbnail']) {
-						imageUrl = sizes['post-thumnail']['url'];
+						imageUrl = sizes['post-thumbnail']['url'];
 					} else {
 						imageUrl = sizes['origin']['url'];
 					}

@@ -35,7 +35,7 @@ $this->menu=array(
 		'name',
 		array(
 			'name'=>'user_id',
-			'value'=>$model->user->nickname,
+			'value'=>$model->user ? $model->user->nickname : User::ANONYMOUS_NAME,
 		),
 		'caption',
 		'description',

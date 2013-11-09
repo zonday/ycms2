@@ -4,7 +4,7 @@
 		'id',
 		array(
 			'name'=>'user_id',
-			'value'=>$model->user->nickname,
+			'value'=>$model->user ? $model->user->nickname : User::ANONYMOUS_NAME,
 		),
 		'title',
 		array(

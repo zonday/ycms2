@@ -385,7 +385,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 	/**
 	 * 对象查找之后
 	 */
-	public function _afterFind($event)
+	public function afterFind($event)
 	{
 		$fields = $this->getUploadFields();
 		$owner = $this->getOwner();

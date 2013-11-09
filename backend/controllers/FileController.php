@@ -161,7 +161,21 @@ class FileController extends Controller
 			if ($file !== false) {
 				if ($isAjax) {
 					header('Content-Type:text/json');
-					echo CJSON::encode(array('error'=>0, 'file'=>$file->toArray()));
+					if (isset($_GET['jquery-file-upload'])) {
+						echo CJSON::encode(array(
+							array(
+								'id'=>$file->id,
+								'name'=>$file->filename,
+								'size'=>$file->filesize,
+								'url'=>$file->getUrl(),
+								'thumbnailUrl'=>$file->getImageUrl(File::IMAGE_THUMBNAIL),
+								'deleteUrl'=>$this->createUrl('delete', array('id'=>$file->id)),
+								'deleteType'=>'POST',
+							)
+						));
+					} else {
+						echo CJSON::encode(array('error'=>0, 'file'=>$file->toArray()));
+					}
 				} elseif ($isIframe) {
 					$url = $file->getUrl();
 					$message= '上传文件成功';
@@ -173,7 +187,15 @@ class FileController extends Controller
 			} else {
 				if ($isAjax) {
 					header('Content-Type:text/json');
-					echo CJSON::encode(array('error'=>1, 'message'=>$model->getError($field)));
+					if (isset($_GET['jquery-file-upload'])) {
+						echo CJSON::encode(array(
+							array(
+								'error'=>$model->getError($field),
+							)
+						));
+					} else {
+						echo CJSON::encode(array('error'=>1, 'message'=>$model->getError($field)));
+					}
 				} elseif ($isIframe) {
 					$message = $model->getError('file');
 					echo "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction({$funcNum}, '', '{$message}');</script>";

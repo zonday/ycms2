@@ -745,27 +745,26 @@ class File extends CActiveRecord
 	 * @param mixed $condition
 	 * @param array $params
 	 */
-	public static function bulkUpdate($columns, $condition='', $params=array())
+	public function bulkUpdate($columns, $condition='', $params=array())
 	{
-		$model = new self();
-		$connection = $model->getConnection();
+		$connection = $this->getDbConnection();
 		$offset = 0;
 		$limit = 500;
 		while (
 			$ids = $connection->createCommand()
 				->select('id')
-				->from($model->tableName())
+				->from($this->tableName())
 				->where($condition, $params)
 				->limit($limit, $offset)
 				->queryColumn()
 		) {
 			$offset += $limit;
 			foreach ($ids as $id) {
-				$model->id = $id;
-				$model->deleteCache();
+				$this->id = $id;
+				$this->deleteCache();
 			}
 		}
-		$connection->createCommand()->update($model->tableName(), $columns, $condition, $params);
+		$connection->createCommand()->update($this->tableName(), $columns, $condition, $params);
 	}
 
 	/**
@@ -773,33 +772,33 @@ class File extends CActiveRecord
 	 * @param mixed $condition
 	 * @param array $params
 	 */
-	public static function bulkDelete($condition='', $params=array())
+	public function bulkDelete($condition='', $params=array())
 	{
-		$self = new self();
-		$connection = $model->getConnection();
+		$connection = $this->getDbConnection();
 		$offset = 0;
 		$limit = 50;
 		while (
 			$rows = $connection->createCommand()
 				->select('id, uri, meta')
-				->from($model->tableName())
+				->from($this->tableName())
 				->where($condition, $params)
 				->limit($limit, $offset)
-				->queryColumn()
+				->queryAll()
 		) {
 			$offset += $limit;
 			$ids = array();
 			foreach ($rows as $row) {
 				$ids[] = $row['id'];
-				$model->id = $row['id'];
-				$model->uri = $row['uri'];
-				$model->meta = serialize($row['meta']);
-				$model->deleteCache();
-				$model->deleteFile();
+				$this->id = $row['id'];
+				$this->uri = $row['uri'];
+				$this->meta = unserialize($row['meta']);
+				$this->deleteCache();
+				$this->deleteFile();
 			}
 			$connection->createCommand()->delete('{{file_usage}}', array('in', 'file_id', $ids));
 		}
-		$connection->createCommand()->delete($model->tableName(), $condition, $params);
+		$this->unsetAttributes(); //释放属性
+		$connection->createCommand()->delete($this->tableName(), $condition, $params);
 	}
 
 	/**
@@ -840,12 +839,11 @@ class File extends CActiveRecord
 	 */
 	protected function deleteFile()
 	{
-		$sizes = isset($file->meta['sizes']) ? $file->meta['sizes'] : array();
+		$sizes = isset($this->meta['sizes']) ? $this->meta['sizes'] : array();
 		foreach ($sizes as $name => $meta) {
 			if ($name == File::IMAGE_ORIGIN) {
 				continue;
 			}
-
 			if (isset($meta['uri']) && ($filePath = realpath(self::localPath($meta['uri'])))) {
 				if (!@unlink($filePath))
 					Yii::log(sprintf('删除文件  %s 失败', $filePath));
@@ -857,7 +855,6 @@ class File extends CActiveRecord
 			if (!@unlink($filePath))
 				Yii::log(sprintf('删除文件  %s 失败', $filePath));
 		}
-
 	}
 
 	/**

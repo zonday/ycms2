@@ -19,10 +19,11 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 ));
 $actions = array(
 	'' => '批量操作',
-	'active' => '激活验证选中用户',
-	'notactive' => '不激活验证选中用户',
-	'block' => '锁定选中用户',
-	'delete' => '删除选中用户',
+	//'active' => '激活验证选中用户',
+	//'notactive' => '不激活验证选中用户',
+	'block' => '禁止选中用户',
+	'unblock' => '解禁选中用户',
+	//'delete' => '删除选中用户',
 );
 
 $allRoleList = Role::allList();

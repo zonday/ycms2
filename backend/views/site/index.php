@@ -53,17 +53,17 @@ $this->breadcrumbs = array(
 				<tr>
 					<th class="title-column">标题</th>
 					<th class="channel-column">栏目</th>
-					<th class="datetime-column">发布时间</th>
+					<th class="datetime-column">更新时间</th>
 					<th class="status-column">状态</th>
 				</tr>
 			</thead>
 			<tbody>
-					<?php foreach ($staticModel->cache(60)->findAll(array('select'=>'id, channel_id, title, create_time, status', 'limit'=>10, 'order'=>'update_time DESC')) as $model): ?>
+					<?php foreach ($staticModel->cache(60)->findAll(array('select'=>'id, channel_id, title, update_time, status', 'limit'=>10, 'order'=>'update_time DESC')) as $model): ?>
 					<?php $channel = Channel::get($model->channel_id); ?>
 				<tr>
 					<td class="title-column"><?php echo CHtml::link(CHtml::encode($model->title), array('content/update', 'channel'=>$model->channel_id, 'id'=>$model->id), array('title'=>CHtml::encode($model->title))); ?> </td>
 					<td class="channel-column"><?php echo CHtml::link(CHtml::encode($channel->title), array('content/index', 'channel'=>$channel->id), array('title'=>'查看该栏目下的文章')); ?></td>
-					<td class="datetime-column"><?php echo Yii::app()->format->date($model->create_time)?></td>
+					<td class="datetime-column"><?php echo Yii::app()->format->date($model->update_time)?></td>
 					<td class="status-column"><?php echo $model->statusList[$model->status]; ?></td>
 				</tr>
 					<?php endforeach; ?>

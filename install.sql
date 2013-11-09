@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- 主机: localhost
--- 生成日期: 2013 年 11 月 05 日 08:47
+-- 生成日期: 2013 年 11 月 09 日 08:18
 -- 服务器版本: 5.5.20
 -- PHP 版本: 5.3.10
 
@@ -35,8 +35,25 @@ CREATE TABLE IF NOT EXISTS `y_article` (
   PRIMARY KEY (`id`),
   KEY `list` (`status`,`sticky`,`create_time`),
   KEY `frontpage` (`status`,`promote`,`sticky`,`create_time`),
-  KEY `channel_id` (`channel_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+  KEY `channel_id` (`channel_id`),
+  KEY `update_time` (`update_time`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `y_article_meta`
+--
+
+CREATE TABLE IF NOT EXISTS `y_article_meta` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `object_id` int(11) unsigned NOT NULL,
+  `meta_key` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `meta_value` text COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `post_meta` (`object_id`,`meta_key`),
+  KEY `post_id` (`object_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -67,6 +84,25 @@ CREATE TABLE IF NOT EXISTS `y_authitem` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- 转存表中的数据 `y_authitem`
+--
+
+INSERT INTO `y_authitem` (`name`, `type`, `description`, `bizrule`, `data`) VALUES
+('admin', 2, '管理员', NULL, 'N;'),
+('Banner.*', 1, 'Banner管理', '', 'N;'),
+('Channel.*', 1, '栏目管理', '', 'N;'),
+('Content.*', 1, '内容管理', '', 'N;'),
+('File.*', 1, '文件管理', '', 'N;'),
+('Link.*', 1, '链接管理', '', 'N;'),
+('Permission.*', 1, '权限管理', '', 'N;'),
+('Role.*', 1, '角色管理', '', 'N;'),
+('Site.Index', 1, '控制面板', '', 'N;'),
+('site.setting', 1, '站点设置', '', 'N;'),
+('Taxonomy.*', 1, '分类管理', '', 'N;'),
+('Term.*', 1, '分类术语管理', '', 'N;'),
+('User.*', 1, '用户管理', '', 'N;');
+
 -- --------------------------------------------------------
 
 --
@@ -79,6 +115,23 @@ CREATE TABLE IF NOT EXISTS `y_authitemchild` (
   PRIMARY KEY (`parent`,`child`),
   KEY `child` (`child`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 转存表中的数据 `y_authitemchild`
+--
+
+INSERT INTO `y_authitemchild` (`parent`, `child`) VALUES
+('admin', 'Channel.*'),
+('admin', 'Content.*'),
+('admin', 'File.*'),
+('admin', 'Link.*'),
+('admin', 'Permission.*'),
+('admin', 'Role.*'),
+('admin', 'Site.Index'),
+('admin', 'site.setting'),
+('admin', 'Taxonomy.*'),
+('admin', 'Term.*'),
+('admin', 'User.*');
 
 -- --------------------------------------------------------
 
@@ -102,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `y_banner` (
   KEY `category` (`category_id`),
   KEY `visible` (`visible`),
   KEY `update_time` (`update_time`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -114,19 +167,21 @@ CREATE TABLE IF NOT EXISTS `y_channel` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `content` longtext NOT NULL,
   `model` varchar(64) NOT NULL,
   `parent_id` int(10) unsigned NOT NULL,
-  `content` longtext NOT NULL,
   `keywords` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `type` tinyint(4) NOT NULL DEFAULT '0',
   `create_time` int(11) NOT NULL DEFAULT '0',
   `update_time` int(11) NOT NULL DEFAULT '0',
   `weight` int(11) NOT NULL DEFAULT '0',
+  `status` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
-  KEY `list` (`weight`,`title`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
+  KEY `list` (`weight`,`title`),
+  KEY `status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -150,7 +205,7 @@ CREATE TABLE IF NOT EXISTS `y_file` (
   KEY `user_id` (`user_id`),
   KEY `status` (`status`),
   KEY `bundle` (`bundle`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=55 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -191,7 +246,7 @@ CREATE TABLE IF NOT EXISTS `y_link` (
   KEY `category_id` (`category_id`),
   KEY `list` (`weight`,`name`),
   KEY `update_time` (`update_time`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -213,7 +268,8 @@ CREATE TABLE IF NOT EXISTS `y_node` (
   PRIMARY KEY (`id`),
   KEY `list` (`status`,`sticky`,`create_time`),
   KEY `frontpage` (`status`,`promote`,`sticky`,`create_time`),
-  KEY `channel_id` (`channel_id`)
+  KEY `channel_id` (`channel_id`),
+  KEY `update_time` (`update_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -230,6 +286,13 @@ CREATE TABLE IF NOT EXISTS `y_role` (
   KEY `list` (`weight`,`description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- 转存表中的数据 `y_role`
+--
+
+INSERT INTO `y_role` (`name`, `description`, `weight`) VALUES
+('admin', '管理员', 0);
+
 -- --------------------------------------------------------
 
 --
@@ -243,7 +306,16 @@ CREATE TABLE IF NOT EXISTS `y_setting` (
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `category_key` (`category`,`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+
+--
+-- 转存表中的数据 `y_setting`
+--
+
+INSERT INTO `y_setting` (`id`, `category`, `key`, `value`) VALUES
+(1, 'general', 'site_name', 'dsfsd'),
+(2, 'general', 'site_keywords', 'dsf'),
+(3, 'general', 'site_description', 'dfdfsfdssdfsdf');
 
 -- --------------------------------------------------------
 
@@ -262,7 +334,15 @@ CREATE TABLE IF NOT EXISTS `y_taxonomy` (
   PRIMARY KEY (`id`),
   KEY `name` (`slug`),
   KEY `list` (`weight`,`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
+
+--
+-- 转存表中的数据 `y_taxonomy`
+--
+
+INSERT INTO `y_taxonomy` (`id`, `name`, `slug`, `description`, `hierarchy`, `weight`, `model`) VALUES
+(1, '标签', 'tags', '', 0, 0, ''),
+(2, '新闻中心', 'news', '', 0, 0, '');
 
 -- --------------------------------------------------------
 
@@ -330,7 +410,14 @@ CREATE TABLE IF NOT EXISTS `y_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+
+--
+-- 转存表中的数据 `y_user`
+--
+
+INSERT INTO `y_user` (`id`, `username`, `password`, `email`, `activation_key`, `nickname`, `status`, `create_time`, `update_time`, `login_time`) VALUES
+(1, 'superadmin', '$2a$13$RZzPR8WMZ1Yys/ice6n0du1QY6mwpHs4r0kjZfFA6EyoUWHpQ/HjG', '261496560@qq.com', '', '超级管理员', 0, 1383525507, 1383979010, 1383979192);
 
 --
 -- 限制导出的表
@@ -348,4 +435,3 @@ ALTER TABLE `y_authassignment`
 ALTER TABLE `y_authitemchild`
   ADD CONSTRAINT `y_authitemchild_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `y_authitem` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `y_authitemchild_ibfk_2` FOREIGN KEY (`child`) REFERENCES `y_authitem` (`name`) ON DELETE CASCADE ON UPDATE CASCADE;
-

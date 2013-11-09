@@ -556,6 +556,11 @@ class Term extends CActiveRecord
 			$savedIds[] = $lastInsertId;
 		}
 
+		if ($insertNames) {
+			$cacheKey = 'term_tree_' . $taxonomy_id;
+			Yii::app()->getCache()->delete($cacheKey);
+		}
+
 		foreach ($newIds as $id) {
 			$connection->createCommand()->insert('{{term_hierarchy}}', array(
 				'term_id' => $id,

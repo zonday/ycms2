@@ -167,18 +167,18 @@ class User extends CActiveRecord
 		}
 
 		if (isset($this->login_time)) {
-			if (!$this->login_time) {
+			if (is_numeric($this->login_time)) {
 				$criteria->compare('login_time', $this->login_time);
-			} else {
+			} elseif ($this->login_time) {
 				$condition = YUtil::generateTimeCondition($this->login_time, 't.login_time');
 				if ($condition)
 					$criteria->addCondition($condition);
 			}
 		}
 
-		if (isset($this->_roleNames) && is_array($this->_roleNames)) {
+		if (isset($this->_roleNames) && $this->_roleNames) {
 			$criteria->join = 'INNER JOIN ' . Yii::app()->getAuthManager()->assignmentTable . ' AS t2 ON t.id = t2.userid';
-			$criteria->addInCondition('t2.itemname', $this->_roleNames);
+			$criteria->addInCondition('t2.itemname', (array) $this->_roleNames);
 		}
 
 		return new CActiveDataProvider($this, array(
@@ -197,7 +197,7 @@ class User extends CActiveRecord
 	{
 		return array(
 			self::STATUS_DEFAULT => '正常',
-			self::STATUS_NOT_ACTIVATED => '未激活验证',
+			//self::STATUS_NOT_ACTIVATED => '未激活验证',
 			self::STATUS_BLOCK => '禁用',
 		);
 	}
@@ -392,7 +392,7 @@ class User extends CActiveRecord
 					if (!$staticModel instanceof Node) {
 						continue;
 					}
-					$connection->createCommand()->update($staticModel->tableName(), array('status'=>Node::STATUS_DRAFT), 'user_id=:user_id', array(':user_id'=>$this->id));
+					$staticModel->bulkUpdate(array('status'=>Node::STATUS_DRAFT), 'user_id=:user_id', array(':user_id'=>$this->id));
 				}
 				return true;
 			case 'reassign':
@@ -402,9 +402,9 @@ class User extends CActiveRecord
 						if (!$staticModel instanceof Node) {
 							continue;
 						}
-						$connecton->crateCommand()->update($staticModel->tableName(), array('user_id'=>0), 'user_id=:user_id', array(':user_id'=>$this->id));
+						$staticModel->bulkUpdate(array('user_id'=>0), 'user_id=:user_id', array(':user_id'=>$this->id));
 					}
-					File::bulkUpdate(array('user_id'=>0), 'user_id=:user_id', array(':user_id'=>$this->id));
+					File::model()->bulkUpdate(array('user_id'=>0), 'user_id=:user_id', array(':user_id'=>$this->id));
 					return true;
 				} else {
 					return false;
@@ -416,9 +416,10 @@ class User extends CActiveRecord
 						if (!$staticModel instanceof Node) {
 							continue;
 						}
-						$connecton->crateCommand()->delete($staticModel->tableName(),'user_id=:user_id', array(':user_id'=>$this->id));
+						$staticModel->bulkDelete('user_id=:user_id', array(':user_id'=>$this->id));
 					}
-					File::bulkDelete('user_id=:user_id', array(':user_id'=>$this->id));
+					File::model()->bulkDelete('user_id=:user_id', array(':user_id'=>$this->id));
+					return true;
 				} else {
 					return false;
 				}

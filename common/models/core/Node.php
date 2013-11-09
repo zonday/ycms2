@@ -375,7 +375,7 @@ abstract class Node extends CActiveRecord
 	 */
 	public function bulkSticky($ids)
 	{
-		self::updateByPk($ids, array('sticky'=>1));
+		$this->updateByPk($ids, array('sticky'=>1));
 	}
 
 	/**
@@ -384,7 +384,7 @@ abstract class Node extends CActiveRecord
 	 */
 	public function bulkUnsticky($ids)
 	{
-		self::updateByPk($ids, array('sticky'=>0));
+		$this->updateByPk($ids, array('sticky'=>0));
 	}
 
 	/**
@@ -393,7 +393,7 @@ abstract class Node extends CActiveRecord
 	 */
 	public function bulkPromote($ids)
 	{
-		self::updateByPk($ids, array('promote'=>1));
+		$this->updateByPk($ids, array('promote'=>1));
 	}
 
 	/**
@@ -402,7 +402,53 @@ abstract class Node extends CActiveRecord
 	 */
 	public function bulkDemote($ids)
 	{
-		self::updateByPk($ids, array('promote'=>0));
+		$this->updateByPk($ids, array('promote'=>0));
+	}
+
+	/**
+	 * 批量更新
+	 * @param array $columns
+	 * @param mixed $condition
+	 * @param array $params
+	 */
+	public function bulkUpdate($columns, $condition='', $params=array())
+	{
+		$connection = $this->getDbConnection();
+		$connection->createCommand()->update($this->tableName(), $columns, $condition, $params);
+	}
+
+	/**
+	 * 批量删除
+	 * @param mixed $condition
+	 * @param array $params
+	 */
+	public function bulkDelete($condition='', $params=array())
+	{
+		$connection = $this->getDbConnection();
+		$hasTaxonomy = isset($this->YTaxonomyBehavior);
+		$hasMeta = isset($this->YMetaBehavior);
+
+		if ($hasTaxonomy || $hasMeta) {
+			$offset = 0;
+			$limit = 500;
+			while (
+				$ids = $connection->createCommand()
+					->select('id')
+					->from($this->tableName())
+					->where($condition, $params)
+					->limit($limit, $offset)
+					->queryColumn()
+			) {
+				$offset += $limit;
+				foreach ($ids as $id) {
+					$this->id = $id;
+					$hasTaxonomy && $this->deleteTermRelationship();
+					$hasMeta && $this->deleteMetaRelationship();
+				}
+			}
+		}
+		$this->unsetAttributes(); //释放属性
+		$connection->createCommand()->delete($this->tableName(), $condition, $params);
 	}
 
 	public function init()
@@ -412,7 +458,6 @@ abstract class Node extends CActiveRecord
 			$this->create_time = date('Y-m-d H:i:s');
 		}
 	}
-
 
 	/**
 	 * 查找之后

@@ -72,6 +72,11 @@ class SiteController extends Controller
 		if(isset($_POST['LostPasswordForm'])) {
 			$model->attributes = $_POST['LostPasswordForm'];
 			if($model->validate() && $model->lostPassword()) {
+				$user = $model->getUser();
+				$subject = sprintf('%s重置密码', Yii::app()->name);
+				$message = sprintf('请复制下面地址进行重置密码%s', Yii::app()->createAbsoluteUrl('site/resetpassword', array('login'=>$user->username, 'key'=>$user->activation_key)));
+				Yii::app()->mailer->sendmail($user->email, $subject, $message);
+				Yii::app()->getUser()->setFlash('success', '重置密码邮件已发送您的电子邮箱。');
 				$this->redirect(array('login'));
 			}
 		}
@@ -154,6 +159,8 @@ class SiteController extends Controller
 	 */
 	public function actionLogout()
 	{
+		$cacheKey = 'backend_nav_items_' . Yii::app()->getSession()->getSessionID();
+		Yii::app()->getCache()->delete($cacheKey);
 		Yii::app()->getUser()->logout();
 		$this->redirect(Yii::app()->homeUrl);
 	}

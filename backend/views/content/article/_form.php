@@ -21,16 +21,17 @@
 				'form'=>$form,
 				'attribute'=>'content',
 			)); ?>
-
 			<?php echo $form->textAreaRow($model,'excerpt',array('class'=>'input-block-level','rows'=>6)); ?>
 		</div>
 		<div class="span4">
 			<div id="form-side">
-				<?php $this->widget('YUploadWidget', array(
+				<?php
+				$this->widget('YUploadWidget', array(
 					'model' => $model,
 					'attribute' => 'image',
 					'form' => $form,
-				))?>
+				))
+				?>
 
 				<?php
 				if (isset($model->YTaxonomyBehavior) && $model->taxonomies()):

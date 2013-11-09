@@ -200,7 +200,7 @@ class PermissionController extends Controller
 			$authItem = $this->loadAuthItem($name);
 			$model = new AuthItemForm();
 			if (Yii::app()->getAuthManager()->removeAuthItem($name))
-				Yii::app()->getUser()->setFlash('success', $model->typeNames[$type] . '删除成功');
+				Yii::app()->getUser()->setFlash('success', $model->typeNames[$authItem->getType()] . '删除成功');
 
 			if(!isset($_GET['ajax']))
 				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));

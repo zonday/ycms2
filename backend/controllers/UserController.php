@@ -104,7 +104,7 @@ class UserController extends Controller
 		$model = $this->loadModel($id);
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$method = isset($_POST['method']) ? $_POST['method'] : null;
-			if ($model->cannel($id, $method)) {
+			if ($model->cannel($method)) {
 				Yii::app()->getUser()->setFlash('success', '操作已执行');
 				$this->redirect(array('index'));
 			}
@@ -185,9 +185,8 @@ class UserController extends Controller
 			case 'block':
 				User::model()->updateByPk($ids, array('status' => User::STATUS_BLOCK));
 				break;
-			 case 'delete':
-				foreach (User::model()->findAllByPk($ids) as $model)
-					$model->delete();
+			 case 'unblock':
+				User::model()->updateByPk($ids, array('status' => User::STATUS_DEFAULT));
 				break;
 		}
 
