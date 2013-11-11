@@ -24,16 +24,16 @@
 class User extends CActiveRecord
 {
 	/**
-	 * 缺省状态
+	 * 正常状态
 	 * @var integer
 	 */
-	const STATUS_DEFAULT = 0;
+	const STATUS_NORMAL = 0;
 
 	/**
 	 * 未激活认证
 	 * @var integer
 	 */
-	const STATUS_NOT_ACTIVATED = 1;
+	const STATUS_NOT_ACTIVE = 1;
 
 	/**
 	 * 锁定
@@ -101,7 +101,7 @@ class User extends CActiveRecord
 			array('nickname', 'length', 'max' => 16),
 			array('email', 'length', 'max' => 128),
 			array('email', 'email'),
-			array('status', 'in', 'range'=>array(self::STATUS_DEFAULT, self::STATUS_NOT_ACTIVATED, self::STATUS_BLOCK)),
+			array('status', 'in', 'range'=>array(self::STATUS_DEFAULT, self::STATUS_NOT_ACTIVE, self::STATUS_BLOCK)),
 			array('username, email', 'unique'),
 			array('roleNames', 'safe'),
 			array('update_time, login_time, create_time', 'safe', 'on' => 'search'),
@@ -196,8 +196,8 @@ class User extends CActiveRecord
 	public static function getStatusList()
 	{
 		return array(
-			self::STATUS_DEFAULT => '正常',
-			//self::STATUS_NOT_ACTIVATED => '未激活验证',
+			self::STATUS_NORMAL => '正常',
+			//self::STATUS_NOT_ACTIVE => '未激活验证',
 			self::STATUS_BLOCK => '禁用',
 		);
 	}

@@ -1,42 +1,51 @@
 <?php
-Yii::setPathOfAlias('root', __DIR__ . '/../..');
-Yii::setPathOfAlias('common', __DIR__ . '/../../common');
+Yii::setPathOfAlias('root', dirname(__FILE__) . '/../..');
+Yii::setPathOfAlias('common', dirname(__FILE__) . '/../../common');
+
+require dirname(__FILE__) . '/db.php';
 
 $defaultSettings = array(
-		'general' => array(
-			'site_name' => array(
-				'label' => '站点名称',
-				'required' => true,
-			),
-			'site_keywords' => array(
-				'label' => '站点关键字',
-			),
-			'site_description' => array(
-				'label' => '站点描述',
-				'type' => 'textarea',
-			)
+	'general' => array(
+		'site_name' => array(
+			'label' => '站点名称',
+			'required' => true,
 		),
-		'system' => array(
-			'admin_email' => array(
-				'label' => '管理员Email',
-				'type' => 'email',
-				'required' => true,
-			),
+		'site_keywords' => array(
+			'label' => '站点关键字',
+		),
+		'site_description' => array(
+			'label' => '站点描述',
+			'type' => 'textarea',
 		)
+	),
+	'system' => array(
+		'admin_email' => array(
+			'label' => '管理员Email',
+			'type' => 'email',
+			'required' => true,
+		),
+	)
 );
 
-$default = array(
-	'runtimePath' => __DIR__. '/../runtime',
+return array(
+	'name' => 'YCMS',
+	'runtimePath' => dirname(__FILE__). '/../runtime',
 	'language' => 'zh_cn',
 	'timezone' => 'Asia/Shanghai',
 	'import' => array(
 		'common.components.*',
 		'common.components.behaviors.*',
+		'common.components.validators.*',
 		'common.components.widgets.*',
 		'common.models.*',
 		'common.models.core.*',
+		'common.models.content.*',
 		'common.helpers.*',
 		'common.extensions.yiidebugtb.*',
+		'application.components.*',
+		'application.controllers.*',
+		'application.models.*',
+		'application.widgets.*',
 	),
 	'components' => array(
 		'mailer'=>array(
@@ -52,6 +61,10 @@ $default = array(
 			'booleanFormat'=>array('否','是'),
 		),
 		'db' => array(
+			'connectionString' => 'mysql:host='. DB_HOST .';dbname=' . DB_NAME,
+			'username' => DB_USER,
+			'password' => DB_PASSWORD,
+			'tablePrefix' => DB_TABLE_PREFIX,
 			'schemaCachingDuration' => YII_DEBUG ? 0 : 86400000, // 1000 天
 			'enableParamLogging' => YII_DEBUG,
 			'emulatePrepare' => true,
@@ -96,12 +109,6 @@ $default = array(
 	),
 
 	'params'=>array(
-		'settings' => CMap::mergeArray($defaultSettings, file_exists(__DIR__ . '/settings.php') ? require(__DIR__ . '/settings.php') : array())
+		'settings' => CMap::mergeArray($defaultSettings, file_exists(dirname(__FILE__) . '/settings.php') ? require(dirname(__FILE__) . '/settings.php') : array())
 	),
-);
-
-return CMap::mergeArray(
-	$default,
-	file_exists(__DIR__ . '/main-env.php') ? require(__DIR__ . '/main-env.php') : array(),
-	file_exists(__DIR__ . '/main-local.php') ? require(__DIR__ . '/main-local.php') : array()
 );

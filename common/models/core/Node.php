@@ -159,7 +159,7 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 状态列表
-	 * @return multitype:string
+	 * @return array
 	 */
 	public static function getStatusList()
 	{

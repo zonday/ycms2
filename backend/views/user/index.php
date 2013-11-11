@@ -65,8 +65,8 @@ foreach ($allRoleList as $name => $description) {
 			'class'=>'YStatusColumn',
 			'statusList' => $model->getStatusList(),
 			'labelMap' => array(
-				User::STATUS_DEFAULT => 'success',
-				User::STATUS_NOT_ACTIVATED => 'warning',
+				User::STATUS_NORMAL => 'success',
+				User::STATUS_NOT_ACTIVE => 'warning',
 				User::STATUS_BLOCK => 'important',
 			),
 			'filter'=>$model->getStatusList(),

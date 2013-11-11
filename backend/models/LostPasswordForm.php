@@ -81,7 +81,7 @@ class LostPasswordForm extends CFormModel
 		if (!isset($this->_user))
 		{
 			$this->addError('login', '无效的' . $label);
-		} elseif ($this->_user->status == User::STATUS_NOT_ACTIVATED)
+		} elseif ($this->_user->status == User::STATUS_NOT_ACTIVE)
 		{
 			$this->addError('login', '邮箱未激活验证！');
 		} elseif ($this->_user->status == User::STATUS_BLOCK)

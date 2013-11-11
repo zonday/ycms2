@@ -89,6 +89,7 @@ class ContentController extends Controller
 		}
 
 		$model = new $modelClass('search');
+
 		$model->unsetAttributes();
 
 		if (isset($_GET[$modelClass])) {
@@ -211,6 +212,7 @@ class ContentController extends Controller
 
 		if (!$model = CActiveRecord::model($modelClass)->findByPk($id))
 			throw new CHttpException(404, '页面没有找到。');
+
 		return $model;
 	}
 

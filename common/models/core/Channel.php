@@ -225,7 +225,7 @@ class Channel extends CActiveRecord
 		$parents = array();
 		$parentId = $this->parent_id;
 		while($parent = self::get($parentId)) {
-			$parents[] = $model;
+			$parents[] = $parent;
 			$parentId = $parent->parent_id;
 		}
 

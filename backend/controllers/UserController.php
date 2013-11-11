@@ -177,16 +177,16 @@ class UserController extends Controller
 
 		switch ($action) {
 			case 'active':
-				User::model()->updateByPk($ids, array('status' => User::STATUS_DEFAULT));
+				User::model()->updateByPk($ids, array('status' => User::STATUS_NORMAL));
 				break;
 			case 'notactive':
-				User::model()->updateByPk($ids, array('status' => User::STATUS_NOT_ACTIVATED));
+				User::model()->updateByPk($ids, array('status' => User::STATUS_NOT_ACTIVE));
 				break;
 			case 'block':
 				User::model()->updateByPk($ids, array('status' => User::STATUS_BLOCK));
 				break;
 			 case 'unblock':
-				User::model()->updateByPk($ids, array('status' => User::STATUS_DEFAULT));
+				User::model()->updateByPk($ids, array('status' => User::STATUS_NORMAL));
 				break;
 		}
 

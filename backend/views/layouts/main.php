@@ -5,8 +5,6 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="robots" content="noindex,nofollow" />
 		<title><?php echo CHtml::encode($this->pageTitle); ?></title>
-		<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->baseUrl; ?>/css/style.css"/>
-		<script type="text/javascript" src="<?php echo Yii::app()->baseUrl; ?>/js/common.js"></script>
 	</head>
 	<body>
 		<?php

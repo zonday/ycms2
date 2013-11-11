@@ -48,7 +48,7 @@ class UserIdentity extends CUserIdentity
 			$this->errorCode = self::ERROR_NONE;
 		} elseif ($user->status == User::STATUS_BLOCK) {
 			$this->errorCode = self::ERROR_USER_BLOCK;
-		} elseif ($user->status == User::STATUS_NOT_ACTIVATED) {
+		} elseif ($user->status == User::STATUS_NOT_ACTIVE) {
 			$this->errorCode = self::ERROR_USER_NOT_ACTIVATED;
 		} elseif (!$user->hasRole('admin')) {
 			$this->errorCode = self::ERROR_ROLE_NOT_ALLOW;

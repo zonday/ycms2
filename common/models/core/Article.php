@@ -56,6 +56,19 @@ class Article extends Node
 			),);
 	}
 
+	public function fileUsage()
+	{
+		return array(
+			'image' => array(
+				'location' => 'public://article/' . date('Ym'),
+				'type' => 'image',
+				'resize' => array(
+					'post-thumbnail'=>array(222, 157, true),
+				)
+			),
+		);
+	}
+
 	public function extraBehaviors(){
 		return array(
 			'YFileUsageBehavior' => array(

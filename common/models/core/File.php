@@ -730,6 +730,7 @@ class File extends CActiveRecord
 		}
 		if ($uncached) {
 			foreach (self::model()->findAllByPk($uncached) as $model) {
+				$model->detachBehaviors();
 				$cacheKey = self::getCacheKey($model->id);
 				Yii::app()->getCache()->add($cacheKey, $model, Setting::get('system', '_file_cache_expire', 3600));
 				$models[] = $model;
@@ -889,7 +890,8 @@ class File extends CActiveRecord
 		parent::afterSave();
 		if (!is_array($this->meta))
 			$this->meta = unserialize($this->meta);
-		Yii::app()->getCache()->set(self::getCacheKey($this->id), $this);
+		$this->detachBehaviors();
+		Yii::app()->getCache()->set(self::getCacheKey($this->id), $this, Setting::get('system', '_file_cache_expire', 3600));
 	}
 
 	/**
