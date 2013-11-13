@@ -201,6 +201,8 @@ class File extends CActiveRecord
 		$ext = $this->getExt();
 		if ( ($pos = strrpos($this->filename, $ext)) !== false) {
 			return substr($this->filename, 0, $pos - 1);
+		} else {
+			return $this->filename;
 		}
 	}
 
@@ -277,7 +279,7 @@ class File extends CActiveRecord
 	 */
 	public function getExt()
 	{
-		return pathinfo($this->filename, PATHINFO_EXTENSION);
+		return pathinfo($this->uri, PATHINFO_EXTENSION);
 	}
 
 	/**

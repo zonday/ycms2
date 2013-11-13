@@ -40,13 +40,8 @@ $this->breadcrumbs = array(
 	<div class="span7 column">
 		<?php
 		$this->beginWidget('bootstrap.widgets.TbBox', array(
-			'title' => '最近的',
+			'title' => '最近的内容',
 		));
-		?>
-		<?php foreach (Channel::getModelList() as $modelClass => $name):
-			$staticModel = CActiveRecord::model($modelClass);
-			if (!$staticModel instanceof Node)
-				continue;
 		?>
 		<table class="table table-hover">
 			<thead>
@@ -58,18 +53,34 @@ $this->breadcrumbs = array(
 				</tr>
 			</thead>
 			<tbody>
-					<?php foreach ($staticModel->cache(60)->findAll(array('select'=>'id, channel_id, title, update_time, status', 'limit'=>10, 'order'=>'update_time DESC')) as $model): ?>
-					<?php $channel = Channel::get($model->channel_id); ?>
+				<?php
+				$statusLabelMap = array(
+					Node::STATUS_DRAFT => 'warning',
+					Node::STATUS_PUBLIC => 'success',
+					Node::STATUS_TRASH => 'inverse',
+				);
+				foreach (Channel::getModelList() as $modelClass => $name):
+					$staticModel = CActiveRecord::model($modelClass);
+					if (!$staticModel instanceof Node)
+						continue;
+				?>
+				<tr><th colspan="4" align="center"><?php echo Channel::model()->getModelName($modelClass); ?></th></tr>
+					<?php foreach ($staticModel->cache(60)->findAll(array('select'=>'id, channel_id, title, update_time, status', 'limit'=>5, 'order'=>'update_time DESC')) as $model): ?>
+					<?php
+						$channel = Channel::get($model->channel_id);
+
+					?>
 				<tr>
 					<td class="title-column"><?php echo CHtml::link(CHtml::encode($model->title), array('content/update', 'channel'=>$model->channel_id, 'id'=>$model->id), array('title'=>CHtml::encode($model->title))); ?> </td>
 					<td class="channel-column"><?php echo CHtml::link(CHtml::encode($channel->title), array('content/index', 'channel'=>$channel->id), array('title'=>'查看该栏目下的文章')); ?></td>
-					<td class="datetime-column"><?php echo Yii::app()->format->date($model->update_time)?></td>
-					<td class="status-column"><?php echo $model->statusList[$model->status]; ?></td>
+					<td class="datetime-column"><abbr title="<?php echo Yii::app()->format->datetime($model->update_time); ?>"><?php echo Yii::app()->format->date($model->update_time)?></abbr></td>
+					<td class="status-column"><span class="label label-<?php echo $statusLabelMap[$model->status]?>"><?php echo $model->statusList[$model->status]; ?></span></td>
 				</tr>
 					<?php endforeach; ?>
+				<?php endforeach; ?>
 			</tbody>
 		</table>
-		<?php endforeach; ?>
+
 		<?php $this->endWidget();?>
 	</div>
 </div>

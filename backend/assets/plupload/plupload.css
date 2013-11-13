@@ -1,6 +1,7 @@
 .drag-drop .drag-drop-area {
 	border: 4px dashed #DDDDDD;
 	height: 200px;
+	margin-bottom: 5px;
 }
 
 .drag-over .drag-drop-area {

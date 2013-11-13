@@ -184,8 +184,8 @@ class Channel extends CActiveRecord
 	 */
 	public static function getModelList()
 	{
-		if (isset(Yii::app()->params['modelList'])) {
-			return Yii::app()->params['modelList'];
+		if (isset(Yii::app()->params['models'])) {
+			return Yii::app()->params['models'];
 		} else {
 			return array(
 				'Article'=>'文章',
@@ -297,8 +297,8 @@ class Channel extends CActiveRecord
 	 */
 	public function getTree($parent=0, $maxDepth=null)
 	{
-		$children = $this->getChildren($parent === 0 ? -1 : $parent);
 
+		$children = $this->getChildren(-1);
 		if ($maxDepth === null ) {
 			$maxDepth = count($children);
 		}
@@ -429,9 +429,12 @@ class Channel extends CActiveRecord
 	 * 获取模型名
 	 * @return string
 	 */
-	public function getModelName()
+	public function getModelName($model=null)
 	{
-		return isset($this->modelList[$this->model]) ? $this->modelList[$this->model] : $this->model;
+		if ($model === null) {
+			$model = $this->model;
+		}
+		return isset($this->modelList[$model]) ? $this->modelList[$model] : $model;
 	}
 
 	/**
@@ -452,14 +455,52 @@ class Channel extends CActiveRecord
 	public function getContentActionLink()
 	{
 		$htmlOptions = array('class'=>'btn');
+		$output = '';
+		$url = array('/content/index','channel'=>$this->id);
+		if ($this->model) {
+			$staticModel = CActiveRecord::model($this->model);
+			if (!$staticModel instanceof Node) {
+				$url = array('/other/' . strtolower($this->model));
+			}
+			$output = CHtml::link('<i class="icon-list"></i> 管理内容', $url, $htmlOptions);
+		}
 
-		$output = CHtml::link('<i class="icon-list"></i> 管理内容', array('/content/create','channel'=>$this->id), $htmlOptions);
 		if ($this->type == Channel::TYPE_LIST)
 			return $output . CHtml::link('<i class="icon-plus"></i> 创建内容', array('/content/create','channel'=>$this->id), $htmlOptions);
 		elseif ($this->type == Channel::TYPE_PAGE)
 			return $output . CHtml::link('<i class="icon-pencil"></i> 更新页面', array('/content/channel','channel'=>$this->id), $htmlOptions);
 		else
 			return $output;
+	}
+
+	/**
+	 * 获取内容对象模型
+	 * @param boolean $static
+	 * @param string $scen
+	 */
+	public function getObjectModel($static=true, $scenario='insert')
+	{
+		if ($this->isNewRecord)
+			throw new CException('栏目不存在');
+
+		if (!$this->model)
+			throw new CException(sprintf(' %s 栏目模型丢失', $channel->title));
+
+		if ($static) {
+			$model = CActiveRecord::model($this->model);
+		} else {
+			$model = new $model($scenario);
+		}
+
+		if ($model instanceof Node) {
+			if ($static) {
+				$model->channel_id = $this->id;
+			} else {
+				$model->byChannel($this->id);
+			}
+		}
+
+		return $model;
 	}
 
 	/**

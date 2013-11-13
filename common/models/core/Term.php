@@ -88,18 +88,27 @@ class Term extends CActiveRecord
 		);
 	}
 
-	public function behaviors(){
-		return array(
-			'fileUsage' => array(
-				'class' => 'YFileUsageBehavior',
-				'fields' => array(
-					'image' => array(
-						'location' => 'public://term',
-						'type' => 'image',
+	/**
+	 * 行为
+	 * @see CModel::behaviors()
+	 */
+	public function behaviors()
+	{
+		if (!empty(Yii::app()->params['termImage'])) {
+			return array(
+				'YFileUsageBehavior' => array(
+					'class' => 'YFileUsageBehavior',
+					'fields' => array(
+						'image' => array(
+							'location' => 'public://term',
+							'type' => 'image',
+						),
 					),
-				),
-			),
-		);
+				)
+			);
+		} else {
+			return array();
+		}
 	}
 
 	/**

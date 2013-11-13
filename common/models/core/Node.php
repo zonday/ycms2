@@ -451,6 +451,42 @@ abstract class Node extends CActiveRecord
 		$connection->createCommand()->delete($this->tableName(), $condition, $params);
 	}
 
+	/**
+	 * 根据栏目
+	 * @param mixed $channel
+	 * @param mixed $limit
+	 * @return Node
+	 */
+	public function byChannel($channel, $limit=null)
+	{
+		if (!$this->hasAttribute('channel_id'))
+			return $this;
+
+		if (is_array($channel)) {
+			foreach ($channel as $value) {
+				if ($value instanceof Channel)
+					$channelIds[] = $value->id;
+				elseif (is_numeric($value))
+					$channelIds[] = (int) $value;
+				else
+					$channelIds[] = Channel::get($value)->id;
+			}
+		} elseif($channel instanceof Channel)
+			$channelIds = array($channel->id);
+		elseif (is_numeric($channel))
+			$channelIds = array((int) $channel);
+		else
+			$channelIds = array(Channel::get($channel)->id);
+
+		$criteria = new CDbCriteria(array(
+			'limit' => $limit,
+		));
+
+		$criteria->compare('channel_id', $channelIds);
+		$this->getDbCriteria()->mergeWith($criteria);
+		return $this;
+	}
+
 	public function init()
 	{
 		parent::init();

@@ -14,6 +14,12 @@
 class YMetaBehavior extends CModelBehavior
 {
 	/**
+	 * meta表
+	 * @var string
+	 */
+	public $metaTable;
+
+	/**
 	 * 对象的Meta
 	 * @var array|null
 	 */
@@ -175,7 +181,11 @@ class YMetaBehavior extends CModelBehavior
 	 */
 	protected function getTable()
 	{
-		$owner = $this->getOwner();
-		return '{{' . strtolower(get_class($owner)) . '_meta}}';
+		if (isset($this->metaTable)) {
+			return $this->metaTable;
+		} else {
+			$owner = $this->getOwner();
+			return '{{' . strtolower(get_class($owner)) . '_meta}}';
+		}
 	}
 }

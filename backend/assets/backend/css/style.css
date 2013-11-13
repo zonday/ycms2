@@ -237,6 +237,22 @@ tr .icon-move {
 	cursor: move;
 }
 
+.bootstrap-widget table .channel-column {
+	width: 8em;
+}
+
+.bootstrap-widget table .status-column {
+	width: 3em;
+}
+
+.bootstrap-widget table .datetime-column {
+	width: 6em;
+}
+
+.bootstrap-widget table thead th {
+	color: #aaa;
+}
+
 .detail-view {
 	border: 1px solid #ddd;
 }

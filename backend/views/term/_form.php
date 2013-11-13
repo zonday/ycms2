@@ -8,6 +8,16 @@
 
 	<?php //echo $form->errorSummary($model); ?>
 
+	<?php
+	if (isset($model->YFileUsageBehavior)) {
+		$this->widget('YUploadWidget', array(
+			'model' => $model,
+			'attribute' => 'image',
+			'form' => $form,
+		));
+	}
+	?>
+
 	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>128)); ?>
 
 	<?php echo $form->textFieldRow($model,'slug',array('class'=>'span5','maxlength'=>128,'hint'=>'唯一标识符，只能包含字母，数字和连字符（-）')); ?>
@@ -53,7 +63,7 @@
 			'buttonType'=>'submitLink',
 			'type'=>'danger',
 			'encodeLabel'=>false,
-			'htmlOptions'=>array('class'=>'pull-right', 'csrf'=>true,'submit'=>array('delete','id'=>$model->id),'confirm'=>'确定要删除这条数据吗?'),
+			'htmlOptions'=>array('class'=>'pull-right', 'csrf'=>true,'submit'=>array('delete','id'=>$model->id),'confirm'=>'删除这个术语将会导致该术语下的所有内容关系将被删除！请谨慎操作！'),
 			'label'=>'<i class="icon-trash"></i> 删除',
 			'visible' => !$model->isNewRecord,
 		));

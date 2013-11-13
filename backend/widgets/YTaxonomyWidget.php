@@ -31,7 +31,7 @@ class YTaxonomyWidget extends CInputWidget
 		foreach ($model->prepareTaxonomies() as $taxonomy => $params) {
 			$htmlOptions = $this->htmlOptions;
 
-			if ($params['many'] !== 1)
+			if ($params['many'])
 				$htmlOptions['multiple'] = true;
 
 			if ($params['allowEmpty'])

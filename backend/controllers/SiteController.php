@@ -65,6 +65,10 @@ class SiteController extends Controller
 	 */
 	public function actionLostpassword()
 	{
+		if (!Yii::app()->hasComponent('mailer')) {
+			throw new CException('应用程序没有配置邮件服务，不能找回密码。');
+		}
+
 		$this->layout = 'none';
 
 		$model = new LostPasswordForm;

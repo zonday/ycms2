@@ -36,8 +36,9 @@ $this->pageTitle='登录';
 		'htmlOptions' => array('class' => 'btn-block'),
 	)); ?>
 
+	<?php if (Yii::app()->hasComponent('mailer')): ?>
 	<p class="signin-actions"><?php echo CHtml::link('忘记密码了？', array('lostpassword'))?></p>
-
+	<?php endif; ?>
 <?php $this->endWidget(); ?>
 
 </div>
