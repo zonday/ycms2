@@ -181,20 +181,24 @@ class Setting extends CFormModel
 	 * @return array
 	 */
 	public static function getAllByCategory($category) {
-		$cacheKey = "setting_{$category}_options";
-		if (($options = Yii::app()->getCache()->get($cacheKey)) === false) {
-			$rows = Yii::app()->getDb()->createCommand()
-				->select(array('key', 'value'))
-				->from('{{setting}}')
-				->where('category=:category', array(':category' => $category))
-				->queryAll();
-			$options = array();
-			foreach ($rows as $row) {
-				$options[$row['key']] = $row['value'];
+		static $allOptions = array();
+		if (!isset($allOptions[$category])) {
+			$cacheKey = "setting_{$category}_options";
+			if (($options = Yii::app()->getCache()->get($cacheKey)) === false) {
+				$rows = Yii::app()->getDb()->createCommand()
+					->select(array('key', 'value'))
+					->from('{{setting}}')
+					->where('category=:category', array(':category' => $category))
+					->queryAll();
+				$options = array();
+				foreach ($rows as $row) {
+					$options[$row['key']] = $row['value'];
+				}
+				Yii::app()->getCache()->set($cacheKey, $options);
 			}
-			Yii::app()->getCache()->set($cacheKey, $options);
+			$allOptions[$category] = $options;
 		}
-		return $options;
+		return $allOptions[$category];
 	}
 
 	/**
@@ -242,7 +246,12 @@ class Setting extends CFormModel
 	 */
 	public static function get($category, $key, $default=null)
 	{
-		$options = self::getAllByCategory($category);
+		if ($key[0] == '_') {
+			$params = Yii::app()->getParams();
+			$options = isset($params['built'][$category]) ? (array) $params['built'][$category] : array();
+		} else {
+			$options = self::getAllByCategory($category);
+		}
 		return isset($options[$key]) ? $options[$key] : $default;
 	}
 

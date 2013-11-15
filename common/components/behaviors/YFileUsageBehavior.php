@@ -28,6 +28,19 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 	private $_oldFileIds = array();
 
 	/**
+	 * 获取图片
+	 * @param string $name
+	 * @param array $htmlOptions
+	 * @return string
+	 */
+	public function getImage($name='post-thumbnail', $htmlOptions=array())
+	{
+		if ($imageFile = $this->getImageFile()) {
+			return $imageFile->getImage($name, $htmlOptions);
+		}
+	}
+
+	/**
 	 * 获取图片文件 根据模型中的image属性
 	 * @return File|null
 	 */
@@ -138,7 +151,10 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 					$params['rule']['types'] = Setting::get('system', '_file_image_types', 'jpg,jpeg,gif,png');
 				}
 
-				$params['isSelf'] = $owner->hasAttribute($field); //是否是模型自带字段（表中有这个字段）
+				if (!isset($params['attribute'])) {
+					$params['attribute'] = $field . '_id';
+				}
+				$params['isSelf'] = $owner->hasAttribute($params['attribute']); //是否是模型自带字段（表中有这个字段）
 				$fields[$field] = $params;
 			}
 			$cache[$className] = $fields;
@@ -289,9 +305,9 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 	 */
 	public function parseIds($ids)
 	{
-		if ($ids && !is_array($ids)) {
+		if ($ids && is_string($ids)) {
 			$ids = preg_split('/\s*,\s*/', trim($ids), -1, PREG_SPLIT_NO_EMPTY);
-		} else {
+		} elseif (!is_array($ids)) {
 			$ids = array();
 		}
 
@@ -340,7 +356,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 				$command->limit($fields[$field]['many']);
 			}
 			$fieldIds = $command->queryColumn();
-			Yii::app()->getCache()->add($cacheKey, $fieldIds);
+			Yii::app()->getCache()->add($cacheKey, $fieldIds, Setting::get('system', '_file_usage_ids_expire', 2592000)); //30天
 		}
 
 		return $fieldIds;
@@ -368,7 +384,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 	public function updatefileIdsCache($id, $field, $fileIds)
 	{
 		$cacheKey = $this->getfileIdsCacheKey($id, $field);
-		Yii::app()->getCache()->set($cacheKey, $fileIds);
+		Yii::app()->getCache()->set($cacheKey, $fileIds, Setting::get('system', '_file_usage_ids_expire', 2592000)); //30天
 	}
 
 	/**
@@ -391,7 +407,67 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 		$owner = $this->getOwner();
 		foreach ($fields as $field => $params) {
 			if ($params['isSelf']) {
-				$this->_oldFileIds[$field] = $this->parseIds($owner->$field);
+				$attribute = $params['attribute'];
+				$this->_oldFileIds[$field] = $this->parseIds($owner->$attribute);
+			}
+		}
+	}
+
+	/**
+	 * 验证之前
+	 * @see CModelBehavior::beforeValidate()
+	 */
+	public function beforeValidate($event)
+	{
+		$owner = $this->getOwner();
+		if ($owner instanceof File)
+			return;
+
+		$fields = $this->getUploadFields();
+		foreach ($fields as $field => $params) {
+			if (!isset($owner->$field))
+				continue;
+
+			$value = $this->parseIds($owner->$field);
+
+			if ($params['many'] !== true)
+				$value =  array_slice($value, 0, $params['many']);
+
+			$types = explode(',', $params['rule']['types']);
+			$validFileIds = array();
+			foreach (File::findFromCache($value) as $model) {
+				if (in_array($model->getExt(), $types)) {
+					$validFileIds[] = $model->id;
+				}
+			}
+			$owner->$field = $validFileIds;
+		}
+	}
+
+	/**
+	 * 对象保存之前
+	 * @see CActiveRecordBehavior::beforeSave()
+	 */
+	public function beforeSave($event)
+	{
+		$owner = $this->getOwner();
+		if ($owner instanceof File)
+			return;
+
+		$fields = $this->getUploadFields();
+		foreach ($fields as $field => $params) {
+			if (!isset($owner->$field))
+				continue;
+
+			if ($params['isSelf']) {
+				$attribute = $params['attribute'];
+				$value = $owner->$field;
+
+				if ($value) {
+					$owner->$attribute = implode(',', $value);
+				} else {
+					$owner->$attribute = 0;
+				}
 			}
 		}
 	}
@@ -403,28 +479,18 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 	public function afterSave($event)
 	{
 		$owner = $this->getOwner();
-		$fields = $this->getUploadFields();
 
 		//File不保存
 		if ($owner instanceof File)
 			return;
 
+		$fields = $this->getUploadFields();
+
 		foreach ($fields as $field => $params) {
 			if (!isset($owner->$field))
 				continue;
 
-			$newFileIds = $this->parseIds($owner->$field);
-
-			if ($params['many'] !== true)
-				$newFileIds =  array_slice($newFileIds, 0, $params['many']);
-
-			$types = explode(',', $params['rule']['types']);
-			$validFileIds = array();
-			foreach (File::findFromCache($newFileIds) as $model) {
-				if (in_array($model->getExt(), $types)) {
-					$validFileIds[] = $model->id;
-				}
-			}
+			$newFileIds = $owner->$field;
 
 			$oldFileIds = $delFileIds = $addFileIds = array();
 			if ($owner->isNewRecord) {
@@ -445,13 +511,11 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 
 			$objectId = $owner->getPrimaryKey();
 			try {
-				if ($delFileIds !== array()) {
-					if (!$params['isSelf']) {
-						$connection->createCommand()->delete('{{file_usage}}', array('and',
-								'object_id=:object_id AND bundle=:bundle AND field=:field',
-								array('in', 'file_id', $delFileIds),
-						), array(':object_id'=>$owner->id, ':bundle'=>get_class($owner),':field'=>$field));
-					}
+				if ($delFileIds) {
+					$connection->createCommand()->delete('{{file_usage}}', array('and',
+							'object_id=:object_id AND bundle=:bundle AND field=:field',
+							array('in', 'file_id', $delFileIds),
+					), array(':object_id'=>$owner->id, ':bundle'=>get_class($owner),':field'=>$field));
 
 					$resize = isset($params['resize']) ? $params['resize'] : true;
 
@@ -469,27 +533,25 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 					}
 				}
 
-				if ($addFileIds !== array()) {
-					if (!$params['isSelf']) {
-						$qField = $connection->quoteValue($field);
-						$qBundle = $connection->quoteValue(get_class($owner));
+				if ($addFileIds) {
+					$qField = $connection->quoteValue($field);
+					$qBundle = $connection->quoteValue(get_class($owner));
+					$values = array();
 
-						foreach($addFileIds as $id) {
-							$values[] = "($objectId, $id, $qBundle, $qField)";
-						}
-						$command = $connection->createCommand("INSERT INTO {{file_usage}} (object_id, file_id, bundle, field) VALUES " . implode(',', $values));
-						$command->execute();
+					foreach($addFileIds as $id) {
+						$values[] = "($objectId, $id, $qBundle, $qField)";
 					}
+
+					$command = $connection->createCommand("INSERT INTO {{file_usage}} (object_id, file_id, bundle, field) VALUES " . implode(',', $values));
+					$command->execute();
 					File::model()->updateByPk($addFileIds, array('status'=>File::STATUS_PERMANENT));
 				}
 
-				if (!$params['isSelf']) {
-					if ($params['sort'] && $newFileIds !== $oldFileIds) {
-						foreach ($newFileIds as $i => $id) {
-							$connection->createCommand()->update('{{file_usage}}', array('weight'=>$i), 'file_id=:file_id', array(
-								':file_id' => $id,
-							));
-						}
+				if ($params['sort'] && $newFileIds !== $oldFileIds) {
+					foreach ($newFileIds as $i => $id) {
+						$connection->createCommand()->update('{{file_usage}}', array('weight'=>$i), 'file_id=:file_id', array(
+							':file_id' => $id,
+						));
 					}
 				}
 				$transaction->commit();
@@ -499,9 +561,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 				return;
 			}
 
-			if (!$params['isSelf']) {
-				$this->updatefileIdsCache($objectId, $field, $newFileIds);
-			}
+			$this->updatefileIdsCache($objectId, $field, $newFileIds);
 		}
 	}
 
@@ -523,20 +583,16 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 
 		foreach ($fields as $field => $params) {
 			$fileIds = $this->getFileIdsByField($field);
-			if (!$params['isSelf']) {
-				$connection->createCommand()->delete('{{file_usage}}', array('and',
-						'object_id=:object_id AND bundle=:bundle AND field=:field',
-						array('in', 'file_id', $fileIds),
-				), array(':object_id'=>$objectId, ':bundle'=>$bundle, ':field'=>$field));
-			}
+			$connection->createCommand()->delete('{{file_usage}}', array('and',
+					'object_id=:object_id AND bundle=:bundle AND field=:field',
+					array('in', 'file_id', $fileIds),
+			), array(':object_id'=>$objectId, ':bundle'=>$bundle, ':field'=>$field));
 
 			foreach (File::model()->findAllByPk($fileIds) as $file) {
 				$file->delete();
 			}
 
-			if (!$params['isSelf']) {
-				$this->deletefileIdsCache($objectId, $field);
-			}
+			$this->deletefileIdsCache($objectId, $field);
 		}
 	}
 }

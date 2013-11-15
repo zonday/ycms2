@@ -105,12 +105,17 @@ class Controller extends CController
 			if ($model->status == Channel::STATUS_TRASH) {
 				continue;
 			}
-			if ($model->type == Channel::TYPE_LIST)
-				$url = array('/content/index', 'channel'=>$model->id);
-			elseif ($this->isOtherContent($model))
-				$url = array('/other/' . $model->name);
-			else
+
+			if ($model->model) {
+				$staticModel = CActiveRecord::model($model->model);
+				if (!$staticModel instanceof Node) {
+					$url = array('/other/' . strtolower($model->model));
+				} else {
+					$url = array('/content/index', 'channel'=>$model->id);
+				}
+			} else {
 				$url = array('/content/channel', 'channel'=>$model->id);
+			}
 
 			$item = array('label'=>$model->title, 'url'=>$url);
 			$childrenItems = $this->getContentItems($model->id);
@@ -120,18 +125,6 @@ class Controller extends CController
 			$items[] = $item;
 		}
 		return $items;
-	}
-
-	/**
-	 * 是否是其它内容
-	 * @param Channel $channel
-	 * @return boolean
-	 */
-	protected function isOtherContent(Channel $channel)
-	{
-		$controllerPath = Yii::app()->getControllerPath();
-		$controllerFile = $controllerPath . '/other/' . ucfirst($channel->name) . 'Controller.php';
-		return $channel->type != Channel::TYPE_LIST && file_exists($controllerFile);
 	}
 
 	/**

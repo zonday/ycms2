@@ -11,7 +11,7 @@
  * @author Yang <css3@qq.com>
  * @package common.components.behaviors
  */
-class YMetaBehavior extends CModelBehavior
+class YMetaBehavior extends CActiveRecordBehavior
 {
 	/**
 	 * meta表
@@ -65,7 +65,7 @@ class YMetaBehavior extends CModelBehavior
 					foreach ($rows as $row)
 						$this->_meta[$row['meta_key']] = $row['meta_value'];
 
-					Yii::app()->getCache()->set($this->getCacheKey(), $this->_meta);
+					Yii::app()->getCache()->add($this->getCacheKey(), $this->_meta, Setting::get('system', '_object_meta_expire', 2592000));
 				}
 			}
 		}
@@ -77,23 +77,13 @@ class YMetaBehavior extends CModelBehavior
 	}
 
 	/**
-	 * 添加一个meta
-	 * @param string $key
-	 * @param mixed $value
-	 */
-	public function addMeta($key, $value)
-	{
-		$this->_saveMeta[$key] = $value;
-	}
-
-	/**
 	 * 设置一个meta
 	 * @param string $key
 	 * @param mixed $value
 	 */
 	public function setMeta($key, $value)
 	{
-		$this->_meta[$key] = $value;
+		$this->_saveMeta[$key] = $value;
 	}
 
 	/**
@@ -113,7 +103,7 @@ class YMetaBehavior extends CModelBehavior
 				':meta_key' => $key,
 			));
 			unset($meta[$key]);
-			Yii::app()->getCache()->setCache($this->getCacheKey(), $meta);
+			Yii::app()->getCache()->set($this->getCacheKey(), $meta, Setting::get('system', '_object_meta_expire', 2592000));
 		}
 	}
 
@@ -123,6 +113,9 @@ class YMetaBehavior extends CModelBehavior
 	 */
 	public function afterSave($event)
 	{
+		if ($this->_saveMeta === array()) {
+			return;
+		}
 		$connection = $this->getOwner()->getDbConnection();
 		if (!$transaction = $connection->getCurrentTransaction())
 			$transaction = $connection->beginTransaction();
@@ -135,23 +128,24 @@ class YMetaBehavior extends CModelBehavior
 					if ($meta[$key] == $value)
 						continue;
 					else
-						$query = "UPDATE {$talbe} SET meta_value=:value WHERE object_id=:object_id AND meta_key=:key";
+						$query = "UPDATE {$table} SET meta_value=:value WHERE object_id=:object_id AND meta_key=:key";
 				} else
 					$query = "INSERT INTO {$table} (object_id, meta_key, meta_value) VALUES (:object_id, :key, :value)";
 
 				$command = $connection->createCommand($query)
-					->bindValue(':object_id', $this->getOwn()->getPrimaryKey())
+					->bindValue(':object_id', $this->getOwner()->getPrimaryKey())
 					->bindValue(':key', $key, PDO::PARAM_STR)
-					->bindValue(':value', $key, PDO::PARAM_STR);
-				if ($command->execute() !== false)
-					$this->setMeta($key, $value);
+					->bindValue(':value', $value, PDO::PARAM_STR);
+				if ($command->execute() !== false) {
+					$this->_meta[$key] = $value;
+				}
 			}
 			$transaction->commit();
 		} catch (CDbException $e) {
 			$transaction->rollback();
 		}
 
-		Yii::app()->getCache()->set($this->getCacheKey(), $this->getMeta());
+		Yii::app()->getCache()->set($this->getCacheKey(), $this->getMeta(), Setting::get('system', '_object_meta_expire', 2592000)); //30天
 	}
 
 	/**

@@ -465,26 +465,29 @@ class Channel extends CActiveRecord
 			$output = CHtml::link('<i class="icon-list"></i> 管理内容', $url, $htmlOptions);
 		}
 
-		if ($this->type == Channel::TYPE_LIST)
-			return $output . CHtml::link('<i class="icon-plus"></i> 创建内容', array('/content/create','channel'=>$this->id), $htmlOptions);
-		elseif ($this->type == Channel::TYPE_PAGE)
+		if ($this->type == Channel::TYPE_LIST){
+			if ($staticModel instanceof Node) {
+				return $output . CHtml::link('<i class="icon-plus"></i> 创建内容', array('/content/create','channel'=>$this->id), $htmlOptions);
+			} else {
+				return $output . CHtml::link('<i class="icon-plus"></i> 创建内容', array('/other/' . strtolower($this->model) . '/create','channel'=>$this->id), $htmlOptions);
+			}
+		} elseif ($this->type == Channel::TYPE_PAGE) {
 			return $output . CHtml::link('<i class="icon-pencil"></i> 更新页面', array('/content/channel','channel'=>$this->id), $htmlOptions);
-		else
+		} else {
 			return $output;
+		}
 	}
 
 	/**
 	 * 获取内容对象模型
 	 * @param boolean $static
-	 * @param string $scen
+	 * @param string $scenario
+	 * @return CActiveRecord|null
 	 */
 	public function getObjectModel($static=true, $scenario='insert')
 	{
-		if ($this->isNewRecord)
-			throw new CException('栏目不存在');
-
-		if (!$this->model)
-			throw new CException(sprintf(' %s 栏目模型丢失', $channel->title));
+		if ($this->isNewRecord || !$this->model)
+			return;
 
 		if ($static) {
 			$model = CActiveRecord::model($this->model);
@@ -494,9 +497,9 @@ class Channel extends CActiveRecord
 
 		if ($model instanceof Node) {
 			if ($static) {
-				$model->channel_id = $this->id;
-			} else {
 				$model->byChannel($this->id);
+			} else {
+				$model->channel_id = $this->id;
 			}
 		}
 

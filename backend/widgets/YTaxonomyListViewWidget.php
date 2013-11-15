@@ -28,8 +28,10 @@ class YTaxonomyListViewWidget extends CWidget
 		if (!isset($this->model))
 			return;
 
-		$terms = $this->model->getTaxonomy();
+		$terms = $this->model->getTerms();
+
 		$taxonomies = $this->model->prepareTaxonomies();
+		echo '<div class="taxonomies">';
 		foreach ($this->model->prepareTaxonomies() as $taxonomy => $params) {
 			echo '<dl><dt>' . CHtml::encode($params['label']) . '</dt>';
 			if (isset($terms[$taxonomy])) {
@@ -41,9 +43,10 @@ class YTaxonomyListViewWidget extends CWidget
 				} else
 					$termNames[] = $terms[$taxonomy]->name;
 
-				echo '<dd>' . implode('</dd> <dd>', array_map(array(CHtml, 'encode'), $termNames)) . '</dd>';
+				echo '<dd>' . implode('</dd> <dd>', array_map(array('CHtml', 'encode'), $termNames)) . '</dd>';
 			}
 			echo '</dl>';
 		}
+		echo '</div>';
 	}
 }

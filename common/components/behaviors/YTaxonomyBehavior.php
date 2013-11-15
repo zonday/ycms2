@@ -46,6 +46,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 					'custom' => false, //允许自定义，例如动态输入标签
 					'allowEmpty' => true, //是否允许为空
 					'cascade' => false, //级联性
+					'channel' => false, //绑定对应的栏目
 				);
 
 				if (is_numeric($key)) {
@@ -73,6 +74,11 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 						$params['label'] = $taxonomy->name;
 					}
 				}
+
+				if (!isset($params['attribute'])) {
+					$params['attribute'] = $taxSlug . '_id';
+				}
+				$params['isSelf'] = $owner->hasAttribute($params['attribute']); //是否是模型自带字段（表中有这个字段）
 
 				$params['taxonomy'] = $taxonomy;
 				$taxonomies[$taxSlug] = $params;
@@ -112,6 +118,32 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 				$value = trim($value);
 			}
 
+			$params = $taxonomies[$taxSlug];
+
+			if ($params['many'] === true) {
+				$count = null;
+			} elseif ($params['many'] === false) {
+				$count = 1;
+			} else {
+				$count = $params['many'];
+			}
+
+			if (!$params['custom']) {
+				$ids = array_unique(array_map('intval', (array) $value));
+				$ids = array_slice($ids, 0, $count);
+				$value = array();
+				foreach (Term::findFromCache($ids) as $term) {
+					if ($term->taxonomy_id == $params['taxonomy']->id) {
+						$value[] = $term->id;
+					}
+				}
+			}
+
+			if ($taxonomies[$taxSlug]['isSelf']) {
+				$attribute = $taxonomies[$taxSlug]['attribute'];
+				$owner->$attribute = $value;
+			}
+
 			$this->_termIds[$taxSlug] = $value;
 		}
 	}
@@ -131,6 +163,12 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 			$this->_termIds = array();
 			$terms = $this->getTerms();
 			foreach ($taxonomies as $taxSlug => $params) {
+				if ($params['isSelf']) {
+					$attribute = $params['attribute'];
+					$this->_termIds[$taxSlug] = $owner->$attribute;
+					continue;
+				}
+
 				if (!isset($terms[$taxSlug])) {
 					continue;
 				}
@@ -152,6 +190,22 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 		}
 
 		return $this->_termIds;
+	}
+
+	/**
+	 * 解析ids
+	 * @param mixed $field
+	 * @return array
+	 */
+	public function parseIds($ids)
+	{
+		if ($ids && is_string($ids)) {
+			$ids = preg_split('/\s*,\s*/', trim($ids), -1, PREG_SPLIT_NO_EMPTY);
+		} elseif (!is_array($ids)) {
+			$ids = array();
+		}
+
+		return array_unique(array_map('intval', $ids));
 	}
 
 	/**
@@ -183,7 +237,6 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	 */
 	public function getTerms()
 	{
-		$taxonomies = $this->prepareTaxonomies();
 		$owner = $this->getOwner();
 
 		if (!isset($this->_terms)) {
@@ -208,16 +261,17 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	 */
 	public function getTermIdsFromDb()
 	{
+		$owner = $this->getOwner();
 		$cacheKey = $this->getTermIdsCacheKey();
 		if (($termIds = Yii::app()->getCache()->get($cacheKey)) === false) {
-			$owner = $this->getOwner();
 			$termIds = $owner->getDbConnection()
 				->createCommand(" SELECT term_id FROM {{term_object}} WHERE bundle=:bundle AND object_id = :object_id")
 				->bindValue(':bundle', get_class($owner))
 				->bindValue(':object_id', $owner->getPrimaryKey())
 				->queryColumn();
-			Yii::app()->getCache()->add($cacheKey, $termIds);
+			Yii::app()->getCache()->add($cacheKey, $termIds, Setting::get('system', '_object_term_ids_expire', 2592000)); //30天
 		}
+
 		return $termIds;
 	}
 
@@ -246,16 +300,10 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 			'params' => array(':id'=>$owner->getPrimaryKey()),
 		));
 
-		$termIds = $this->getTermIds(false);
-
-		if ($termIds) {
-			$criteria->join = "INNER JOIN {{term_object}} AS term ON term.object_id = t.id";
-			$criteria->addInCondition('term.term_id', $termIds);
-			$criteria->addCondition('term.bundle="' . get_class($this->getOwner()) . '"');
-		}
+		$termIds = $this->getTermIds();
 
 		$owner->getDbCriteria()->mergeWith($criteria);
-		return $owner;
+		return $owner->byAndTerm($termIds, $limit);
 	}
 
 	/**
@@ -313,8 +361,13 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 		));
 
 		$bundle = get_class($owner);
-		foreach((array) $termIds as $index => $termId) {
-			$alias = "`term{$index}`";
+		$taxonomies = $this->prepareTaxonomies();
+		foreach((array) $termIds as $taxSlug => $termId) {
+			if (!empty($taxonomies[$taxSlug]['isSelf'])) {
+				$criteria->compare($taxonomies[$taxSlug]['attribute'], $termId);
+				continue;
+			}
+			$alias = "`term{$taxSlug}`";
 			$join .= " INNER JOIN {{term_object}} AS {$alias} ON {$alias}.object_id=t.id ";
 			$criteria->compare("{$alias}.term_id", $termId);
 			$criteria->compare("{$alias}.bundle", $bundle);
@@ -384,63 +437,14 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	}
 
 	/**
-	 * 根据术语ids获取对象数目
-	 * @param mixed $termIds
-	 * @return integer
-	 */
-	public function getCountByTermIds($termIds)
-	{
-		$owner = $this->getOwner();
-		$termIds = array_map('intval', (array) $termIds);
-		$count = $owner->getDbConnection()->createCommand()
-			->select('COUNT(*)')
-			->from('{{term_object}}')
-			->where(array('and', 'bundle=:bundle', array('in', 'term_id', $termIds)), array(':bundle'=>get_class($owner)))
-			->queryScalar();
-		return $count === false ? 0 : $count;
-	}
-
-	/**
-	 * 获取对象ids
-	 * @param mixed $termIds 术语ids
-	 * @param string $operator
-	 * @param mixed $limit
-	 * @param mixed $offset
-	 * @return array
-	 */
-	public function getObjectIdsByTermId($termIds, $operator='OR', $limit=null, $offset=null)
-	{
-		$owner = $this->getOwner();
-		$termIds = array_map('intval', (array) $termIds);
-
-		if (strtoupper($operator) === 'AND') {
-			$command = $owner->getDbConnection()->createCommand()
-				->selectDistinct('t.object_id')
-				->from('{{term_object}} AS t');
-				$where[] = 't.bundle=:bundle';
-			foreach ($termIds as $index => $termId) {
-				$alias = "t" . ($index + 1) ;
-				$command->join("{{term_object}} AS {$alias}", "{$alias}.object_id = t.object_id");
-				$where[] = "{$alias}.term_id={$termId}";
-			}
-			$command->where(implode(' AND ', $where), array(':bundle'=>get_class($owner)));
-		} else {
-			$command = $owner->getDbConnection()->createCommand()
-				->select('t.object_id')
-				->from('{{term_object}} AS t')
-				->where(array('and', 'bundle=:bundle', array('in', 'term_id', $termIds)), array(':bundle'=>get_class($owner)));
-		}
-		if ($limit !== null)
-			$command->limit($limit, $offset);
-		return $command->queryColumn();
-	}
-
-	/**
 	 * 验证之前
 	 * @see CModelBehavior::beforeValidate()
 	 */
 	public function beforeValidate($event)
 	{
+		if (!isset($this->_termIds))
+			return;
+
 		$taxonomies = $this->prepareTaxonomies();
 		$owner = $this->getOwner();
 
@@ -455,14 +459,40 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	}
 
 	/**
+	 * 保存之前
+	 * @see CActiveRecordBehavior::beforeSave()
+	 */
+	public function beforeSave($event)
+	{
+		if (!isset($this->_termIds))
+			return;
+
+		$taxonomies = $this->prepareTaxonomies();
+		$owner = $this->getOwner();
+
+		$termIds = $this->getTermIds();
+		foreach ($taxonomies as $taxSlug => $params) {
+			if ($params['isSelf']) {
+				$attribute = $params['attribute'];
+				if (!empty($termIds[$taxSlug])) {
+					$owner->$attribute = implode(',', $this->parseIds($termIds[$taxSlug]));
+				} else {
+					$owner->$attribute = 0;
+				}
+			}
+		}
+	}
+
+	/**
 	 * 对象保存之后
 	 * @see CActiveRecordBehavior::afterSave()
 	 */
 	public function afterSave($event)
 	{
-		$owner = $this->getOwner();
 		if (!isset($this->_termIds))
 			return;
+
+		$owner = $this->getOwner();
 
 		$newTermIds = array();
 		$taxonomies = $this->prepareTaxonomies();
@@ -483,8 +513,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 			if ($params['custom']) {
 				$ids = Term::custom($value, $taxSlug, $count);
 			} else {
-				$ids = array_unique(array_map('intval', (array) $value));
-				$ids = array_slice($ids, 0, $count);
+				$ids = (array) $value;
 			}
 
 			$newTermIds = array_merge($newTermIds, $ids);
@@ -534,7 +563,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 			return;
 		}
 
-		Yii::app()->getCache()->set($this->getTermIdsCacheKey(), $newTermIds);
+		Yii::app()->getCache()->set($this->getTermIdsCacheKey(), $newTermIds, Setting::get('system', '_object_term_ids_expire', 2592000)); //30天
 	}
 
 	public function deleteTermRelationship()

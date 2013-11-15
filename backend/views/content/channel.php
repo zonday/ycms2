@@ -3,7 +3,11 @@
 /* @var $model Channel */
 /* @var $form TbActiveForm */
 
-$this->pageTitle = '更新' . $model->title;
+if ($model->type == Channel::TYPE_PAGE) {
+	$this->pageTitle = '更新' . $model->title;
+} else {
+	$this->pageTitle = $model->title;
+}
 
 $this->breadcrumbs=$this->generateBreadcrumb($model);
 $this->breadcrumbs[]=$model->title;
@@ -13,15 +17,17 @@ $this->menu = $this->getContentItems($model->id);
 ?>
 
 <div class="page-header">
-	<h1><i class="icon-pencil"></i> <?php echo $this->pageTitle; ?></h1>
+	<h1><i class="icon-<?php echo $model->type == Channel::TYPE_PAGE ? 'pencil' : 'list'; ?>"></i> <?php echo $this->pageTitle; ?></h1>
+	<?php if ($this->menu): ?>
 	<div class="btn-group pull-right">
 		<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"> 内容列表 <span class="caret"></span></button>
 		<?php $this->widget('bootstrap.widgets.TbDropdown', array(
 			'items' => $this->menu,
 		))?>
 	</div>
+	<?php endif;?>
 </div>
-
+<?php if ($model->type == Channel::TYPE_PAGE): ?>
 <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	'id'=>'channel-form',
 )); ?>
@@ -43,3 +49,32 @@ $this->menu = $this->getContentItems($model->id);
 	</div>
 
 <?php $this->endWidget(); ?>
+<?php else: ?>
+<?php
+$this->widget('bootstrap.widgets.TbExtendedGridView', array(
+	'id'=>'channel-grid',
+	'dataProvider'=>new CArrayDataProvider($model->getTree($model->id), array(
+		'pagination'=>array(
+			'pageSize'=>50,
+		),
+	)),
+	'rowHtmlOptionsExpression' => 'array("class"=>"level-" .$data->depth)',
+	'columns'=>array(
+		array(
+			'name'=>'title',
+			'header'=>$model->getAttributeLabel('title'),
+			'htmlOptions'=>array('class'=>'title-column'),
+			'value'=>'$data->title',
+		),
+		array(
+			'name'=>'name',
+			'header'=>$model->getAttributeLabel('name'),
+		),
+		array(
+			'header'=>'操作',
+			'type'=>'raw',
+			'value'=>'$data->getContentActionLink()',
+		),
+	),
+)); ?>
+<?php endif; ?>

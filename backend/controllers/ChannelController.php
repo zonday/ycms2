@@ -147,6 +147,7 @@ class ChannelController extends Controller
 			foreach ((array) $weights as $id => $weight) {
 				Channel::updateWeightByPk($id, $weight);
 			}
+			Channel::model()->deleteCache();
 			Yii::app()->getUser()->setFlash('success', '保存权重成功');
 			$this->redirect(array('index'));
 			return;

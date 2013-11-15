@@ -96,7 +96,7 @@ abstract class Node extends CActiveRecord
 			'title' => '标题',
 			'create_time' => '发布时间',
 			'update_time' => '更新时间',
-			'user_id' => '作者',
+			'user_id' => '发布人',
 			'excerpt'=>'摘要',
 			'promote'=>'推荐至首页',
 			'sticky'=>'置顶',
@@ -167,6 +167,30 @@ abstract class Node extends CActiveRecord
 			self::STATUS_DRAFT=>'待审核',
 			self::STATUS_PUBLIC=>'公开',
 		);
+	}
+
+	/**
+	 * 根据栏目获取内容模型
+	 * @param mixed $channel
+	 * @return Node|null
+	 */
+	public static function get($channel, $static=true, $scenario='insert')
+	{
+		if ($channel = Channel::get($channel)) {
+			$model =  $channel->getObjectModel($static, $scenario);
+			if ($model instanceof Node)
+				return $model;
+		}
+	}
+
+	/**
+	 * 获取栏目
+	 * @return Channel|null
+	 */
+	public function getChannel()
+	{
+		if (isset($this->channel_id))
+			return Channel::get($this->channel_id);
 	}
 
 	/**

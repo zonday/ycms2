@@ -302,8 +302,8 @@ class File extends CActiveRecord
 		$cacheKey = "file_{$this->id}_download_count";
 		if (($count = Yii::app()->getCache()->get($cacheKey)) === false) {
 			$count = $this->getDbConnection()->createCommand('SELECT download_count FROM {{file_usage}} WHERE file_id=:file_id LIMIT 1')
-			->bindValue(':file_id', $this->id, PDO::PARAM_INT)
-			->queryScalar();
+				->bindValue(':file_id', $this->id, PDO::PARAM_INT)
+				->queryScalar();
 			Yii::app()->getCache()->add($cacheKey, $count ? $count : 0, Setting::get('system', '_file_cache_expire', 3600));
 		}
 		return $count;
@@ -317,6 +317,19 @@ class File extends CActiveRecord
 		$cacheKey = "file_{$this->id}_download_count";
 		$count = $this->getDownloadCount();
 		$count +=1;
+		try {
+			$staticModel = CActiveRecord::model($this->bundle);
+			if ($staticModel->hasAttribute('download_count')) {
+				$object_id = $this->getDbConnection()->createComand()
+					->select('object_id')
+					->from('{{file_usage}}')
+					->where('file_id=:file_id', array(':file_id'=>$this->id))
+					->queryScalar();
+				if ($object_id) {
+					$staticModel->updateByPk($object_id, array('download_count'=>$count));
+				}
+			}
+		} catch (Exception $e) {}
 		Yii::app()->getCache()->set($cacheKey, $count, Setting::get('system', '_file_cache_expire', 3600));
 	}
 
@@ -335,8 +348,8 @@ class File extends CActiveRecord
 	public function download()
 	{
 		$this->getDbConnection()->createCommand('UPDATE {{file_usage}} SET download_count = download_count+1 WHERE file_id=:file_id')
-		->bindValue(':file_id', $this->id, PDO::PARAM_INT)
-		->execute();
+			->bindValue(':file_id', $this->id, PDO::PARAM_INT)
+			->execute();
 		$this->updateDownloadCountCache();
 		Yii::app()->getRequest()->xSendFile($this->getPath(), array('mimeType'=>$this->filemime, 'saveName'=>$this->filename));
 	}
@@ -347,7 +360,7 @@ class File extends CActiveRecord
 	 * @param array $htmlOptions
 	 * @return string
 	 */
-	public function getImage($name, $htmlOptions=array())
+	public function getImage($name='post-thumbnail', $htmlOptions=array())
 	{
 		if (!$this->hasImage($name)) {
 			$name = self::IMAGE_ORIGIN;
@@ -734,7 +747,7 @@ class File extends CActiveRecord
 			foreach (self::model()->findAllByPk($uncached) as $model) {
 				$model->detachBehaviors();
 				$cacheKey = self::getCacheKey($model->id);
-				Yii::app()->getCache()->add($cacheKey, $model, Setting::get('system', '_file_cache_expire', 3600));
+				Yii::app()->getCache()->add($cacheKey, $model, Setting::get('system', '_file_cache_expire', 2592000)); //30天
 				$models[] = $model;
 			}
 		}

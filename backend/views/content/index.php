@@ -1,5 +1,4 @@
 <?php
-
 $channel = $this->getChannel();
 $this->pageTitle = $channel->title;
 
@@ -8,7 +7,7 @@ $this->breadcrumbs[]=$channel->title;
 ?>
 
 <div class="page-header">
-	<h1> <?php echo $this->pageTitle; ?></h1>
+	<h1><i class="icon-list"></i> <?php echo $this->pageTitle; ?></h1>
 	<div class="pull-right">
 		<?php echo CHtml::link('<i class="icon-plus"></i> 创建' . $channel->modelName, array('create', 'channel'=>$channel->id), array('class' => 'btn btn-primary')); ?>
 	</div>

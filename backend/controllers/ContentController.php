@@ -123,7 +123,7 @@ class ContentController extends Controller
 			if ($model->save()) {
 				Yii::app()->getUser()->setFlash('success', $channelModel->modelName . '创建成功');
 				if (isset($_POST['_addanother'])) {
-					$url = array('create');
+					$url = array('create', 'channel'=>$channel);
 				} elseif (isset($_POST['_continue'])) {
 					$url = array('update', 'channel'=>$channel, 'id'=>$model->id);
 				} else {
@@ -154,7 +154,7 @@ class ContentController extends Controller
 			if ($model->save()) {
 				Yii::app()->getUser()->setFlash('success', $channelModel->modelName . '更新成功');
 				if (isset($_POST['_addanother'])) {
-					$url = array('create');
+					$url = array('create', 'channel'=>$channel);
 				} elseif (isset($_POST['_continue'])) {
 					$url = array('update', 'channel'=>$channel, 'id'=>$model->id);
 				} else {
@@ -290,12 +290,17 @@ class ContentController extends Controller
 		$parents = $channel->getParentsAll();
 		foreach ($parents as $parent)
 		{
-			if ($parent->type == Channel::TYPE_LIST)
-				$breadcrumb[$parent->title] = array('content/index', 'channel'=>$parent->id);
-			elseif ($this->isOtherContent($parent)) {
-				$breadcrumb[$parent->title] = array('other/' . $parent->name);
-			} else
-				$breadcrumb[$parent->title] = array('content/channel', 'channel'=>$parent->id);
+			if ($parent->model) {
+				$staticModel = CActiveRecord::model($parent->model);
+				if (!$staticModel instanceof Node) {
+					$url = array('/other/' . strtolower($parent->model));
+				} else {
+					$url = array('/content/index', 'channel'=>$parent->id);
+				}
+			} else {
+				$url = array('/content/channel', 'channel'=>$parent->id);
+			}
+			$breadcrumb[$parent->title] = $url;
 		}
 
 		return $breadcrumb;

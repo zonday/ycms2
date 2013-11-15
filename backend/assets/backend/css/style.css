@@ -298,6 +298,16 @@ form .cke {
 	cursor: text;
 }
 
+.detail-view .taxonomies dt {
+	display: inline;
+	margin: 5px 5px 0 0;
+}
+
+.detail-view .taxonomies dd {
+	display: inline;
+	margin: 0 0 0 5px;
+}
+
 #form-side.affix {
 	top: 60px;
 }

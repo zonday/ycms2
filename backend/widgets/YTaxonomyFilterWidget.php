@@ -36,6 +36,13 @@ class YTaxonomyFilterWidget extends CWidget
 				$params['many']=false;
 				CHtml::resolveNameID($model, $attribute, $htmlOptions);
 				$this->registerCascadeScript($htmlOptions['id'], $params['allowEmpty']);
+			} elseif (!empty($params['channel'])) {
+				$termSlug = $this->getOwner()->getChannel()->name;
+				$term = Term::model()->findFromCacheBySlug($termSlug, $params['taxonomy']->id);
+				if ($term)
+					$list = CHtml::listData(Term::model()->getTree($params['taxonomy']->id, $term->id), 'id', 'name');
+				else
+					$list = array();
 			} else {
 				$list = Term::model()->generateTreeList($params['taxonomy']->id);
 			}
