@@ -370,8 +370,16 @@ class Channel extends CActiveRecord
 	 */
 	public static function get($value)
 	{
-		if (empty($value))
+		static $cache = array();
+
+		if (!$value)
 			return;
+
+		if ($value instanceof Channel)
+			return $value;
+
+		if (isset($cache[$value]))
+			return $cache[$value];
 
 		$children = self::model()->getChildren(-1);
 
@@ -389,8 +397,10 @@ class Channel extends CActiveRecord
 			}
 		}
 
-		if (isset($channel))
+		if (isset($channel)) {
+			$cache[$value] = $channel;
 			return $channel;
+		}
 	}
 
 	/**
@@ -399,17 +409,17 @@ class Channel extends CActiveRecord
 	 */
 	public function getPath()
 	{
+		static $cache = array();
+		if (isset($cache[$this->id])) {
+			return $cache[$this->id];
+		}
 		$parents = $this->getParentsAll();
 		foreach ($parents as $parent)
 			$path[] = $parent->name;
 
 		$path[] = $this->name;
-		return implode('/', $path);
-	}
-
-	public function getPermalink()
-	{
-		return $this->getPath();
+		$cache[$this->id] = implode('/', $path);
+		return $cache[$this->id];
 	}
 
 	/**
@@ -489,18 +499,16 @@ class Channel extends CActiveRecord
 		if ($this->isNewRecord || !$this->model)
 			return;
 
+		$modelClass = $this->model;
+
 		if ($static) {
-			$model = CActiveRecord::model($this->model);
+			$model = CActiveRecord::model($modelClass);
 		} else {
-			$model = new $model($scenario);
+			$model = new $modelClass($scenario);
 		}
 
 		if ($model instanceof Node) {
-			if ($static) {
-				$model->byChannel($this->id);
-			} else {
-				$model->channel_id = $this->id;
-			}
+			$model->byChannel($this->id);
 		}
 
 		return $model;
@@ -548,6 +556,10 @@ class Channel extends CActiveRecord
 					unset($this->parent_id);
 					break;
 				}
+			}
+
+			if (trim($this->parent_id) === '') {
+				$this->parent_id = 0;
 			}
 
 			if ($this->parent_id == $this->id) {

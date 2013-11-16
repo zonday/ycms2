@@ -170,11 +170,49 @@ abstract class Node extends CActiveRecord
 	}
 
 	/**
+	 * 获取内容模型
+	 * @param string $modelClass
+	 * @param mixed $channels
+	 * @param boolean $static
+	 * @param string $scenario
+	 * @return Node
+	 */
+	public static function get($modelClass, $channels=null, $static=true, $scenario='insert')
+	{
+		$modelClass = ucfirst($modelClass);
+
+		if ($static) {
+			$model = Node::model($modelClass);
+		} else {
+			$model = new $modelClass($scenario);
+		}
+
+		if ($channels && $model->hasAttribute('channel_id')) {
+			$applyChannels = array();
+			foreach ((array) $channels as $index => $id) {
+				if (($channel = Channel::get($id)) && $channel->model === $modelClass) {
+					$applyChannels[] = $channel->id;
+				}
+			}
+
+			if ($applyChannels) {
+				if ($static) {
+					$model->byChannel($applyChannels);
+				} else {
+					$model->channel_id = $applyChannels;
+				}
+			}
+		}
+
+		return $model;
+	}
+
+	/**
 	 * 根据栏目获取内容模型
 	 * @param mixed $channel
 	 * @return Node|null
 	 */
-	public static function get($channel, $static=true, $scenario='insert')
+	public static function getByChannel($channel, $static=true, $scenario='insert')
 	{
 		if ($channel = Channel::get($channel)) {
 			$model =  $channel->getObjectModel($static, $scenario);
@@ -220,7 +258,7 @@ abstract class Node extends CActiveRecord
 	public function promote($limit=null)
 	{
 		$this->getDbCriteria()->mergeWith(array(
-			'condition'=>'t.status=:status AND t.promote != 0',
+			'condition'=>'t.status=:status',
 			'order'=>'t.promote DESC, t.sticky DESC, t.create_time DESC',
 			'params'=>array(
 				':status'=>self::STATUS_PUBLIC,
