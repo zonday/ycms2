@@ -288,10 +288,10 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 
 	/**
 	 * 分类相关查询
-	 * @param mixed $limit
+	 * @param integer $limit
 	 * @return array
 	 */
-	public function related($limit=null)
+	public function related($limit=-1)
 	{
 		$owner = $this->getOwner();
 		$criteria = new CDbCriteria(array(
@@ -309,24 +309,24 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	/**
 	 * by Term IN 操作
 	 * @param mxied $term
-	 * @param mxied $limit
+	 * @param integer $limit
 	 * @return CActiveRecord
 	 */
-	public function byTerm($term, $limit=null)
+	public function byTerm($term, $limit=-1)
 	{
 		$owner = $this->getOwner();
-
-		if (empty($term))
-			return $owner;
+		$termIds = array();
 
 		if (is_array($term) && ($term[0] instanceof Term)) {
 			foreach ($term as $model) {
-				$termIds[] = $term->id;
+				$termIds[] = $model->id;
 			}
 		} elseif ($term instanceof Term) {
-			$termIds = $term->id;
-		} else {
+			$termIds[] = $term->id;
+		} elseif (is_array($term)) {
 			$termIds = $term;
+		} else {
+			$termIds[] = (int) $term;
 		}
 
 		$criteria = new CDbCriteria(array(
@@ -344,10 +344,10 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	/**
 	 * by Term AND 操作
 	 * @param mxied $term
-	 * @param mxied $limit
+	 * @param integer $limit
 	 * @return CActiveRecord
 	 */
-	public function byAndTerm($termIds, $limit=null)
+	public function byAndTerm($termIds, $limit=-1)
 	{
 		$owner = $this->getOwner();
 
@@ -382,31 +382,45 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	 * by TermSlug
 	 * @param mxied $taxonomy
 	 * @param mxied $termSlug
-	 * @param mxied $limit
+	 * @param integer $limit
 	 * @return CActiveRecord
 	 */
-	public function byTermSlug($taxonomy, $termSlug, $limit=null)
+	public function byTermSlug($taxonomy, $termSlug, $limit=-1)
 	{
 		$owner = $this->getOwner();
-
-		if (empty($taxonomy) || empty($termSlug))
-			return $owner;
 
 		if (!$taxonomy instanceof Taxonomy) {
 			$taxonomy = Taxonomy::findFromCache($taxonomy);
 		}
 
-		if (!$taxonomy)
-			return $owner;
+		if (!$taxonomy) {
+			throw new CException(sprintf('没有找到别名为s%分类', $taxonomy));
+		}
 
-		$terms = array();
-		foreach ((array) $termSlug as $slug) {
-			if ($term = Term::findFromCacheBySlug($slug, $taxonomy->id)) {
-				$terms[] = $term;
+		$termIds = array();
+		$taxonomies = $this->prepareTaxonomies();
+
+		if ($termSlug instanceof Term) {
+			$termIds[] = $termSlug->id;
+		} else {
+			foreach ((array) $termSlug as $slug) {
+				if ($term = Term::findFromCacheBySlug($slug, $taxonomy->id)) {
+					$termIds[] = $term->id;
+				} else {
+					$termIds[] = null;
+				}
 			}
 		}
 
-		return $this->byTerm($terms, $limit);
+		if (isset($taxonomies[$taxonomy->slug]) && $taxonomies[$taxonomy->slug]['isSelf']) {
+			$attribute = $taxonomies[$taxonomy->slug]['attribute'];
+			$criteria = new CDbCriteria();
+			$criteria->compare('t.' . $attribute, $termIds);
+			$owner->getDbCriteria()->mergeWith($criteria);
+			return $owner;
+		}
+
+		return $this->byTerm($termIds, $limit);
 	}
 
 	/**
@@ -415,13 +429,30 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	 * @param mxied $limit
 	 * @return CActiveRecord
 	 */
-	public function byTaxonomy($taxonomy, $limit=null)
+	public function byTaxonomy($taxonomy, $limit=-1)
 	{
+		$owner = $this->getOwner();
+
 		$taxonomy = Taxonomy::model()->findFromCache($taxonomy);
-		if ($taxonomy) {
-			$terms = $taxonomy->getTree();
-		} else {
-			$terms = array();
+
+		if (!$taxonomy) {
+			throw new CException(sprintf('没有找到别名为s%分类', $taxonomy));
+		}
+
+		$terms = $taxonomy->getTree();
+		$taxonomies = $this->prepareTaxonomies();
+
+		if (isset($taxonomies[$taxonomy->slug]) && $taxonomies[$taxonomy->slug]['isSelf']) {
+			$attribute = $taxonomies[$taxonomy->slug]['attribute'];
+			$criteria = new CDbCriteria();
+			$criteria->limit = $limit;
+			$termIds = array();
+			foreach ($terms as $term) {
+				$termIds[] = $term->id;
+			}
+			$criteria->compare('t.' . $attribute, $termIds);
+			$owner->getDbCriteria()->mergeWith($criteria);
+			return $owner;
 		}
 
 		return $this->byTerm($terms, $limit);

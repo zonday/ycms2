@@ -595,4 +595,30 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 			$this->deletefileIdsCache($objectId, $field);
 		}
 	}
+
+	/**
+	 * 根据文件字段下载字数排行
+	 * @param string $field
+	 * @param integer $limit
+	 * @return CActiveRecord
+	 */
+	public function byDownloadTop($field, $limit=null)
+	{
+		$owner = $this->getOwner();
+		if ($owner->hasAttribute('download_count')) {
+			$owner->getDbCriteria()->mergeWith(array(
+				'order'=>'t.download_count DESC'
+			));
+		} else {
+			$owner->getDbCriteria()->mergeWith(array(
+				'join' => ' INNER JOIN {{file_usage}} AS t2 ON t2.object_id = t.id',
+				'condition' => 'bundle=:bundle AND field=:field',
+				'limit'=>$limit,
+				'order'=>'t2.download_count DESC',
+				'params'=>array(':bundle'=>get_class($owner), ':field'=>$field),
+			));
+		}
+
+		return $owner;
+	}
 }
