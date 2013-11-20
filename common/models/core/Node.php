@@ -98,7 +98,7 @@ abstract class Node extends CActiveRecord
 			'update_time' => '更新时间',
 			'user_id' => '发布人',
 			'excerpt'=>'摘要',
-			'promote'=>'推荐至首页',
+			'promote'=>'显示在首页',
 			'sticky'=>'置顶',
 			'status'=>'状态',
 			'hits'=>'点击次数',
@@ -177,14 +177,18 @@ abstract class Node extends CActiveRecord
 	 * @param string $scenario
 	 * @return Node
 	 */
-	public static function get($modelClass, $channels=null, $static=true, $scenario='insert')
+	public static function get($modelClass, $channels=null, $static=true)
 	{
 		$modelClass = ucfirst($modelClass);
 
 		if ($static) {
 			$model = Node::model($modelClass);
 		} else {
-			$model = new $modelClass($scenario);
+			$model = new $modelClass();
+		}
+
+		if (!$model instanceof Node) {
+			throw new CException(sprintf('%s没有继承Node', $modelClass));
 		}
 
 		if ($channels && $model->hasAttribute('channel_id')) {
@@ -196,11 +200,7 @@ abstract class Node extends CActiveRecord
 			}
 
 			if ($applyChannels) {
-				if ($static) {
-					$model->byChannel($applyChannels);
-				} else {
-					$model->channel_id = $applyChannels;
-				}
+				$model->byChannel($applyChannels);
 			}
 		}
 
@@ -210,14 +210,17 @@ abstract class Node extends CActiveRecord
 	/**
 	 * 根据栏目获取内容模型
 	 * @param mixed $channel
+	 * @param boolean $applyChannel
 	 * @return Node|null
 	 */
-	public static function getByChannel($channel, $static=true, $scenario='insert')
+	public static function getByChannel($channel, $static=true, $applyChannel=true)
 	{
 		if ($channel = Channel::get($channel)) {
-			$model =  $channel->getObjectModel($static, $scenario);
+			$model =  $channel->getObjectModel($static, $applyChannel);
 			if ($model instanceof Node)
 				return $model;
+			else
+				throw new CException(sprintf('%s没有继承Node', $modelClass));
 		}
 	}
 
@@ -233,10 +236,10 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 最近的
-	 * @param mixed $limit
+	 * @param integer $limit
 	 * @return Node
 	 */
-	public function recently($limit=null)
+	public function recently($limit=-1)
 	{
 		$this->getDbCriteria()->mergeWith(array(
 			'condition'=>'t.status=:status',
@@ -252,10 +255,10 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 显示在首页
-	 * @param mixed $limit
+	 * @param integer $limit
 	 * @return Node
 	 */
-	public function promote($limit=null)
+	public function promote($limit=-1)
 	{
 		$this->getDbCriteria()->mergeWith(array(
 			'condition'=>'t.status=:status',
@@ -271,10 +274,10 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 已发布的
-	 * @param mixed $limit
+	 * @param integer $limit
 	 * @return Node
 	 */
-	public function published($limit=null)
+	public function published($limit=-1)
 	{
 		$this->getDbCriteria()->mergeWith(array(
 			'condition'=>'t.status=:status',
@@ -289,7 +292,7 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 按点击次数排行
-	 * @param mixed $limit
+	 * @param integer $limit
 	 * @return Node
 	 */
 	public function top($limit=10)
@@ -450,7 +453,7 @@ abstract class Node extends CActiveRecord
 	}
 
 	/**
-	 * 批量推荐至首页
+	 * 批量显示在首页
 	 * @param mixed $ids
 	 */
 	public function bulkPromote($ids)

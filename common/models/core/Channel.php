@@ -194,6 +194,30 @@ class Channel extends CActiveRecord
 	}
 
 	/**
+	 * 根据模型获取栏目
+	 * @param string $model
+	 * @return array
+	 */
+	public static function getChannelsByModel($modelClass)
+	{
+		static $cache = array();
+		if (!isset($cache[$modelClass])) {
+			$children = self::model()->getChildren(-1);
+			$channels = array();
+
+			foreach ($children as $parentId => $models) {
+				foreach ($models as $model) {
+					if ($model->model === $modelClass) {
+						$channels[] = $model;
+					}
+				}
+			}
+			$cache[$modelClass] = $channels;
+		}
+		return $cache[$modelClass];
+	}
+
+	/**
 	 * 根据id更新权重
 	 * @param integer $id
 	 * @param integer $weight
@@ -491,10 +515,10 @@ class Channel extends CActiveRecord
 	/**
 	 * 获取内容对象模型
 	 * @param boolean $static
-	 * @param string $scenario
+	 * @param boolean $applyChannel
 	 * @return CActiveRecord|null
 	 */
-	public function getObjectModel($static=true, $scenario='insert')
+	public function getObjectModel($static=true, $applyChannel=true)
 	{
 		if ($this->isNewRecord || !$this->model)
 			return;
@@ -504,10 +528,10 @@ class Channel extends CActiveRecord
 		if ($static) {
 			$model = CActiveRecord::model($modelClass);
 		} else {
-			$model = new $modelClass($scenario);
+			$model = new $modelClass();
 		}
 
-		if ($model instanceof Node) {
+		if (($model instanceof Node) && $applyChannel) {
 			$model->byChannel($this->id);
 		}
 

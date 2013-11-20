@@ -13,9 +13,10 @@
  */
 class YContentUrlRule extends CBaseUrlRule
 {
+	public $exclude = array();
+
 	public function createUrl($manager,$route,$params,$ampersand)
 	{
-		Yii::log(var_export($params, true));
 		if (in_array($route, array('content/index', 'content/view')) && isset($params['path'])) {
 			$url = $params['path'];
 			$id = isset($params['id']) ? $params['id'] : null;
@@ -56,6 +57,9 @@ class YContentUrlRule extends CBaseUrlRule
 
 	protected function isValidChannel($path)
 	{
+		if (in_array($path, $this->exclude))
+			return false;
+
 		$parts = explode('/', $path);
 		$i = 0;
 		while($id = current($parts)) {

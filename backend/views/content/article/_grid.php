@@ -43,8 +43,8 @@ $actions = array(
 	'' => '批量操作',
 	'sticky'=>'置顶',
 	'unsticky'=>'取消置顶',
-	'promote'=>'推荐至首页',
-	'demote'=>'取消推荐至首页',
+	'promote'=>'显示在首页',
+	'demote'=>'取消显示在首页',
 	'public'=>'公开',
 	'draft'=>'待审核',
 	'delete' => '删除',
@@ -72,7 +72,7 @@ $actions = array(
 		array(
 			'name'=>'title',
 			'type'=>'raw',
-			'value'=>'CHtml::encode($data->title) . ($data->sticky ? " <span class=\"label\">置顶</span> " : "") . ($data->promote ? " <span class=\"label\">推荐至首页</strong> " : "")',
+			'value'=>'CHtml::encode($data->title) . ($data->sticky ? " <span class=\"label\">置顶</span> " : "") . ($data->promote ? " <span class=\"label\">显示在首页</strong> " : "")',
 		),
 		array(
 			'name'=>'status',

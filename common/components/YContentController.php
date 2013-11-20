@@ -1,4 +1,16 @@
 <?php
+/**
+ * YContentController class file
+ *
+ * @author Yang <css3@qq.com>
+ */
+
+/**
+ * YContentController
+ *
+ * @author Yang <css3@qq.com>
+ * @package common.components
+ */
 class YContentController extends CController
 {
 	/**
@@ -40,39 +52,13 @@ class YContentController extends CController
 	{
 		parent::init();
 		$this->baseUrl = Yii::app()->getTheme()->getBaseurl();
-
-		if (empty($_GET['path'])) {
-			throw new CHttpException(404, '栏目路径没有找到');
-		} else {
-			$this->_path =  trim($_GET['path']);
-		}
-
-		$parts = explode('/', $this->_path);
-
-		if (!$channel = Channel::get($parts[count($parts) - 1])) {
-			throw new CHttpException(404, '栏目没有找到');
-		}
-
-		while (isset($this->channelMap[$channel->name])) {
-			$value = $this->channelMap[$channel->name];
-			if ($value === '_CHILD') {
-				$channel = current($channel->getChildren());
-			} else {
-				$channel = Channel::get($value);
-			}
-			if (!$channel) {
-				throw new CHttpException(404, '栏目没有找到');
-			}
-		}
-
-		$this->_channel = $channel;
 	}
 
 	/**
 	 * 首页
 	 * @param string $path
 	 */
-	public function actionIndex($path)
+	public function actionIndex()
 	{
 		$channel = $this->getChannel();
 		if ($channel->type == Channel::TYPE_LIST) {
@@ -109,14 +95,15 @@ class YContentController extends CController
 	 * @throws CException
 	 * @throws CHttpException
 	 */
-	public function actionView($path, $id)
+	public function actionView($id)
 	{
 		$channel = $this->getChannel();
-		if (!$staticModel = $channel->getObjectModel()) {
+
+		if (!$staticModel = $channel->getObjectModel(true, false)) {
 			throw new CException('内容模型丢失');
 		}
 
-		if (!$model = $staticModel->published()->findByPk($id)) {
+		if (!$model = $staticModel->cache(60)->published()->findByPk($id)) {
 			throw new CHttpException(404, '页面没有找到');
 		}
 
@@ -129,7 +116,63 @@ class YContentController extends CController
 	 */
 	public function getChannel()
 	{
+		if (!isset($this->_channel)) {
+			$path = $this->getPath();
+			$parts = explode('/', $path);
+			$this->setChannel($parts[count($parts) - 1]);
+		}
 		return $this->_channel;
+	}
+
+	/**
+	 * 设置栏目
+	 * @param mixed $idName
+	 * @throws CHttpException
+	 */
+	public function setChannel($idName)
+	{
+		if (!$channel = Channel::get($idName)) {
+			throw new CHttpException(404, '栏目没有找到');
+		}
+
+		while (isset($this->channelMap[$channel->name])) {
+			$value = $this->channelMap[$channel->name];
+			if ($value === '_CHILD') {
+				$channel = current($channel->getChildren());
+			} else {
+				$channel = Channel::get($value);
+			}
+			if (!$channel) {
+				throw new CHttpException(404, '栏目没有找到');
+			}
+		}
+
+		$this->_channel = $channel;
+	}
+
+	/**
+	 * 获取栏目路径
+	 */
+	public function getPath()
+	{
+		if (!isset($this->_path)) {
+			if (empty($_GET['path'])) {
+				throw new CHttpException(404, '栏目路径没有找到');
+			} else {
+				$this->_path =  trim($_GET['path']);
+			}
+		}
+
+		return $this->_path;
+	}
+
+	/**
+	 * 设置栏目路径
+	 * @param string $path
+	 */
+	public function setPath($path)
+	{
+		$this->_path = trim($path);
 	}
 
 	/**
@@ -178,7 +221,7 @@ class YContentController extends CController
 		else
 			$view = 'index';
 
-		$parts = explode('/', $this->_path);
+		$parts = explode('/', $this->getPath());
 
 		if (isset($this->viewMap[$channelName][$view]))
 			return $parts[0] . '/' . $this->viewMap[$channelName][$view];

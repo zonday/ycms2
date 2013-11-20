@@ -63,12 +63,13 @@ $this->breadcrumbs = array(
 					$staticModel = CActiveRecord::model($modelClass);
 					if (!$staticModel instanceof Node)
 						continue;
+
+					$staticModel->byChannel(Channel::getChannelsByModel($modelClass));
 				?>
 				<tr><th colspan="4" align="center"><?php echo Channel::model()->getModelName($modelClass); ?></th></tr>
 					<?php foreach ($staticModel->cache(60)->findAll(array('select'=>'id, channel_id, title, update_time, status', 'limit'=>5, 'order'=>'update_time DESC')) as $model): ?>
 					<?php
 						$channel = Channel::get($model->channel_id);
-
 					?>
 				<tr>
 					<td class="title-column"><?php echo CHtml::link(CHtml::encode($model->title), array('content/update', 'channel'=>$model->channel_id, 'id'=>$model->id), array('title'=>CHtml::encode($model->title))); ?> </td>
