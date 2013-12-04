@@ -63,7 +63,7 @@ class ContentController extends Controller
 			if ($model->save(true,array('title', 'content', 'keywords', 'description')))
 			{
 				Yii::app()->getUser()->setFlash('success', '更新页面内容成功。');
-				$this->redirect(array('channel', 'chanenl'=>$model->id));
+				$this->redirect(array('channel', 'channel'=>$model->id));
 			}
 		}
 

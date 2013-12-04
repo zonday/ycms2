@@ -105,6 +105,7 @@ class Channel extends CActiveRecord
 			array('name', 'match', 'pattern'=>'|^[0-9a-z\-]+$|i', 'message'=>'{attribute} 只能包含英文和 数字 、-.'),
 			array('name', 'unique'),
 			array('parent_id, weight', 'numerical', 'integerOnly'=>true),
+			array('content', 'filter', 'filter'=>array($obj=new CHtmlPurifier(),'purify')),
 			array('type', 'in', 'range'=>array(self::TYPE_EMPTY, self::TYPE_LIST, self::TYPE_PAGE)),
 			array('model', 'validateModel'),
 			array('description', 'safe'),

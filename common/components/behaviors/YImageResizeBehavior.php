@@ -130,11 +130,21 @@ class YImageResizeBehavior extends CActiveRecordBehavior
 
 			list($width, $height, $crop) = $size;
 
+			if (empty($width) && $height) {
+				$master = Image::HEIGHT;
+				$width = ceil($image->width * $height / $image->height);
+			} elseif (empty($height) && $width) {
+				$master = Image::WIDTH;
+				$height = ceil($image->height * $width / $image->width);
+			} else {
+				$master = Image::AUTO;
+			}
+
 			if ($image->width < $width && $image->height < $height && $name !== File::IMAGE_THUMBNAIL)
 				continue;
 
 			if (!$crop) {
-				$image->resize($width, $height);
+				$image->resize($width, $height, $master);
 			} else {
 				list($cropW, $cropH, $top, $left, $newW, $newH) = $this->resizeImageCrop($image->width, $image->height, $width, $height);
 				$image->crop($cropW, $cropH, $top, $left)->resize($newW, $newH);

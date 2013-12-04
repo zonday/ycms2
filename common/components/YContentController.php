@@ -83,6 +83,8 @@ class YContentController extends CController
 			}
 
 			$this->render($this->findView(), $data);
+		} elseif ($channel->type == Channel::TYPE_PAGE) {
+			$this->render($this->findView(), array('model'=>$channel));
 		} else {
 			$this->render($this->findView());
 		}

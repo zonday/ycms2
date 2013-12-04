@@ -440,7 +440,7 @@ abstract class Node extends CActiveRecord
 	 */
 	public function bulkSticky($ids)
 	{
-		$this->updateByPk($ids, array('sticky'=>1));
+		$this->updateByPk($ids, array('sticky'=>1, 'update_time'=>time()));
 	}
 
 	/**
@@ -449,7 +449,7 @@ abstract class Node extends CActiveRecord
 	 */
 	public function bulkUnsticky($ids)
 	{
-		$this->updateByPk($ids, array('sticky'=>0));
+		$this->updateByPk($ids, array('sticky'=>0, 'update_time'=>time()));
 	}
 
 	/**
@@ -458,7 +458,7 @@ abstract class Node extends CActiveRecord
 	 */
 	public function bulkPromote($ids)
 	{
-		$this->updateByPk($ids, array('promote'=>1));
+		$this->updateByPk($ids, array('promote'=>1, 'update_time'=>time()));
 	}
 
 	/**
@@ -467,7 +467,7 @@ abstract class Node extends CActiveRecord
 	 */
 	public function bulkDemote($ids)
 	{
-		$this->updateByPk($ids, array('promote'=>0));
+		$this->updateByPk($ids, array('promote'=>0, 'update_time'=>time()));
 	}
 
 	/**

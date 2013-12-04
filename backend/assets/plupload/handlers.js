@@ -6,10 +6,10 @@ jQuery(function($) {
 		var $item = $('#media-item-' + file.id);
 
 		if ($item.length === 0) {
-			$item = $('<div id="media-item-' + file.id + '" class="media-item-error alert alert-error"><button data-dismiss="alert" class="close" type="button">×</button>' + file.name + '  ' +  message + '</div>');
+			$item = $('<div id="media-item-' + file.id + '" class="media-item media-item-error alert alert-error"><button data-dismiss="alert" class="close" type="button">×</button>' + file.name + '  ' +  message + '</div>');
 			$('#media-container-' + up._id).append($item);
 		} else {
-			$item.attr('class', 'media-item-error alert alert-error')
+			$item.attr('class', 'media-item media-item-error alert alert-error')
 				.html('<button data-dismiss="alert" class="close" type="button">×</button>' + message);
 		}
 
