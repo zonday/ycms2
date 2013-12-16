@@ -527,6 +527,7 @@ abstract class Node extends CActiveRecord
 		if (!$this->hasAttribute('channel_id'))
 			return $this;
 
+		$channelIds = array();
 		if (is_array($channel)) {
 			foreach ($channel as $value) {
 				if ($value instanceof Channel)
