@@ -108,7 +108,7 @@ class FileController extends Controller
 				Yii::app()->end();
 			}
 		} else
-			throw new CHttpException(400,'无效的请求，请重试');
+			throw new CHttpException(405,'无效的请求，请重试');
 	}
 
 	/**
@@ -125,7 +125,7 @@ class FileController extends Controller
 
 			$this->redirect(array('index'));
 		} else
-			throw new CHttpException(400,'无效的请求，请重试');
+			throw new CHttpException(405,'无效的请求，请重试');
 	}
 
 	/**

@@ -44,7 +44,9 @@ class YContentCacheDependency extends CCacheDependency
 			$model = CActiveRecord::model($modelClass);
 			$table = $model->tableName();
 			if (!isset($lastUpdateTime[$table]) && $model->hasAttribute('update_time')) {
-				if ($value = Yii::app()->getDB()->createCommand()
+				if ($model instanceof  Node) {
+					$lastUpdateTime[$table] = $model->getLastUpdateTime();
+				} elseif ($value = Yii::app()->getDB()->createCommand()
 					->select('update_time')
 					->from($table)
 					->order('update_time DESC')

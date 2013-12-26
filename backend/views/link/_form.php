@@ -3,10 +3,8 @@
 /* @var $model Link */
 /* @var $form TbActiveForm */
 ?>
-<div class="form">
-
 <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
-	'id'=>'history-form',
+	'id'=>'link-form',
 	'type'=>'horizontal',
 	'enableAjaxValidation'=>false,
 )); ?>
@@ -60,4 +58,3 @@
 	</div>
 
 <?php $this->endWidget(); ?>
-</div>

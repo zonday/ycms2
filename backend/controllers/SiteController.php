@@ -143,11 +143,11 @@ class SiteController extends Controller
 		$user = User::validateKey($key, $login);
 		if ($user) {
 			$result = $user->saveAttributes(array(
-				'status' => User::STATUS_NOMAL,
+				'status' => User::STATUS_NORMAL,
 				'activation_key' => '',
 			));
 		} else {
-			$resutl = false;
+			$result = false;
 		}
 
 		if ($result)

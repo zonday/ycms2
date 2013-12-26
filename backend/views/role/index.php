@@ -23,7 +23,7 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 ));
 ?>
 <?php $this->widget('bootstrap.widgets.TbGridView',array(
-	'id'=>'taxonomy-grid',
+	'id'=>'role-grid',
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
 	'columns'=>array(

@@ -111,6 +111,7 @@ abstract class Node extends CActiveRecord
 	 */
 	public function behaviors()
 	{
+		return $this->extraBehaviors();
 		return array_merge(array(
 			'CTimestampBehavior' => array(
 				'class' => 'zii.behaviors.CTimestampBehavior',
@@ -527,7 +528,6 @@ abstract class Node extends CActiveRecord
 		if (!$this->hasAttribute('channel_id'))
 			return $this;
 
-		$channelIds = array();
 		if (is_array($channel)) {
 			foreach ($channel as $value) {
 				if ($value instanceof Channel)
@@ -562,6 +562,37 @@ abstract class Node extends CActiveRecord
 	}
 
 	/**
+	 * 获取最后更新时间
+	 * @return integer
+	 */
+	public function getLastUpdateTime()
+	{
+		$cacheKey = $this->tableName() . '_last_updatetime';
+		if (($cache=Yii::app()->getCache()->get($cacheKey)) === false) {
+			$lastTime = $this->getDbConnection()->createCommand()
+				->select('update_time')
+				->from($this->tableName())
+				->order('update_time DESC')
+				->limit(1)
+				->queryScalar();
+			Yii::app()->getCache()->set($cacheKey, $lastTime);
+		}
+		return $cache;
+	}
+
+	/**
+	 * 更新最后更新时间
+	 * @param integer $time
+	 */
+	public function updateLastUpdateTime($time=null)
+	{
+		$cacheKey = $this->tableName() . '_last_updatetime';
+		if ($time === null)
+			$time = time();
+		Yii::app()->getCache()->set($cacheKey, $time);
+	}
+
+	/**
 	 * 查找之后
 	 * @see CActiveRecord::afterFind()
 	 */
@@ -581,9 +612,21 @@ abstract class Node extends CActiveRecord
 			} else {
 				$this->create_time = time();
 			}
+			$this->update_time = time();
+			$this->updateLastUpdateTime();
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * 删除之后
+	 * @see CActiveRecord::afterDelete()
+	 */
+	protected function afterDelete()
+	{
+		parent::afterDelete();
+		$this->updateLastUpdateTime();
 	}
 }

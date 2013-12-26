@@ -195,7 +195,7 @@ class ContentController extends Controller
 				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index', 'channel'=>$channel));
 			}
 		} else {
-			throw new CHttpException(400,'无效的请求，请重试');
+			throw new CHttpException(405,'无效的请求，请重试');
 		}
 	}
 

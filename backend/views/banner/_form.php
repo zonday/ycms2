@@ -4,14 +4,14 @@
 /* @var $form TbActiveForm */
 ?>
 <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
-	'id'=>'history-form',
+	'id'=>'banner-form',
 	'type'=>'horizontal',
 	'enableAjaxValidation'=>false,
 )); ?>
 
 	<p class="help-block"><span class="required">*</span> 字段必填.</p>
 
-	<?php //echo $form->errorSummary($model); ?>
+	<?php echo $form->errorSummary($model); ?>
 
 	<?php $this->widget('YUploadWidget', array(
 		'model' => $model,

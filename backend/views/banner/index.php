@@ -32,7 +32,7 @@ $actions = array(
 	'delete' => '删除',
 );
 $this->widget('bootstrap.widgets.TbExtendedGridView',array(
-	'id'=>'file-grid',
+	'id'=>'banner-grid',
 	'dataProvider'=>$model->with('category')->search(),
 	'bulkActions' => array(
 		'class' => 'YBulkActions',

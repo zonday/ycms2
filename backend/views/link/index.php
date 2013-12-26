@@ -25,7 +25,7 @@ $actions = array(
 ?>
 <?php
 $this->widget('bootstrap.widgets.TbExtendedGridView',array(
-	'id'=>'file-grid',
+	'id'=>'link-grid',
 	'dataProvider'=>$model->with('category')->search(),
 	'bulkActions' => array(
 		'class' => 'YBulkActions',
