@@ -53,7 +53,7 @@ return array(
 			'host'=>'smtp.qq.com',
 			'username'=>'zhuanjiao.test@foxmail.com',
 			'password'=>'zhuanjiao.test',
-			'from'=>'zhuanjiao.test@foxmail.com'
+			'from'=>'zhuanjiao.test@foxmail.com',
 		),
 		'format'=>array(
 			'datetimeFormat'=>'Y-m-d h:i:s',

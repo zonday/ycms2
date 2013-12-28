@@ -23,6 +23,7 @@ class Mailer extends CComponent
 	public $from;
 	public $fromName;
 	public $auth = true;
+	public $port;
 
 	private $_mailer;
 
@@ -46,8 +47,18 @@ class Mailer extends CComponent
 				$this->_mailer->Password = $this->password;
 				$this->_mailer->SMTPAuth = $this->auth;
 
-				if (isset($this->secure))
-					$this->_mailer->SMTPSecure = $secure;
+				if (isset($this->secure)) {
+					$this->_mailer->SMTPSecure = 'ssl';
+					if (!isset($this->port)) {
+						$this->port = 465;
+					}
+				}
+
+				if (!isset($this->port)) {
+					$this->port = 25;
+				}
+
+				$this->_mailer->Port = $this->port;
 			} else {
 				$this->_mailer->IsMail();
 			}
@@ -59,12 +70,10 @@ class Mailer extends CComponent
 		}
 
 		$this->_mailer->ClearAddresses();
-		$this->_mailer->ClearAddresses();
 		$this->_mailer->ClearAllRecipients();
 		$this->_mailer->ClearAttachments();
 		$this->_mailer->ClearBCCs();
 		$this->_mailer->ClearCCs();
-		$this->_mailer->ClearCustomHeaders();
 		$this->_mailer->ClearReplyTos();
 
 		return $this->_mailer;
