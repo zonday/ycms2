@@ -529,6 +529,7 @@ abstract class Node extends CActiveRecord
 			return $this;
 
 		if (is_array($channel)) {
+			$channelIds = array();
 			foreach ($channel as $value) {
 				if ($value instanceof Channel)
 					$channelIds[] = $value->id;

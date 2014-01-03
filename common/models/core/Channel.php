@@ -478,7 +478,11 @@ class Channel extends CActiveRecord
 	 */
 	public function getWeightList()
 	{
-		$count = count($this->getChildren(-1));
+		$total = array();
+		foreach ($this->getChildren(-1) as $children) {
+			$total[] = count($children);
+		}
+		$count = max($total);
 		$range = range(-$count, $count);
 		return array_combine($range, $range);
 	}
