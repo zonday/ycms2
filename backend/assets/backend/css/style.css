@@ -24,7 +24,7 @@ body {
 	float: left;
 	background-color: #f2f2f2;
 	border-right: 1px solid #ccc;
-	width: 190px;
+	width: 150px;
 	top: 40px;
 	bottom: 0;
 	left: 0;
@@ -40,7 +40,7 @@ body {
 }
 
 .main-content {
-	margin-left: 190px;
+	margin-left: 150px;
 	min-height: 100%;
 	transition: margin-left 0.3s ease 0s;
 }
@@ -194,7 +194,7 @@ table .toggle-column i {
 }
 
 table .id-column {
-	width: 5em;
+	width: 3em;
 }
 
 table .checkbox-column input{
@@ -203,6 +203,12 @@ table .checkbox-column input{
 
 table .status-column {
 	width: 8em;
+}
+
+table .name-column,
+table .category-column,
+table .slug-column {
+	width: 10em;
 }
 
 tr.odd {
@@ -235,6 +241,10 @@ tr.level-5 .title-column {
 
 tr .icon-move {
 	cursor: move;
+}
+
+.depth-indent {
+	color: #ccc;
 }
 
 .bootstrap-widget table .channel-column {

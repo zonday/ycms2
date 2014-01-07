@@ -26,11 +26,13 @@
 		<div class="span4">
 			<div id="form-side">
 				<?php
-				$this->widget('YUploadWidget', array(
-					'model' => $model,
-					'attribute' => 'image',
-					'form' => $form,
-				))
+				if (isset($model->YUploadWidget) && $model->fileUsage()):
+					$this->widget('YUploadWidget', array(
+						'model' => $model,
+						'attribute' => 'image',
+						'form' => $form,
+					));
+				endif;
 				?>
 
 				<?php
@@ -62,7 +64,7 @@
 		</div>
 	</div>
 
-	<div class="form-actions" data-editor="Article_content">
+	<div class="form-actions" data-editor="<?php echo get_class($model); ?>_content">
 		<?php $this->widget('bootstrap.widgets.TbButton', array(
 			'buttonType'=>'submit',
 			'htmlOptions'=>array('name'=>'_save'),

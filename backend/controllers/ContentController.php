@@ -35,6 +35,15 @@ class ContentController extends Controller
 	}
 
 	/**
+	 * 设置栏目
+	 * @param Channel $channel
+	 */
+	public function setChannel(Channel $channel)
+	{
+		$this->_channel = $channel;
+	}
+
+	/**
 	 * 获取栏目模型类名
 	 * @return string
 	 */
@@ -266,15 +275,18 @@ class ContentController extends Controller
 	 * @param Node $model
 	 * @return string
 	 */
-	protected function getViewDirectory($model)
+	protected function getViewDirectory(Node $model)
 	{
 		$className = get_class($model);
-		$viewDirectory  = $this->getViewPath() . DIRECTORY_SEPARATOR . strtolower($className);
-
-		if (($model instanceof Article) && !file_exists($viewDirectory))
-			return 'article';
-		else
-			return strtolower($className);
+		$viewDirectory = $this->getViewPath() . DIRECTORY_SEPARATOR . strtolower($className);
+		while (!file_exists($viewDirectory)) {
+			$parent = get_parent_class($className);
+			if (!$parent || strtolower($parent) === strtolower('CActiveRecord'))
+				break;
+			$className = $parent;
+			$viewDirectory = $this->getViewPath() . DIRECTORY_SEPARATOR . strtolower($className);
+		}
+		return strtolower($className);
 	}
 
 	/**
@@ -286,7 +298,8 @@ class ContentController extends Controller
 	{
 		if ($channel === null)
 			$channel = $this->getChannel();
-		$breadcrumb = array('栏目' => array('channel/index'));
+		//$breadcrumb = array('栏目' => array('channel/index'));
+		$breadcrumb = array();
 		$parents = $channel->getParentsAll();
 		foreach ($parents as $parent)
 		{

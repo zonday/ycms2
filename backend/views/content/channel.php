@@ -58,13 +58,19 @@ $this->widget('bootstrap.widgets.TbExtendedGridView', array(
 			'pageSize'=>50,
 		),
 	)),
-	'rowHtmlOptionsExpression' => 'array("class"=>"level-" .$data->depth)',
+	//'rowHtmlOptionsExpression' => 'array("class"=>"level-" .$data->depth)',
 	'columns'=>array(
 		array(
+			'name'=>'id',
+			'header'=>$model->getAttributeLabel('id'),
+			'headerHtmlOptions'=>array('class'=>'id-column'),
+		),
+		array(
 			'name'=>'title',
+			'type'=>'raw',
 			'header'=>$model->getAttributeLabel('title'),
+			'value'=>'"<span class=\"depth-indent\">" . str_repeat(" — ", $data->depth) . "</span>" . $data->title',
 			'htmlOptions'=>array('class'=>'title-column'),
-			'value'=>'$data->title',
 		),
 		array(
 			'name'=>'name',

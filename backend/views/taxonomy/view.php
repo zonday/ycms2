@@ -64,23 +64,27 @@ $this->widget('bootstrap.widgets.TbGridView',array(
 	//'filter'=>null,
 	'enableSorting'=> $model->hierarchy == Taxonomy::HIERARCHY_DISABLED ? true : false,
 	'columns'=>array(
-		/*
 		array(
 			'name'=>'id',
-			'header'=>'ID',
-		),*/
+			'header'=>$term->getAttributeLabel('id'),
+			'headerHtmlOptions'=>array('class'=>'id-column'),
+		),
 		array(
 			'name'=>'name',
 			'header'=>$term->getAttributeLabel('name'),
-			'value'=>'str_repeat(" — ", $data->depth) . " " . $data->name',
+			'headerHtmlOptions'=>array('class'=>'name-column'),
+			'type'=>'raw',
+			'value'=>'"<span class=\"depth-indent\">" . str_repeat(" — ", $data->depth) . "</span>" . CHtml::encode($data->name)',
 		),
 		array(
 			'name'=>'slug',
 			'header'=>$term->getAttributeLabel('slug'),
+			'headerHtmlOptions'=>array('class'=>'slug-column'),
 		),
 		array(
 			'name'=>'description',
 			'header'=>$term->getAttributeLabel('description'),
+			'headerHtmlOptions'=>array('class'=>'description-column'),
 		),
 		array(
 			'class'=>'YInputColumn',

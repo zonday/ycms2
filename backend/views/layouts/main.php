@@ -4,7 +4,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="robots" content="noindex,nofollow" />
-		<title><?php echo CHtml::encode($this->pageTitle); ?></title>
+		<title><?php echo CHtml::encode($this->pageTitle . ' - ' . Yii::app()->name); ?></title>
 	</head>
 	<body>
 		<?php

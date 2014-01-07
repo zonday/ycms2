@@ -67,12 +67,17 @@ $this->breadcrumbs = array(
 					$staticModel->byChannel(Channel::getChannelsByModel($modelClass));
 				?>
 				<tr><th colspan="4" align="center"><?php echo Channel::model()->getModelName($modelClass); ?></th></tr>
-					<?php foreach ($staticModel->cache(60)->findAll(array('select'=>'id, channel_id, title, update_time, status', 'limit'=>5, 'order'=>'update_time DESC')) as $model): ?>
 					<?php
-						$channel = Channel::get($model->channel_id);
+					$select = 'id, title, update_time, status';
+					if ($staticModel->hasAttribute('channel_id')) {
+						$select .= ', channel_id';
+					}
+					foreach ($staticModel->cache(60)->findAll(array('select'=>$select, 'limit'=>5, 'order'=>'update_time DESC')) as $model): ?>
+					<?php
+						$channel = $model->getChannel();
 					?>
 				<tr>
-					<td class="title-column"><?php echo CHtml::link(CHtml::encode($model->title), array('content/update', 'channel'=>$model->channel_id, 'id'=>$model->id), array('title'=>CHtml::encode($model->title))); ?> </td>
+					<td class="title-column"><?php echo CHtml::link(CHtml::encode($model->title), array('content/update', 'channel'=>$channel->id, 'id'=>$model->id), array('title'=>CHtml::encode($model->title))); ?> </td>
 					<td class="channel-column"><?php echo CHtml::link(CHtml::encode($channel->title), array('content/index', 'channel'=>$channel->id), array('title'=>'查看该栏目下的文章')); ?></td>
 					<td class="datetime-column"><abbr title="<?php echo Yii::app()->format->datetime($model->update_time); ?>"><?php echo Yii::app()->format->date($model->update_time)?></abbr></td>
 					<td class="status-column"><span class="label label-<?php echo $statusLabelMap[$model->status]?>"><?php echo $model->statusList[$model->status]; ?></span></td>

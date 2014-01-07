@@ -25,9 +25,22 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
 	'columns'=>array(
-		'name',
-		'slug',
-		'description',
+		array(
+			'name'=>'id',
+			'headerHtmlOptions'=>array('class'=>'id-column'),
+		),
+		array(
+			'name'=>'name',
+			'headerHtmlOptions'=>array('class'=>'name-column'),
+		),
+		array(
+			'name'=>'slug',
+			'headerHtmlOptions'=>array('class'=>'slug-column'),
+		),
+		array(
+			'name'=>'description',
+			'headerHtmlOptions'=>array('class'=>'description-column'),
+		),
 		array(
 			'class'=>'YInputColumn',
 			'name'=>'weight',
@@ -35,9 +48,8 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 		),
 		array(
 			'class'=>'CLinkColumn',
-			'label'=>'添加术语',
+			'label'=>'<i class="icon-plus"></i> 添加术语',
 			'urlExpression'=>'Yii::app()->createUrl("term/create", array("taxonomy_id"=>$data->id))',
-			'linkHtmlOptions'=>array('class'=>'btn'),
 		),
 		array(
 			'class'=>'bootstrap.widgets.TbButtonColumn',

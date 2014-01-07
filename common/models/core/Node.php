@@ -50,11 +50,27 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 栏目id
-	 * @var integer
+	 * @var integer 虚拟属性 根据表字段
 	 */
 	public $channel_id;
 
+	/**
+	 * @var integer 虚拟属性 根据表字段
+	 */
 	public $hits;
+
+	/**
+	 * @param string $className
+	 * @return Node
+	 */
+	public static function model($className)
+	{
+		$model = parent::model($className);
+		if (!$model instanceof Node) {
+			throw CException($className . ' 没有继承 Node');
+		}
+		return $model;
+	}
 
 	/**
 	 * 验证规则
@@ -165,7 +181,7 @@ abstract class Node extends CActiveRecord
 	public static function getStatusList()
 	{
 		return array(
-			self::STATUS_DRAFT=>'待审核',
+			self::STATUS_DRAFT=>'草稿',
 			self::STATUS_PUBLIC=>'公开',
 		);
 	}
@@ -233,6 +249,10 @@ abstract class Node extends CActiveRecord
 	{
 		if (isset($this->channel_id))
 			return Channel::get($this->channel_id);
+		else if ($channels = Channel::getChannelsByModel(get_class($this)))
+			return current($channels);
+		else
+			return null;
 	}
 
 	/**
@@ -326,11 +346,9 @@ abstract class Node extends CActiveRecord
 	{
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id,true);
-
-		$criteria->compare('promote',$this->promote);
-		$criteria->compare('sticky',$this->sticky);
-		$criteria->compare('status',$this->status);
+		$criteria->compare('t.id',$this->id,true);
+		$criteria->compare('t.sticky',$this->sticky);
+		$criteria->compare('t.promote',$this->promote);
 
 		if ($this->create_time) {
 			$condition = YUtil::generateTimeCondition($this->create_time, 't.create_time');
@@ -339,22 +357,24 @@ abstract class Node extends CActiveRecord
 				$criteria->addCondition($condition);
 		}
 
-		$criteria->compare('title',$this->title,true);
+		$criteria->compare('t.title',$this->title,true);
 
 		if (!empty($this->user_id)) {
 			if (is_numeric($this->user_id)) {
-				$criteria->compare('user_id',$this->user_id);
+				$criteria->compare('t.user_id',$this->user_id);
 			} else {
 				$this->with('user');
 				$criteria->compare('user.nickname', $this->user_id, true);
 			}
 		}
 
+		$this->afterSearch($criteria);
+
 		if (!empty($this->channel_id)) {
 			$criteria->compare('t.channel_id',$this->channel_id);
 		}
 
-		$this->afterSearch($criteria);
+		$criteria->compare('t.status', $this->status);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -411,9 +431,9 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 搜索之后
-	 * @param mixed $criteria
+	 * @param CDbCriteria $criteria
 	 */
-	public function afterSearch($criteria)
+	public function afterSearch(CDbCriteria $criteria)
 	{
 		if (isset($this->YTaxonomyBehavior))
 			$this->searchByTaxonomy($criteria);
@@ -560,6 +580,29 @@ abstract class Node extends CActiveRecord
 		if ($this->isNewRecord) {
 			$this->create_time = date('Y-m-d H:i:s');
 		}
+	}
+
+	/**
+	 * 获取Raw标题
+	 * @param boolean $editLink 是否显示编辑链接
+	 * @return string
+	 */
+	public function getRawTitle($editLink=True)
+	{
+		$title = CHtml::encode($this->title);
+		if ($editLink) {
+			$url = array('/content/update', 'id'=>$this->id, 'channel'=>$this->channel->id);
+			$htmlOptions = array('title'=>'更新 “' . $title . '” ');
+			$title = CHtml::link($title, $url, $htmlOptions);
+		}
+		if ($this->sticky) {
+			$title .= ' <span class="label label-info label-sticky">置顶</span> ';
+		}
+		if ($this->promote) {
+			$title .= ' <span class="label label-info label-promote">显示在首页</span> ';
+		}
+
+		return '<div class="node-title">' . $title . '</div>';
 	}
 
 	/**

@@ -103,8 +103,9 @@ class Channel extends CActiveRecord
 			array('title, name', 'required'),
 			array('title, name, keywords', 'length', 'max'=>255),
 			array('name', 'match', 'pattern'=>'|^[0-9a-z\-]+$|i', 'message'=>'{attribute} 只能包含英文和 数字 、-.'),
-			array('name', 'unique'),
 			array('parent_id, weight', 'numerical', 'integerOnly'=>true),
+			array('name', 'unique'),
+			//array('name', 'unique', 'criteria'=>array('condition'=>'parent_id=:parent_id', 'params'=>array(':parent_id'=>$this->parent_id))),
 			array('content', 'filter', 'filter'=>array($obj=new CHtmlPurifier(),'purify')),
 			array('type', 'in', 'range'=>array(self::TYPE_EMPTY, self::TYPE_LIST, self::TYPE_PAGE)),
 			array('model', 'validateModel'),
@@ -112,6 +113,9 @@ class Channel extends CActiveRecord
 		);
 	}
 
+	/**
+	 * 验证模型
+	 */
 	public function validateModel()
 	{
 		$modelList = $this->getModelList();
@@ -478,7 +482,7 @@ class Channel extends CActiveRecord
 	 */
 	public function getWeightList()
 	{
-		$total = array();
+		$total = array(0);
 		foreach ($this->getChildren(-1) as $children) {
 			$total[] = count($children);
 		}
@@ -493,28 +497,27 @@ class Channel extends CActiveRecord
 	 */
 	public function getContentActionLink()
 	{
-		$htmlOptions = array('class'=>'btn');
-		$output = '';
+		$htmlOptions = array();;
+		$links = array();
 		$url = array('/content/index','channel'=>$this->id);
 		if ($this->model) {
 			$staticModel = CActiveRecord::model($this->model);
 			if (!$staticModel instanceof Node) {
 				$url = array('/other/' . strtolower($this->model));
 			}
-			$output = CHtml::link('<i class="icon-list"></i> 管理内容', $url, $htmlOptions);
+			$links[] = CHtml::link('<i class="icon-list"></i> 管理内容', $url, $htmlOptions);
 		}
 
 		if ($this->type == Channel::TYPE_LIST){
 			if ($staticModel instanceof Node) {
-				return $output . CHtml::link('<i class="icon-plus"></i> 创建内容', array('/content/create','channel'=>$this->id), $htmlOptions);
+				$links[] = CHtml::link(' <i class="icon-plus"></i> 创建内容', array('/content/create','channel'=>$this->id), $htmlOptions);
 			} else {
-				return $output . CHtml::link('<i class="icon-plus"></i> 创建内容', array('/other/' . strtolower($this->model) . '/create','channel'=>$this->id), $htmlOptions);
+				$links[] = CHtml::link(' <i class="icon-plus"></i> 创建内容', array('/other/' . strtolower($this->model) . '/create','channel'=>$this->id), $htmlOptions);
 			}
 		} elseif ($this->type == Channel::TYPE_PAGE) {
-			return $output . CHtml::link('<i class="icon-pencil"></i> 更新页面', array('/content/channel','channel'=>$this->id), $htmlOptions);
-		} else {
-			return $output;
+			$links[] = CHtml::link('<i class="icon-pencil"></i> 更新页面', array('/content/channel','channel'=>$this->id), $htmlOptions);
 		}
+		return implode("\t", $links);
 	}
 
 	/**

@@ -54,7 +54,7 @@ $this->widget('bootstrap.widgets.TbExtendedGridView', array(
 		'align' => 'left',
 		'actionButtons' => $actions,
 	),
-	'rowHtmlOptionsExpression' => 'array("class"=>"level-" .$data->depth)',
+	//'rowHtmlOptionsExpression' => 'array("class"=>"level-" .$data->depth)',
 	'columns'=>array(
 		array(
 			'name'=>'id',
@@ -63,11 +63,16 @@ $this->widget('bootstrap.widgets.TbExtendedGridView', array(
 			'checkBoxHtmlOptions'=>array('name' => 'ids[]'),
 		),
 		array(
+			'name'=>'id',
+			'header'=>$model->getAttributeLabel('id'),
+			'headerHtmlOptions'=>array('class'=>'id-column'),
+		),
+		array(
 			'name'=>'title',
-			//'type'=>'raw',
+			'type'=>'raw',
 			'header'=>$model->getAttributeLabel('title'),
+			'value'=>'"<span class=\"depth-indent\">" . str_repeat(" — ", $data->depth) . "</span>" . $data->title',
 			'htmlOptions'=>array('class'=>'title-column'),
-			'value'=>'$data->title',
 		),
 		array(
 			'name'=>'name',

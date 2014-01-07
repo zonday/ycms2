@@ -48,12 +48,8 @@ class Article extends Node
 				'many'=>true,
 				'allowEmpty'=>false,
 				'custom'=>true,
-			),
-			'news'=>array(
-				'label'=>'分类',
-				'many'=>true,
-				'allowEmpty'=>false,
-			),);
+			)
+		);
 	}
 
 	public function fileUsage()
@@ -73,15 +69,7 @@ class Article extends Node
 		return array(
 			'YFileUsageBehavior' => array(
 				'class' => 'YFileUsageBehavior',
-				'fields' => array(
-					'image' => array(
-						'location' => 'public://article/' . date('Ym'),
-						'type' => 'image',
-						'resize' => array(
-							'post-thumbnail'=>array(222, 157, true),
-						)
-					),
-				),
+				'fields' => $this->fileUsage(),
 			),
 			'YTaxonomyBehavior' => array(
 				'class'=>'YTaxonomyBehavior',

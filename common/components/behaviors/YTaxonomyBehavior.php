@@ -139,9 +139,13 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 				}
 			}
 
-			if ($taxonomies[$taxSlug]['isSelf']) {
+			if ($params['isSelf']) {
 				$attribute = $taxonomies[$taxSlug]['attribute'];
-				$owner->$attribute = $value;
+				if ($params['many'] === false && is_array($value)) {
+					$owner->$attribute = current($value);
+				} else {
+					$owner->$attribute = $value;
+				}
 			}
 
 			$this->_termIds[$taxSlug] = $value;
@@ -356,7 +360,6 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 
 		$join = '';
 		$criteria = new CDbCriteria(array(
-			'distinct' => true,
 			'limit' => $limit,
 		));
 
@@ -367,10 +370,12 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 				$criteria->compare($taxonomies[$taxSlug]['attribute'], $termId);
 				continue;
 			}
+
 			$alias = "`term{$taxSlug}`";
 			$join .= " INNER JOIN {{term_object}} AS {$alias} ON {$alias}.object_id=t.id ";
 			$criteria->compare("{$alias}.term_id", $termId);
 			$criteria->compare("{$alias}.bundle", $bundle);
+			$criteria->distinct = true;
 		}
 		$criteria->join = $join;
 
@@ -486,6 +491,20 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 					$owner->addError("termIds[{$taxSlug}]", $params['label'] . ' 不能为空白.');
 				}
 			}
+		}
+	}
+
+	/**
+	 * 根据模型属性查找分类对象
+	 * @param string $attribute
+	 * @return Taxonomy|null
+	 */
+	public function findTaxonomyByAttribute($attribute)
+	{
+		foreach ($this->prepareTaxonomies() as $taxSlug => $params)
+		{
+			if (isset($params['attribute']) && $params['attribute'] = $attribute)
+				return $params['taxonomy'];
 		}
 	}
 

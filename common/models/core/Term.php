@@ -484,7 +484,7 @@ class Term extends CActiveRecord
 	 * @param string $spacer
 	 * @return array
 	 */
-	public function generateTreeList($taxonomy_id=null, $parent=0, $maxDepth=null, $spacer='—')
+	public function generateTreeList($taxonomy_id=null, $parent=0, $maxDepth=null, $spacer=' — ')
 	{
 		if ($taxonomy_id === null)
 			$taxonomy_id = $this->taxonomy_id;

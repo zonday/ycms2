@@ -97,7 +97,7 @@ class Controller extends CController
 	 * @param integer $parent
 	 * @return array
 	 */
-	public function getContentItems($parent=0)
+	public function getContentNavItems($parent=0)
 	{
 		$items = array();
 		$children = Channel::model()->getChildren($parent);
@@ -118,11 +118,28 @@ class Controller extends CController
 			}
 
 			$item = array('label'=>$model->title, 'url'=>$url);
-			$childrenItems = $this->getContentItems($model->id);
+			$childrenItems = $this->getContentNavItems($model->id);
 
 			if ($childrenItems !== array())
 				$item['items'] = $childrenItems;
 			$items[] = $item;
+		}
+		return $items;
+	}
+
+	public function getFormNavItems()
+	{
+		$items = array();
+		if (isset(Yii::app()->params['formModels'])) {
+			foreach (Yii::app()->params['formModels'] as $model => $name) {
+				$items[] = array(
+					'label'=>$name,
+					'url'=>array('/other/' . strtolower($model)),
+				);
+			}
+		}
+		if ($items) {
+			array_unshift($items, array('label' => '表单', 'itemOptions' => array('class' => 'nav-header')));
 		}
 		return $items;
 	}
@@ -135,20 +152,24 @@ class Controller extends CController
 	{
 		$cacheKey = 'backend_nav_items_' . Yii::app()->getSession()->getSessionID();
 		if (($items = Yii::app()->getCache()->get($cacheKey)) === false) {
-			$items = array(
-					array('label' => '首页', 'url' => array('/site/index'), 'icon' => 'fixed-width home'),
-					array('label' => '内容', 'url'=>'#', 'items' => $this->getContentItems()),
-					array('label' => '栏目', 'url' => array('/channel/index')),
-					array('label' => '系统', 'itemOptions' => array('class' => 'nav-header')),
-					array('label' => '分类', 'url' => array('/taxonomy/index')),
-					array('label' => '链接', 'url' => array('/link/index'), 'icon' => 'fixed-width link'),
-					array('label' => 'Banner', 'url' => array('/banner/index'), 'icon' => 'fixed-width picture'),
-					array('label' => '文件', 'url' => array('/file/index'), 'icon' => 'fixed-width file'),
-					array('label' => '用户', 'url' => array('/user/index'), 'icon' => 'fixed-width user'),
-					array('label' => '角色', 'url' => array('/role/index'), 'icon' => 'fixed-width group'),
-					array('label' => '权限', 'url' => array('/permission/index'), 'icon' => 'fixed-width lock'),
-					array('label' => '设置', 'url' => array('/site/setting'), 'icon' => 'fixed-width cog'),
-			);
+			$items = array_merge(array(
+					array('label' => '首页', 'url' => array('/site/index'), 'icon' => 'fixed-width home')
+				)
+				,
+				$this->getContentNavItems(),
+				$this->getFormNavItems(),
+				array(
+				array('label' => '系统', 'itemOptions' => array('class' => 'nav-header')),
+				array('label' => '栏目', 'url' => array('/channel/index'), 'icon' => 'fixed-width list'),
+				array('label' => '分类', 'url' => array('/taxonomy/index'), 'icon' => 'fixed-width tags'),
+				array('label' => '链接', 'url' => array('/link/index'), 'icon' => 'fixed-width link'),
+				array('label' => 'Banner', 'url' => array('/banner/index'), 'icon' => 'fixed-width picture'),
+				array('label' => '文件', 'url' => array('/file/index'), 'icon' => 'fixed-width file'),
+				array('label' => '用户', 'url' => array('/user/index'), 'icon' => 'fixed-width user'),
+				array('label' => '角色', 'url' => array('/role/index'), 'icon' => 'fixed-width group'),
+				array('label' => '权限', 'url' => array('/permission/index'), 'icon' => 'fixed-width lock'),
+				array('label' => '设置', 'url' => array('/site/setting'), 'icon' => 'fixed-width cog'),
+			));
 
 			$this->filterNavItems($items);
 			Yii::app()->getCache()->set($cacheKey, $items, 3600);

@@ -46,7 +46,7 @@ $actions = array(
 	'promote'=>'显示在首页',
 	'demote'=>'取消显示在首页',
 	'public'=>'公开',
-	'draft'=>'待审核',
+	'draft'=>'草稿',
 	'delete' => '删除',
 );?>
 <?php $this->widget('bootstrap.widgets.TbExtendedGridView', array(
@@ -72,7 +72,7 @@ $actions = array(
 		array(
 			'name'=>'title',
 			'type'=>'raw',
-			'value'=>'CHtml::encode($data->title) . ($data->sticky ? " <span class=\"label\">置顶</span> " : "") . ($data->promote ? " <span class=\"label\">显示在首页</strong> " : "")',
+			'value'=>'$data->getRawTitle()',
 		),
 		array(
 			'name'=>'status',
