@@ -33,7 +33,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 	 * @param array $htmlOptions
 	 * @return string
 	 */
-	public function getImage($name='post-thumbnail', $htmlOptions=array())
+	public function getImage($name=File::IMAGE_POST_THUMBNAIL, $htmlOptions=array())
 	{
 		if ($imageFile = $this->getImageFile()) {
 			return $imageFile->getImage($name, $htmlOptions);

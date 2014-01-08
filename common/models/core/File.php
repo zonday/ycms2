@@ -21,6 +21,7 @@
  */
 class File extends CActiveRecord
 {
+	const IMAGE_POST_THUMBNAIL = 'post-thumbnail';
 	const IMAGE_THUMBNAIL = 'thumbnail';
 	const IMAGE_MEDIUM = 'medium';
 	const IMAGE_LARGE = 'large';
