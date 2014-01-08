@@ -93,32 +93,31 @@ class Controller extends CController
 	}
 
 	/**
-	 * 获取内容餐单项目
-	 * @param integer $parent
+	 * 获取内容模型导航
+	 * @param integer $parent 栏目id
 	 * @return array
 	 */
-	public function getContentNavItems($parent=0)
+	public function getContentItems($parent=0)
 	{
 		$items = array();
 		$children = Channel::model()->getChildren($parent);
-		foreach ($children as $parent => $model) {
-			if ($model->status == Channel::STATUS_TRASH) {
+		foreach ($children as $parent => $channel) {
+			if ($channel->status == Channel::STATUS_TRASH) {
 				continue;
 			}
 
-			if ($model->model) {
-				$staticModel = CActiveRecord::model($model->model);
-				if (!$staticModel instanceof Node) {
-					$url = array('/other/' . strtolower($model->model));
+			if ($channel->model) {
+				if (is_subclass_of($channel->model, 'Node')) {
+					$url = array('/content/index', 'channel'=>$channel->id);
 				} else {
-					$url = array('/content/index', 'channel'=>$model->id);
+					$url = array('/other/' . strtolower($channel->model));
 				}
 			} else {
-				$url = array('/content/channel', 'channel'=>$model->id);
+				$url = array('/content/channel', 'channel'=>$channel->id);
 			}
 
-			$item = array('label'=>$model->title, 'url'=>$url);
-			$childrenItems = $this->getContentNavItems($model->id);
+			$item = array('label'=>$channel->title, 'url'=>$url);
+			$childrenItems = $this->getContentItems($channel->id);
 
 			if ($childrenItems !== array())
 				$item['items'] = $childrenItems;
@@ -127,19 +126,38 @@ class Controller extends CController
 		return $items;
 	}
 
-	public function getFormNavItems()
+	/**
+	 * 获取其他模型导航
+	 * @return array
+	 */
+	public function getOtherNavItems()
 	{
 		$items = array();
-		if (isset(Yii::app()->params['formModels'])) {
-			foreach (Yii::app()->params['formModels'] as $model => $name) {
+		if (isset(Yii::app()->params['otherModels'])) {
+			foreach (Yii::app()->params['otherModels'] as $model => $name) {
 				$items[] = array(
 					'label'=>$name,
-					'url'=>array('/other/' . strtolower($model)),
+					'url'=>array('/other/' . strtolower($model) . '/index'),
 				);
 			}
 		}
 		if ($items) {
-			array_unshift($items, array('label' => '表单', 'itemOptions' => array('class' => 'nav-header')));
+			array_unshift($items, array('label' => '其他', 'itemOptions' => array('class' => 'nav-header')));
+		}
+		return $items;
+	}
+
+	/**
+	 * 获取扩展导航
+	 */
+	public function getExtendNavTtems()
+	{
+		$items = array();
+		if (isset(Yii::app()->params['extendNav'])) {
+			$items = Yii::app()->params['extendNav'];
+		}
+		if ($items) {
+			array_unshift($items, array('label' => '扩展', 'itemOptions' => array('class' => 'nav-header')));
 		}
 		return $items;
 	}
@@ -156,8 +174,9 @@ class Controller extends CController
 					array('label' => '首页', 'url' => array('/site/index'), 'icon' => 'fixed-width home')
 				)
 				,
-				$this->getContentNavItems(),
-				$this->getFormNavItems(),
+				$this->getContentItems(),
+				$this->getOtherNavItems(),
+				$this->getExtendNavTtems(),
 				array(
 				array('label' => '系统', 'itemOptions' => array('class' => 'nav-header')),
 				array('label' => '栏目', 'url' => array('/channel/index'), 'icon' => 'fixed-width list'),

@@ -20,11 +20,16 @@ class Article extends Node
 	/**
 	 * 获取模型
 	 * @param string $className
-	 * @return CActiveRecord $model
+	 * @return Article $model
 	 */
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	public static function className()
+	{
+		return 'Article';
 	}
 
 	public function tableName()
@@ -42,27 +47,12 @@ class Article extends Node
 
 	public function taxonomies()
 	{
-		return array(
-			'tags'=>array(
-				'label'=>'标签',
-				'many'=>true,
-				'allowEmpty'=>false,
-				'custom'=>true,
-			)
-		);
+		return array();
 	}
 
 	public function fileUsage()
 	{
-		return array(
-			'image' => array(
-				'location' => 'public://article/' . date('Ym'),
-				'type' => 'image',
-				'resize' => array(
-					'post-thumbnail'=>array(222, 157, true),
-				)
-			),
-		);
+		return array();
 	}
 
 	public function extraBehaviors(){

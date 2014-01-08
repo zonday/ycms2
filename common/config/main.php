@@ -40,6 +40,7 @@ return array(
 		'common.models.*',
 		'common.models.core.*',
 		'common.models.content.*',
+		'common.models.other.*',
 		'common.helpers.*',
 		'common.extensions.yiidebugtb.*',
 		'application.components.*',

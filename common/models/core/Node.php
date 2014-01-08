@@ -63,13 +63,18 @@ abstract class Node extends CActiveRecord
 	 * @param string $className
 	 * @return Node
 	 */
-	public static function model($className)
+	public static function model($className=__CLASS__)
 	{
 		$model = parent::model($className);
 		if (!$model instanceof Node) {
 			throw CException($className . ' 没有继承 Node');
 		}
 		return $model;
+	}
+
+	public static function className()
+	{
+		return 'Node';
 	}
 
 	/**
@@ -226,6 +231,30 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 根据栏目获取内容模型
+	 * @param $mixed $channel 栏目 栏目对象 栏目别名 栏目id
+	 * @param boolean $static 是否是静态对象
+	 * @param boolean $applyChannel 是否要应用栏目
+	 * @throws CException
+	 * @return Node|null
+	 */
+	public static function contentModel($channel, $static=true, $applyChannel=true)
+	{
+		if ($channel = Channel::get($channel)) {
+			$callClass = self::className();
+			if (!strcasecmp($callClass, $channel->model) && is_subclass_of($callClass, $channel->model))
+				throw new CException(sprintf('栏目模型%s没有继承%s', $channel->model, $callClass));
+
+			$model =  $channel->getObjectModel($static, $applyChannel);
+			if ($model instanceof Node)
+				return $model;
+			else
+				throw new CException(sprintf('栏目模型%s没有继承Node', $modelClass));
+		}
+	}
+
+	/**
+	 * 根据栏目获取内容模型
+	 * @deprecated
 	 * @param mixed $channel
 	 * @param boolean $applyChannel
 	 * @return Node|null
@@ -237,7 +266,7 @@ abstract class Node extends CActiveRecord
 			if ($model instanceof Node)
 				return $model;
 			else
-				throw new CException(sprintf('%s没有继承Node', $modelClass));
+				throw new CException(sprintf('栏目模型%s没有继承Node', $modelClass));
 		}
 	}
 
@@ -580,6 +609,7 @@ abstract class Node extends CActiveRecord
 		if ($this->isNewRecord) {
 			$this->create_time = date('Y-m-d H:i:s');
 		}
+		$this->status = self::STATUS_PUBLIC;
 	}
 
 	/**

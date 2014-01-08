@@ -189,13 +189,19 @@ class Channel extends CActiveRecord
 	 */
 	public static function getModelList()
 	{
-		if (isset(Yii::app()->params['models'])) {
-			return Yii::app()->params['models'];
-		} else {
-			return array(
-				'Article'=>'文章',
-			);
+		static $models;
+		if (!isset($models)) {
+			if (isset(Yii::app()->params['contentModels'])) {
+				$models = Yii::app()->params['contentModels'];
+			} else if (isset(Yii::app()->params['models'])) {
+				$models = Yii::app()->params['models'];
+			} else {
+				$models = array(
+					'Article'=>'文章',
+				);
+			}
 		}
+		return $models;
 	}
 
 	/**
@@ -639,7 +645,9 @@ class Channel extends CActiveRecord
 			if (!$staticModel instanceof Node) {
 				return;
 			}
-			$staticModel->bulkDelete('channel_id=:channel_id', array(':channel_id'=>$this->id));
+			if ($staticModel->hasAttribute('channel_id')) {
+				$staticModel->bulkDelete('channel_id=:channel_id', array(':channel_id'=>$this->id));
+			}
 		}
 	}
 
