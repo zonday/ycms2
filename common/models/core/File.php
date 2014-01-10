@@ -85,12 +85,6 @@ class File extends CActiveRecord
 	public function behaviors()
 	{
 		return array(
-			'CTimestampBehavior' => array(
-				'class' => 'zii.behaviors.CTimestampBehavior',
-				'createAttribute' => 'create_time',
-				'updateAttribute' => 'update_time',
-				'setUpdateOnCreate' => true,
-			),
 			'YFileUsageBehavior' => array(
 				'class' => 'YFileUsageBehavior',
 				'fields' => array(
@@ -891,6 +885,10 @@ class File extends CActiveRecord
 	protected function beforeSave()
 	{
 		if (parent::beforeSave()) {
+			if ($this->isNewRecord) {
+				$this->create_time = time();
+			}
+			$this->update_time = time();
 			$this->meta = serialize($this->meta);
 			return true;
 		} else

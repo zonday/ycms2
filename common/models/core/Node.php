@@ -91,6 +91,7 @@ abstract class Node extends CActiveRecord
 				array('excerpt', 'filter', 'filter'=>array($obj=new CHtmlPurifier(),'purify')),
 				array('status', 'in', 'range'=>array(self::STATUS_DRAFT, self::STATUS_PUBLIC)),
 				array('create_time', 'date', 'format'=>'yyyy-MM-dd HH:mm:ss'),
+				array('id', 'safe', 'on'=>'search'),
 			),$this->extraRules()
 		);
 	}
@@ -133,14 +134,6 @@ abstract class Node extends CActiveRecord
 	public function behaviors()
 	{
 		return $this->extraBehaviors();
-		return array_merge(array(
-			'CTimestampBehavior' => array(
-				'class' => 'zii.behaviors.CTimestampBehavior',
-				'createAttribute' => null,
-				'updateAttribute' => 'update_time',
-				'setUpdateOnCreate' => true,
-			),
-		), $this->extraBehaviors());
 	}
 
 	/**
@@ -610,6 +603,11 @@ abstract class Node extends CActiveRecord
 			$this->create_time = date('Y-m-d H:i:s');
 		}
 		$this->status = self::STATUS_PUBLIC;
+	}
+
+	public function getTheExcerpt($length=100, $more='...')
+	{
+		return YUtil::substr(strip_tags($this->excerpt), $length, $more);
 	}
 
 	/**

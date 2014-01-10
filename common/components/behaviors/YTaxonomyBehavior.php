@@ -231,6 +231,10 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 		if ($taxSlug === null)
 			return $terms;
 		$params = $taxonomies[$taxSlug];
+		if ($params['isSelf']) {
+			$attribute = $params['attribute'];
+			return Term::findFromCache($owner->$attribute);
+		}
 		$terms = isset($terms[$taxSlug]) ? $terms[$taxSlug] : array();
 		return $params['many'] ? $terms : current($terms);
 	}

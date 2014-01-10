@@ -14,6 +14,16 @@
 
 	<?php //echo $form->errorSummary($model); ?>
 
+	<?php
+	if (isset($model->YFileUsageBehavior)) {
+		$this->widget('YUploadWidget', array(
+			'model' => $model,
+			'attribute' => 'image',
+			'form' => $form,
+		));
+	}
+	?>
+
 	<?php echo $form->textFieldRow($model,'title',array('class'=>'span5','maxlength'=>64)); ?>
 
 	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>64, 'hint'=>'唯一标识符，只能包含英文和数字、-')); ?>

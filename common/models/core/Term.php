@@ -67,6 +67,7 @@ class Term extends CActiveRecord
 			array('description', 'filter', 'filter'=>array($obj=new CHtmlPurifier(),'purify')),
 			array('parentIds', 'validateParentIds'),
 			array('image', 'safe'),
+			array('id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -95,6 +96,7 @@ class Term extends CActiveRecord
 	public function behaviors()
 	{
 		if (!empty(Yii::app()->params['termImage'])) {
+			$termImage = Yii::app()->params['termImage'];
 			return array(
 				'YFileUsageBehavior' => array(
 					'class' => 'YFileUsageBehavior',
@@ -102,6 +104,7 @@ class Term extends CActiveRecord
 						'image' => array(
 							'location' => 'public://term',
 							'type' => 'image',
+							'resize'=>isset($termImage['resize']) ? $termImage['resize'] : null,
 						),
 					),
 				)

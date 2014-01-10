@@ -104,7 +104,7 @@ class User extends CActiveRecord
 			array('status', 'in', 'range'=>array(self::STATUS_NORMAL, self::STATUS_NOT_ACTIVE, self::STATUS_BLOCK)),
 			array('username, email', 'unique'),
 			array('roleNames', 'safe'),
-			array('update_time, login_time, create_time', 'safe', 'on' => 'search'),
+			array('update_time, login_time, create_time, id', 'safe', 'on' => 'search'),
 		);
 	}
 

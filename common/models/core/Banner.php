@@ -33,7 +33,7 @@ class Banner extends CActiveRecord
 			array('weight, visible', 'numerical', 'integerOnly'=>true),
 			array('link_target', 'in', 'range'=>array_keys($this->getTargetList())),
 			array('category_id', 'in', 'range'=>array_keys($this->getCategoryList())),
-			array('create_time, visible', 'safe', 'on'=>'search'),
+			array('create_time, visible, id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -54,12 +54,6 @@ class Banner extends CActiveRecord
 
 	public function behaviors(){
 		return array(
-			'timestamp' => array(
-				'class' => 'zii.behaviors.CTimestampBehavior',
-				'createAttribute' => 'create_time',
-				'updateAttribute' => 'update_time',
-				'setUpdateOnCreate' => true,
-			),
 			'fileUsage' => array(
 				'class' => 'YFileUsageBehavior',
 				'fields' => array(
@@ -156,12 +150,12 @@ class Banner extends CActiveRecord
 	 * @param string $order
 	 * @return array
 	 */
-	public static function getBanners($category, $limit=1, $order=null)
+	public static function getBanners($category=null, $limit=1, $order=null)
 	{
 		if ($order === null)
 			$order = 'weight, name';
 
-		return self::model()->findAllByCategory($category, array('limit'=>$limit, 'order'=>$order, 'condition'=>'visible=1'));
+		return self::model()->cache(60)->findAllByCategory($category, array('limit'=>$limit, 'order'=>$order, 'condition'=>'visible=1'));
 	}
 
 	/**
@@ -173,5 +167,18 @@ class Banner extends CActiveRecord
 	{
 		$weight = intval($weight);
 		self::model()->updateByPk($id, array('weight'=>$weight));
+	}
+
+	protected function beforeSave()
+	{
+		if (parent::beforeSave()) {
+			if ($this->isNewRecord) {
+				$this->create_time = time();
+			}
+			$this->update_time = time();
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

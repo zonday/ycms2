@@ -82,11 +82,21 @@ class YContentController extends CController
 				));
 			}
 
-			$this->render($this->findView(), $data);
+			$this->render($this->findView(), isset($data) ? $data : array());
 		} elseif ($channel->type == Channel::TYPE_PAGE) {
-			$this->render($this->findView(), array('model'=>$channel));
+			$method = str_replace('-', '', $channel->name) . 'Page';
+			if (method_exists($this, $method)) {
+				$data = call_user_func(array($this, $method));
+			} else {
+				$data = array('model'=>$channel);
+			}
+			$this->render($this->findView(), isset($data) ? $data : array());
 		} else {
-			$this->render($this->findView());
+			$method = str_replace('-', '', $channel->name) . 'Index';
+			if (method_exists($this, $method)) {
+				$data = call_user_func(array($this, $method));
+			}
+			$this->render($this->findView(), isset($data) ? $data : array());
 		}
 	}
 
@@ -189,12 +199,12 @@ class YContentController extends CController
 					$this->pageTitle = $channel->title;
 
 				foreach ($channel->getParentsAll() as $index => $parent)
-					$this->breadcrumbs[$parent->title] = array('/content/index', 'path'=>$parent->getPath());
+					$this->breadcrumbs[$parent->title] = array('/content/index', 'channel_id'=>$parent->id);
 
 				if ($this->action->id !== 'view') {
 					$this->breadcrumbs[] = $channel->title;
 				} else {
-					$this->breadcrumbs[$channel->title] = array('/content/index', 'path'=>$channel->getPath());
+					$this->breadcrumbs[$channel->title] = array('/content/index', 'channel_id'=>$channel->id);
 				}
 			}
 			return true;
@@ -223,7 +233,7 @@ class YContentController extends CController
 		else
 			$view = 'index';
 
-		$parts = explode('/', $this->getPath());
+		$parts = explode('/', $channel->getPath());
 
 		if (isset($this->viewMap[$channelName][$view]))
 			return $parts[0] . '/' . $this->viewMap[$channelName][$view];

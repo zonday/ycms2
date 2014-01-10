@@ -70,6 +70,7 @@ class Taxonomy extends CActiveRecord
 			array('hierarchy', 'in', 'range'=>array_keys($this->getHierarchyList())),
 			array('slug', 'unique'),
 			array('description', 'filter', 'filter'=>array($obj=new CHtmlPurifier(),'purify')),
+			array('id', 'safe', 'on'=>'search'),
 		);
 	}
 

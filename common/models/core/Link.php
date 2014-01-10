@@ -45,22 +45,7 @@ class Link extends CActiveRecord
 			array('name, description, link_href', 'length', 'max'=>255),
 			array('link_target', 'in', 'range'=>array_keys($this->getTargetList())),
 			array('category_id', 'in', 'range'=>array_keys($this->getCategoryList())),
-			array('create_time, visible', 'safe', 'on'=>'search'),
-		);
-	}
-
-	/**
-	 * 行为
-	 * @see CModel::behaviors()
-	 */
-	public function behaviors(){
-		return array(
-			'CTimestampBehavior' => array(
-				'class' => 'zii.behaviors.CTimestampBehavior',
-				'createAttribute' => 'create_time',
-				'updateAttribute' => 'update_time',
-				'setUpdateOnCreate' => true,
-			)
+			array('create_time, visible, id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -171,12 +156,12 @@ class Link extends CActiveRecord
 	 * @param string $order
 	 * @return array
 	 */
-	public static function getLinks($category, $limit=null, $order=null)
+	public static function getLinks($category=null, $limit=null, $order=null)
 	{
 		if ($order === null)
 			$order = 'weight, name';
 
-		return self::model()->findAllByCategory($category, array('limit'=>$limit, 'order'=>$order, 'condition'=>'visible=1'));
+		return self::model()->cache(60)->findAllByCategory($category, array('limit'=>$limit, 'order'=>$order, 'condition'=>'visible=1'));
 	}
 
 	/**
@@ -188,5 +173,18 @@ class Link extends CActiveRecord
 	{
 		$weight = intval($weight);
 		self::model()->updateByPk($id, array('weight'=>$weight));
+	}
+
+	protected function beforeSave()
+	{
+		if (parent::beforeSave()) {
+			if ($this->isNewRecord) {
+				$this->create_time = time();
+			}
+			$this->update_time = time();
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

@@ -26,7 +26,7 @@
 		<div class="span4">
 			<div id="form-side">
 				<?php
-				if (isset($model->YUploadWidget) && $model->fileUsage()):
+				if ($model->fileUsage()):
 					$this->widget('YUploadWidget', array(
 						'model' => $model,
 						'attribute' => 'image',
@@ -36,7 +36,7 @@
 				?>
 
 				<?php
-				if (isset($model->YTaxonomyBehavior) && $model->taxonomies()):
+				if ($model->taxonomies()):
 					$this->widget('YTaxonomyWidget', array(
 						'model'=>$model,
 						'form'=>$form,

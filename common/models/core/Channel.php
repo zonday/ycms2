@@ -59,6 +59,8 @@ class Channel extends CActiveRecord
 	 */
 	public $depth = 0;
 
+	public $image;
+
 	/**
 	 * 获取模型
 	 * @param string $className
@@ -82,15 +84,25 @@ class Channel extends CActiveRecord
 	 * 行为
 	 * @see CModel::behaviors()
 	 */
-	public function behaviors(){
-		return array(
-			'CTimestampBehavior' => array(
-				'class' => 'zii.behaviors.CTimestampBehavior',
-				'createAttribute' => 'create_time',
-				'updateAttribute' => 'update_time',
-				'setUpdateOnCreate' => true,
-			),
-		);
+	public function behaviors()
+	{
+		if (!empty(Yii::app()->params['channelImage'])) {
+			$channelImage = Yii::app()->params['channelImage'];
+			return array(
+				'YFileUsageBehavior' => array(
+					'class' => 'YFileUsageBehavior',
+					'fields' => array(
+						'image' => array(
+							'location' => 'public://term',
+							'type' => 'image',
+							'resize'=>isset($channelImage['resize']) ? $termImage['resize'] : null,
+						),
+					),
+				)
+			);
+		} else {
+			return array();
+		}
 	}
 
 	/**
@@ -109,7 +121,8 @@ class Channel extends CActiveRecord
 			array('content', 'filter', 'filter'=>array($obj=new CHtmlPurifier(),'purify')),
 			array('type', 'in', 'range'=>array(self::TYPE_EMPTY, self::TYPE_LIST, self::TYPE_PAGE)),
 			array('model', 'validateModel'),
-			array('description', 'safe'),
+			array('description, image', 'safe'),
+			array('id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -308,7 +321,7 @@ class Channel extends CActiveRecord
 		if (!isset($children) && ($children = Yii::app()->getCache()->get('channel_children')) === false) {
 			$children = array();
 			foreach ($this->findAll(array('order'=>'weight, title')) as $model) {
-				$children[$model->parent_id][]= $model;
+				$children[$model->parent_id][$model->id]= $model;
 			}
 			Yii::app()->getCache()->set('channel_children', $children);
 		}
@@ -424,16 +437,26 @@ class Channel extends CActiveRecord
 			$attribute = 'name';
 
 		foreach ($children as $parent => $models) {
-			foreach ($models as $model) {
-				if ($model->$attribute == $value) {
-					$channel = $model;
+			if ($attribute === 'id') {
+				if (isset($models[$value])) {
+					$channel = $models[$value];
 					break;
+				} else {
+					continue;
+				}
+			} else {
+				foreach ($models as $model) {
+					if ($model->name == $value) {
+						$channel = $model;
+						break;
+					}
 				}
 			}
 		}
 
 		if (isset($channel)) {
-			$cache[$value] = $channel;
+			$cache[$channel->id] = $channel;
+			$cache[$channel->name] = &$cache[$channel->id];
 			return $channel;
 		}
 	}
@@ -542,7 +565,7 @@ class Channel extends CActiveRecord
 		if ($static) {
 			$model = CActiveRecord::model($modelClass);
 		} else {
-			$model = new $modelClass();
+			$model = new $modelClass('search');
 		}
 
 		if (($model instanceof Node) && $applyChannel) {
@@ -589,6 +612,11 @@ class Channel extends CActiveRecord
 	public function beforeSave()
 	{
 		if (parent::beforeSave()) {
+			if ($this->isNewRecord) {
+				$this->create_time = time();
+			}
+			$this->update_time = time();
+
 			foreach ($this->getChildrenAll() as $child) {
 				if ($child->id == $this->parent_id) {
 					unset($this->parent_id);
