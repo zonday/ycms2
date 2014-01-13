@@ -115,6 +115,7 @@ class Setting extends CFormModel
 				case 'html':
 					$validators['filter'][] = $name;
 					break;
+				case 'boolean':
 				case 'bool':
 					$validators['boolean'][] = $name;
 					break;
@@ -128,8 +129,8 @@ class Setting extends CFormModel
 		}
 
 		foreach ($validators as $validator => $names) {
-			if ($validator === 'html')
-				$params = array('filter'=>array($obj=new CHtmlPurifier(),'purify'));
+			if ($validator === 'filter')
+				$params = array('filter'=>array($obj = new CHtmlPurifier(),'purify'));
 			else if ($validator === 'length')
 				$params = array('max' => 255);
 			else

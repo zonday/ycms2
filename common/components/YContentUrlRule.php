@@ -24,7 +24,6 @@ class YContentUrlRule extends CBaseUrlRule
 	{
 		if (in_array($route, array('content/index', 'content/view')) &&
 			(isset($params['path']) || isset($params['channel_id']) || isset($params['channel_name']))) {
-			var_dump(isset($params['channel_id']));
 			if (isset($params['path'])) {
 				$url = $params['path'];
 				unset($params['path']);

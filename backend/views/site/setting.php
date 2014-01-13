@@ -8,21 +8,26 @@ $this->breadcrumbs=array(
 	'设置' => array('index'),
 	$categories[$category]
 );
-foreach ($categories as $category => $description)
-	$this->menu[] = array('label' => $description, 'url' => array('setting', 'category' => $category));
-
-$this->menu[] = array('label'=>'清空缓存', 'url'=>array('flushCache'));
+$tabs = array();
+foreach ($categories as $id => $description) {
+	$tabs[] = array('label' => $description, 'url' => array('setting', 'category' => $id), 'active' => $id==$category ? true : false);
+}
 ?>
 <div class="page-header">
 	<h1><i class="icon-cog"></i>设置</h1>
 	<div class="btn-group pull-right">
+		<?php echo CHtml::link('清空系统缓存', array('flushCache'), array('class'=>'btn btn-danger')); ?>
+		<?php if ($this->menu): ?>
 		<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"> 操作 <span class="caret"></span></button>
 		<?php $this->widget('bootstrap.widgets.TbDropdown', array(
 			'items' => $this->menu,
 		))?>
+		<?php endif;?>
 	</div>
 </div>
-
+<?php
+	$this->widget('bootstrap.widgets.TbTabs', array('tabs'=>$tabs));
+?>
 <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'id'=>'setting-form',
 	'type'=>'horizontal',
@@ -37,6 +42,15 @@ $this->menu[] = array('label'=>'清空缓存', 'url'=>array('flushCache'));
 		$type = isset($params['type']) ? $params['type'] : 'text';
 		$hint = isset($params['hint']) ? $params['hint']: null;
 		switch ($type) {
+			case 'html':
+				$this->widget('ext.ckeditor.CkeditorWidget', array(
+				'model'=>$model,
+				'form'=>$form,
+				'attribute'=>$name,
+				'options'=>array('height'=>200),
+				'htmlOptions'=>array('hint'=>$hint),
+				));
+				break;
 			case 'textarea':
 				echo $form->textAreaRow($model, $name, array('class'=>'span6', 'rows'=>5, 'hint'=>$hint));
 				break;

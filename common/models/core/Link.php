@@ -8,6 +8,16 @@
 /**
  * Link Model
  *
+ * @property integer $id ID
+ * @property string $name 名称
+ * @property string $link_href 链接地址
+ * @property string $link_target 链接目标
+ * @property string $description 描述
+ * @property integer $weight 权重
+ * @property integer $create_time 创建时间
+ * @property Term $category 分类
+ * @property integer visible 可见性
+ *
  * @author Yang <css3@qq.com>
  * @package backend.models.core
  */
@@ -26,6 +36,7 @@ class Link extends CActiveRecord
 	/**
 	 * 表名称
 	 * @see CActiveRecord::tableName()
+	 * @return array
 	 */
 	public function tableName()
 	{
@@ -35,6 +46,7 @@ class Link extends CActiveRecord
 	/**
 	 * 验证规则
 	 * @see CModel::rules()
+	 * @return array
 	 */
 	public function rules()
 	{
@@ -49,6 +61,10 @@ class Link extends CActiveRecord
 		);
 	}
 
+	/**
+	 * @see CActiveRecord::relations()
+	 * @return array
+	 */
 	public function relations()
 	{
 		return array(
@@ -56,6 +72,11 @@ class Link extends CActiveRecord
 		);
 	}
 
+	/**
+	 * 获取属性标签
+	 * @see CModel::attributeLabels()
+	 * @return array
+	 */
 	public function attributeLabels()
 	{
 		return array(
@@ -72,7 +93,9 @@ class Link extends CActiveRecord
 		);
 	}
 
-
+	/**
+	 * @return CActiveDataProvider
+	 */
 	public function search()
 	{
 		$criteria=new CDbCriteria;
@@ -150,7 +173,23 @@ class Link extends CActiveRecord
 	}
 
 	/**
+	 * 可见的
+	 * @param integer $limit
+	 * @return Link
+	 */
+	public function visible($limit=-1)
+	{
+		$this->getDbCriteria()->mergeWith(array(
+			'limit'=>$limit,
+			'order'=>'weight, name',
+			'condition'=>'visible=1'
+		));
+		return $this;
+	}
+
+	/**
 	 * 获取链接 数目$limit 分类$category 排序$order
+	 * @deprecated
 	 * @param string $category
 	 * @param mixed $limit
 	 * @param string $order
@@ -175,6 +214,10 @@ class Link extends CActiveRecord
 		self::model()->updateByPk($id, array('weight'=>$weight));
 	}
 
+	/**
+	 * @see CActiveRecord::beforeSave()
+	 * @return boolean
+	 */
 	protected function beforeSave()
 	{
 		if (parent::beforeSave()) {

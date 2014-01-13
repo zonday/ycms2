@@ -143,11 +143,11 @@ class SiteController extends Controller
 		$user = User::validateKey($key, $login);
 		if ($user) {
 			$result = $user->saveAttributes(array(
-				'status' => User::STATUS_NORMAL,
+				'status' => User::STATUS_NOMAL,
 				'activation_key' => '',
 			));
 		} else {
-			$result = false;
+			$resutl = false;
 		}
 
 		if ($result)
@@ -201,7 +201,7 @@ class SiteController extends Controller
 			$model->attributes = $_POST['Setting'];
 			if ($model->save()) {
 				Yii::app()->getUser()->setFlash('success', '设置已更新');
-				$this->redirect(array('setting'));
+				$this->redirect(array('setting', 'category'=>$category));
 			}
 		}
 		$this->render('setting', array('model'=>$model, 'category'=>$category, 'categories'=>$categories));

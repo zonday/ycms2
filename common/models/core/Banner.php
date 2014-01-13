@@ -8,6 +8,17 @@
 /**
  * Banner Model
  *
+ * @property integer $id ID
+ * @property string $name 名称
+ * @property string $image 图片
+ * @property string $link_href 链接地址
+ * @property string $link_target 链接目标
+ * @property string $description 描述
+ * @property integer $weight 权重
+ * @property integer $create_time 创建时间
+ * @property Term $category 分类
+ * @property integer visible 可见性
+ *
  * @author Yang <css3@qq.com>
  * @package backend.models.core
  */
@@ -15,28 +26,45 @@ class Banner extends CActiveRecord
 {
 	public $image;
 
+	/**
+	 * @param string $className
+	 * @return Banner
+	 */
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
 	}
 
+	/**
+	 * @see CActiveRecord::tableName()
+	 * @return string
+	 */
 	public function tableName()
 	{
 		return '{{banner}}';
 	}
 
+	/**
+	 * @see CModel::rules()
+	 * @return array
+	 */
 	public function rules()
 	{
 		return array(
 			array('name, image', 'required'),
 			array('link_href', 'url'),
 			array('weight, visible', 'numerical', 'integerOnly'=>true),
+			array('name, description, link_href', 'length', 'max'=>255),
 			array('link_target', 'in', 'range'=>array_keys($this->getTargetList())),
 			array('category_id', 'in', 'range'=>array_keys($this->getCategoryList())),
 			array('create_time, visible, id', 'safe', 'on'=>'search'),
 		);
 	}
 
+	/**
+	 * @see CModel::attributeLabels()
+	 * @return array
+	 */
 	public function attributeLabels()
 	{
 		return array(
@@ -52,6 +80,10 @@ class Banner extends CActiveRecord
 		);
 	}
 
+	/**
+	 * @see CModel::behaviors()
+	 * @return array
+	 */
 	public function behaviors(){
 		return array(
 			'fileUsage' => array(
@@ -66,6 +98,10 @@ class Banner extends CActiveRecord
 		);
 	}
 
+	/**
+	 * @see CActiveRecord::relations()
+	 * @return array
+	 */
 	public function relations()
 	{
 		return array(
@@ -73,6 +109,10 @@ class Banner extends CActiveRecord
 		);
 	}
 
+	/**
+	 *
+	 * @return CActiveDataProvider
+	 */
 	public function search()
 	{
 		$criteria=new CDbCriteria;
@@ -97,6 +137,9 @@ class Banner extends CActiveRecord
 		));
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getCategoryList()
 	{
 		$taxonomy = Taxonomy::findfromCache('banner');
@@ -107,6 +150,9 @@ class Banner extends CActiveRecord
 			return $list;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getTargetList()
 	{
 		return array(
@@ -144,13 +190,29 @@ class Banner extends CActiveRecord
 	}
 
 	/**
+	 * 可见的
+	 * @param integer $limit
+	 * @return Banner
+	 */
+	public function visible($limit=-1)
+	{
+		$this->getDbCriteria()->mergeWith(array(
+			'limit'=>$limit,
+			'order'=>'weight, name',
+			'condition'=>'visible=1'
+		));
+		return $this;
+	}
+
+	/**
 	 * 获取Banner 数目$limit 分类$category 排序$order
+	 * @deprecated
 	 * @param string $category
 	 * @param mixed $limit
 	 * @param string $order
 	 * @return array
 	 */
-	public static function getBanners($category=null, $limit=1, $order=null)
+	public static function getBanners($category=null, $limit=-1, $order=null)
 	{
 		if ($order === null)
 			$order = 'weight, name';
@@ -169,6 +231,10 @@ class Banner extends CActiveRecord
 		self::model()->updateByPk($id, array('weight'=>$weight));
 	}
 
+	/**
+	 * @see CActiveRecord::beforeSave()
+	 * @return boolean
+	 */
 	protected function beforeSave()
 	{
 		if (parent::beforeSave()) {

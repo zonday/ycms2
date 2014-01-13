@@ -11,7 +11,7 @@
  * @author Yang <css3@qq.com>
  * @package common.components
  */
-class YContentController extends CController
+class YContentController extends YController
 {
 	/**
 	 * @var array 栏目映射
@@ -24,16 +24,6 @@ class YContentController extends CController
 	public $viewMap = array();
 
 	/**
-	 * @var string
-	 */
-	public $baseUrl;
-
-	/**
-	 * @var array 面包屑
-	 */
-	public $breadcrumbs = array();
-
-	/**
 	 * @var Channel 栏目
 	 */
 	private $_channel;
@@ -42,17 +32,6 @@ class YContentController extends CController
 	 * @var string 栏目路径
 	 */
 	private $_path;
-
-	/**
-	 * 初始化
-	 * 获取栏目路径 根据栏目映射设置栏目
-	 * @see CController::init()
-	 */
-	public function init()
-	{
-		parent::init();
-		$this->baseUrl = Yii::app()->getTheme()->getBaseurl();
-	}
 
 	/**
 	 * 首页

@@ -56,16 +56,20 @@ class Article extends Node
 	}
 
 	public function extraBehaviors(){
-		return array(
-			'YFileUsageBehavior' => array(
+		$behaviors = array();
+		if ($this->fileUsage()) {
+			$behaviors['YFileUsageBehavior'] = array(
 				'class' => 'YFileUsageBehavior',
 				'fields' => $this->fileUsage(),
-			),
-			'YTaxonomyBehavior' => array(
+			);
+		}
+		if ($this->taxonomies()) {
+			$behaviors['YTaxonomyBehavior'] = array(
 				'class'=>'YTaxonomyBehavior',
 				'taxonomies'=>$this->taxonomies(),
-			),
-		);
+			);
+		}
+		return $behaviors;
 	}
 
 	public function extraLabels()
@@ -76,5 +80,14 @@ class Article extends Node
 			'image'=>'特色图',
 			'taxonomy'=>'分类',
 		);
+	}
+
+	public function getTheExcerpt($length=100, $more='...')
+	{
+		if (empty($this->excerpt)) {
+			return YUtil::substr(strip_tags($this->content), $length, $more);
+		} else {
+			return YUtil::substr($this->excerpt, $length, $more);
+		}
 	}
 }
