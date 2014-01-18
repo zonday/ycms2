@@ -23,9 +23,9 @@ class YStatusColumn extends CDataColumn
 
 	/**
 	 * 状态列表
-	 * @var array
+	 * @var mixed
 	 */
-	public $statusList = array();
+	public $statusList;
 
 	/**
 	 * @var array
@@ -55,7 +55,8 @@ class YStatusColumn extends CDataColumn
 			$value = CHtml::value($data,$this->name);
 		}
 
-		$value = $value === null ? $this->grid->nullDisplay : $this->grid->getFormatter()->format($value, $this->type);
+		if ($value !== null)
+			$value = $this->grid->getFormatter()->format($value, $this->type);
 
 		if (!isset($this->labelMap[$value])) {
 			$label = 'default';
@@ -63,9 +64,23 @@ class YStatusColumn extends CDataColumn
 			$label = $this->labelMap[$value];
 		}
 
-		if (isset($this->statusList[$value])) {
-			$value = $this->statusList[$value];
+		if (is_string($this->statusList) && method_exists($data, $this->statusList)) {
+			$statusList = call_user_func(array($data, $this->statusList));
+		} else if (is_array($this->statusList)) {
+			$statusList = $this->statusList;
+		} else {
+			$statusList = array();
 		}
-		echo '<span class="label label-' . $label . '">' . $value . '</span>';
+
+		if (isset($statusList[$value])) {
+			$value = $statusList[$value];
+		} else {
+			$value = null;
+		}
+		if ($value) {
+			echo '<span class="label label-' . $label . '">' . $value . '</span>';
+		} else {
+			echo '-';
+		}
 	}
 }

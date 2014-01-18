@@ -90,6 +90,11 @@
 	height: 160px;
 }
 
+.media-image-single .media-item {
+	float: left;
+}
+
+.media-image-single .media-item-uploading,
 .media-image-multi .media-item-uploading {
 	width: 158px;
 	height: 158px;
@@ -98,6 +103,7 @@
 	background-color: #f8f8f;
 }
 
+.media-image-single .progress,
 .media-image-multi .progress {
 	float: none;
 	width: 90%;

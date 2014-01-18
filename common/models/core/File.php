@@ -533,7 +533,7 @@ class File extends CActiveRecord
 	 * @throws CException
 	 * @return string
 	 */
-	public function createUrl($uri)
+	public static function createUrl($uri)
 	{
 		$scheme = self::uriScheme($uri);
 		if (!$scheme) {
@@ -544,7 +544,7 @@ class File extends CActiveRecord
 		} elseif ($scheme == 'http' || $scheme == 'https') {
 			return $uri;
 		} else {
-			$schemeDirectoryMap = $this->schemeDirectoryMap();
+			$schemeDirectoryMap = self::schemeDirectoryMap();
 			if (!isset($schemeDirectoryMap[$scheme]))
 				throw new CException(sprintf('%s 协议没有映射路径', $scheme));
 			$directoryPath = $schemeDirectoryMap[$scheme];

@@ -140,7 +140,8 @@ class YImageResizeBehavior extends CActiveRecordBehavior
 				$master = Image::AUTO;
 			}
 
-			if ($image->width < $width && $image->height < $height && $name !== File::IMAGE_THUMBNAIL)
+			if ($image->width < $width && $image->height < $height
+					&& ($name !== File::IMAGE_THUMBNAIL || $name !== File::IMAGE_ORIGIN))
 				continue;
 
 			if (!$crop) {
@@ -150,18 +151,23 @@ class YImageResizeBehavior extends CActiveRecordBehavior
 				$image->crop($cropW, $cropH, $top, $left)->resize($newW, $newH);
 			}
 
-			$directory = $baseUri . "{$name}";
+			if ($name === File::IMAGE_ORIGIN) {
+				$saveFilePath = false;
+				$uri = $owner->uri;
+			} else {
+				$directory = $baseUri . "{$name}";
 
-			if (!$owner->prepareDirectory($owner->localPath($directory)))
-				continue;
+				if (!$owner->prepareDirectory($owner->localPath($directory)))
+					continue;
 
-			$uri = $directory . "/{$filename}.{$ext}";
-			$saveFilePath = $owner->localPath($uri);
+				$uri = $directory . "/{$filename}.{$ext}";
+				$saveFilePath = $owner->localPath($uri);
+			}
 
 			if ($image->save($saveFilePath)) {
-				$imageSize = getimagesize($saveFilePath);
+				$imageSize = getimagesize($saveFilePath ? $saveFilePath : $filePath);
 				$metaSizes[$name] = array(
-					'uri'=>$uri,
+					'uri'=> $uri,
 					'width'=>$imageSize[0],
 					'height'=>$imageSize[1],
 					//'mime'=>$imageSize['mime'],
@@ -169,11 +175,13 @@ class YImageResizeBehavior extends CActiveRecordBehavior
 			}
 		}
 
-		$metaSizes['origin'] = array(
-			'width' => $image->width,
-			'height'=> $image->height,
-			'uri' => $owner->uri,
-		);
+		if (!isset($metaSizes[File::IMAGE_ORIGIN])) {
+			$metaSizes[File::IMAGE_ORIGIN] = array(
+				'uri' => $owner->uri,
+				'width' => $image->width,
+				'height'=> $image->height,
+			);
+		}
 
 		return $metaSizes;
 	}

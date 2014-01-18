@@ -236,7 +236,12 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 			return Term::findFromCache($owner->$attribute);
 		}
 		$terms = isset($terms[$taxSlug]) ? $terms[$taxSlug] : array();
-		return $params['many'] ? $terms : current($terms);
+		if ($params['many']) {
+			return $terms;
+		} else {
+			$term = current($terms);
+			return $term ? $term : Term::model();
+		}
 	}
 
 	/**

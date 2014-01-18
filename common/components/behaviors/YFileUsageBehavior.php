@@ -253,7 +253,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 				if (!is_array($resize))
 					$resize = array(File::IMAGE_THUMBNAIL => $defaultSizes[File::IMAGE_THUMBNAIL]);
 				else
-					$resize = array(File::IMAGE_THUMBNAIL => $defaultSizes[File::IMAGE_THUMBNAIL]) + $resize;
+					$resize += array(File::IMAGE_THUMBNAIL => $defaultSizes[File::IMAGE_THUMBNAIL]);
 
 				$file->attachBehavior('imageResize', array(
 					'class'=>'YImageResizeBehavior',
@@ -399,10 +399,9 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 	}
 
 	/**
-	 * 对象查找之后
+	 * 设置旧的文件ids
 	 */
-	public function afterFind($event)
-	{
+	public function setOldFields() {
 		$fields = $this->getUploadFields();
 		$owner = $this->getOwner();
 		foreach ($fields as $field => $params) {
@@ -411,6 +410,14 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 				$this->_oldFileIds[$field] = $this->parseIds($owner->$attribute);
 			}
 		}
+	}
+
+	/**
+	 * 对象查找之后
+	 */
+	public function afterFind($event)
+	{
+		$this->setOldFields();
 	}
 
 	/**
@@ -436,7 +443,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 			$types = explode(',', $params['rule']['types']);
 			$validFileIds = array();
 			foreach (File::findFromCache($value) as $model) {
-				if (in_array($model->getExt(), $types)) {
+				if (in_array($model->getExt(), $types) && $model->bundle == get_class($owner)) {
 					$validFileIds[] = $model->id;
 				}
 			}
@@ -464,7 +471,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 				$value = $owner->$field;
 
 				if ($value) {
-					$owner->$attribute = implode(',', $value);
+					$owner->$attribute = is_array($value) ? implode(',', $value) : $value;
 				} else {
 					$owner->$attribute = 0;
 				}
@@ -490,7 +497,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 			if (!isset($owner->$field))
 				continue;
 
-			$newFileIds = $owner->$field;
+			$newFileIds = (array) $owner->$field;
 
 			$oldFileIds = $delFileIds = $addFileIds = array();
 			if ($owner->isNewRecord) {
@@ -515,7 +522,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 					$connection->createCommand()->delete('{{file_usage}}', array('and',
 							'object_id=:object_id AND bundle=:bundle AND field=:field',
 							array('in', 'file_id', $delFileIds),
-					), array(':object_id'=>$owner->id, ':bundle'=>get_class($owner),':field'=>$field));
+					), array(':object_id'=>$owner->getPrimaryKey(), ':bundle'=>get_class($owner),':field'=>$field));
 
 					$resize = isset($params['resize']) ? $params['resize'] : true;
 
@@ -541,7 +548,6 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 					foreach($addFileIds as $id) {
 						$values[] = "($objectId, $id, $qBundle, $qField)";
 					}
-
 					$command = $connection->createCommand("INSERT INTO {{file_usage}} (object_id, file_id, bundle, field) VALUES " . implode(',', $values));
 					$command->execute();
 					File::model()->updateByPk($addFileIds, array('status'=>File::STATUS_PERMANENT));
