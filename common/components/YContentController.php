@@ -24,6 +24,14 @@ class YContentController extends YController
 	public $viewMap = array();
 
 	/**
+	 * @var array 翻页参数
+	 */
+	public $pagination = array(
+		'pageSize'=>20,
+		'pageVar'=>'page'
+	);
+
+	/**
 	 * @var Channel 栏目
 	 */
 	private $_channel;
@@ -54,10 +62,7 @@ class YContentController extends YController
 				$data = call_user_func(array($this, $method), $model);
 			} else {
 				$data['dataProvider'] = new CActiveDataProvider($model, array(
-					'pagination'=> array(
-						'pageSize'=>20,
-						'pageVar'=>'page',
-					)
+					'pagination'=> $this->pagination,
 				));
 			}
 

@@ -30,6 +30,18 @@ class YUploadWidget extends CInputWidget
 	public $hint = true;
 
 	/**
+	 * 展示的图片尺寸名
+	 * @var string
+	 */
+	public $showImageSizeName = File::IMAGE_POST_THUMBNAIL;
+
+	/**
+	 * 是否可以预览
+	 * @var boolean
+	 */
+	public $preview = false;
+
+	/**
 	 * @var mixed 文件参数
 	 */
 	private $_fileParams;
@@ -73,7 +85,7 @@ class YUploadWidget extends CInputWidget
 			$this->uploadLabel = '选择' . ($this->_fileParams['type'] === 'image' ? '图片' : '文件');
 		}
 
-		if (!empty($this->_fileParams['preview'])) {
+		if (!empty($this->_fileParams['preview']) || $this->preview) {
 			$popupAssets = Yii::app()->getAssetManager()->publish($baseDir . '/../assets/magnific_popup');
 			$cs->registerScriptFile($popupAssets . '/jquery.magnific-popup.js');
 			$cs->registerCssFile($popupAssets . '/magnific-popup.css');
@@ -160,7 +172,7 @@ class YUploadWidget extends CInputWidget
 					'data-id' => $file->id,
 				));
 				if ($type === 'image') {
-					echo $file->getImage($many === 1 ? 'post-thumbnail' : 'thumbnail', array(
+					echo $file->getImage($many === 1 ? $this->showImageSizeName : File::IMAGE_THUMBNAIL, array(
 						'class' => "thumbnail",
 						'width' => false,
 						'height' => false,
@@ -179,7 +191,7 @@ class YUploadWidget extends CInputWidget
 				echo '<div class="media-item-actions">'
 					.'<a href="#" title="编辑" data-id="' . $file->id . '" ref="tooltip" class="media-item-edit"><i class="icon-pencil"></i></a>'
 					.'<a href="#" title="删除" data-id="' . $file->id . '" ref="tooltip" class="media-item-delete"><i class="icon-trash"></i></a>'
-					. ($this->_fileParams['preview'] ? '<a href="#" data-image-title="' . $file->getName() . '" data-mfp-src="' . $file->getUrl() . '" title="预览" ref="tooltip" class="media-item-preview"><i class="icon-zoom-in"></i></a>' : '')
+					. (($this->_fileParams['preview'] || $this->preview) ? '<a href="#" data-image-title="' . $file->getName() . '" data-mfp-src="' . $file->getUrl() . '" title="预览" ref="tooltip" class="media-item-preview"><i class="icon-zoom-in"></i></a>' : '')
 					.'</div>';
 				echo CHtml::closeTag('div');
 			}

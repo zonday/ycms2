@@ -110,7 +110,7 @@ class Controller extends CController
 				if (is_subclass_of($channel->model, 'Node')) {
 					$url = array('/content/index', 'channel'=>$channel->id);
 				} else {
-					$url = array('/other/' . strtolower($channel->model));
+					$url = array('/other/' . $this->lcfirst($channel->model));
 				}
 			} else {
 				$url = array('/content/channel', 'channel'=>$channel->id);
@@ -137,7 +137,7 @@ class Controller extends CController
 			foreach (Yii::app()->params['otherModels'] as $model => $name) {
 				$items[] = array(
 					'label'=>$name,
-					'url'=>array('/other/' . strtolower($model) . '/index'),
+					'url'=>array('/other/' . $this->lcfirst($model) . '/index'),
 				);
 			}
 		}
@@ -162,6 +162,10 @@ class Controller extends CController
 		return $items;
 	}
 
+	protected function lcfirst($upper) {
+		return strtolower(substr($upper,0,1)) . substr($upper,1);
+	}
+
 	/**
 	 * 生成侧边栏导航
 	 * @return array
@@ -180,13 +184,13 @@ class Controller extends CController
 				array(
 				array('label' => '系统', 'itemOptions' => array('class' => 'nav-header')),
 				array('label' => '栏目', 'url' => array('/channel/index'), 'icon' => 'fixed-width list'),
-				array('label' => '分类', 'url' => array('/taxonomy/index'), 'icon' => 'fixed-width tags'),
+				//array('label' => '分类', 'url' => array('/taxonomy/index'), 'icon' => 'fixed-width tags'),
 				array('label' => '链接', 'url' => array('/link/index'), 'icon' => 'fixed-width link'),
 				array('label' => 'Banner', 'url' => array('/banner/index'), 'icon' => 'fixed-width picture'),
-				array('label' => '文件', 'url' => array('/file/index'), 'icon' => 'fixed-width file'),
+				//array('label' => '文件', 'url' => array('/file/index'), 'icon' => 'fixed-width file'),
 				array('label' => '用户', 'url' => array('/user/index'), 'icon' => 'fixed-width user'),
-				array('label' => '角色', 'url' => array('/role/index'), 'icon' => 'fixed-width group'),
-				array('label' => '权限', 'url' => array('/permission/index'), 'icon' => 'fixed-width lock'),
+				//array('label' => '角色', 'url' => array('/role/index'), 'icon' => 'fixed-width group'),
+				//array('label' => '权限', 'url' => array('/permission/index'), 'icon' => 'fixed-width lock'),
 				array('label' => '设置', 'url' => array('/site/setting'), 'icon' => 'fixed-width cog'),
 			));
 
