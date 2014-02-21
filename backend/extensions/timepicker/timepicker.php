@@ -64,7 +64,7 @@ class timepicker extends CWidget {
 			<?php echo $this->form->labelEx($this->model,$this->name, array('class'=>'control-label')); ?>
 			<div class="controls">
 			<input type="text" class="timepicker" id="<?php echo $this->id; ?>" value="<?php echo $this->model->{$this->name}?$this->model->{$this->name}:$this->options['value']; ?>" name="<?php echo get_class($this->model).(!empty($this->options['tabularLevel'])?$this->options['tabularLevel']:'').'['.$this->name.']'; ?>" />
-			<?php echo $this->form->error($this->model,'create_time', array('class'=>'help-block')); ?>
+			<?php echo $this->form->error($this->model,$this->name, array('class'=>'help-block')); ?>
 			</div>
 		</div>
 		<?php
@@ -72,7 +72,7 @@ class timepicker extends CWidget {
 		?>
 			<?php echo $this->form->labelEx($this->model,$this->name); ?>
 			<input type="text" class="timepicker" id="<?php echo $this->id; ?>" value="<?php echo $this->model->{$this->name}?$this->model->{$this->name}:$this->options['value']; ?>" name="<?php echo get_class($this->model).(!empty($this->options['tabularLevel'])?$this->options['tabularLevel']:'').'['.$this->name.']'; ?>" />
-			<?php echo $this->form->error($this->model,'create_time', array('class'=>'help-block')); ?>
+			<?php echo $this->form->error($this->model,$this->name, array('class'=>'help-block')); ?>
 		<?php
 		endif;
 	}

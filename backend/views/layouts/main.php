@@ -6,7 +6,7 @@
 		<meta name="robots" content="noindex,nofollow" />
 		<title><?php echo CHtml::encode($this->pageTitle . ' - ' . Yii::app()->name); ?></title>
 	</head>
-	<body>
+	<body class="sticky-menu">
 		<?php
 			$this->widget('bootstrap.widgets.TbNavbar', array(
 				'fluid'=>true,
@@ -31,34 +31,35 @@
 				)
 			));
 		?>
-		<div class="main-container" id="main-container">
-			<div class="main-container-inner">
-				<div class="sidebar" id="sidebar">
-				<?php
-				$this->widget(
-					'bootstrap.widgets.TbMenu',
-					array(
-						'type' => 'list',
-						'items' => $this->generateNavItems(),
-					)
-				);
-				?>
-				</div> <!-- /.sidebar -->
-				<div class="main-content">
-					<a class="btn btn-default btn-layout-full" href="javascript:void(0)" id="btn-layout-full" title="全屏"><i class="icon-fullscreen"></i></a>
-					<div class="breadcrumbs">
-						<?php if (isset($this->breadcrumbs)): ?>
-							<?php $this->widget('bootstrap.widgets.TbBreadcrumbs', array(
-								'links' => $this->breadcrumbs,
-							)); ?><!-- breadcrumbs -->
-						<?php endif?>
+		<div class="main-container clearfix" id="main-container">
+			<div id="sidebarback" class="sidebarback"></div>
+			<div class="sidebar" id="sidebar">
+			<?php
+			$this->widget(
+				'bootstrap.widgets.TbMenu',
+				array(
+					'type' => 'list',
+					'items' => $this->generateNavItems(),
+				)
+			);
+			?>
+			</div> <!-- /.sidebar -->
+			<a class="btn btn-default btn-layout-full" href="javascript:void(0)" id="btn-layout-full" title="全屏"><i class="icon-fullscreen"></i></a>
+			<div class="breadcrumbs">
+				<?php if (isset($this->breadcrumbs)): ?>
+					<?php $this->widget('bootstrap.widgets.TbBreadcrumbs', array(
+						'links' => $this->breadcrumbs,
+					)); ?><!-- breadcrumbs -->
+				<?php endif?>
+			</div>
+			<div class="main-content clearfix">
+				<div class="page-content">
+					<div class="container-fluid">
+					<?php $this->widget('bootstrap.widgets.TbAlert'); ?>
+					<?php echo $content; ?>
 					</div>
-					<div class="page-content container-fluid">
-						<?php $this->widget('bootstrap.widgets.TbAlert'); ?>
-						<?php echo $content; ?>
-					</div> <!-- /.page-content -->
-				</div> <!-- /.main-content -->
-			</div> <!-- /.main-container-inner -->
+				</div> <!-- /.page-content -->
+			</div> <!-- /.main-content -->
 		</div> <!-- /.main-container -->
 	</body>
 </html>

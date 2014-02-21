@@ -74,13 +74,13 @@ class Controller extends CController
 		$authItem = '';
 
 		if( ($module = $controller->getModule())!==null )
-			$authItem .= ucfirst($module->id).'.';
+			$authItem .= $this->lcfirst($module->id).'.';
 
-		$authItem .= ucfirst($controller->id);
+		$authItem .= implode('.', array_map(array($this, 'lcfirst'), explode('/', $controller->id)));
 
 		$allow = true;
 		if( $user->checkAccess($authItem.'.*')!==true ) {
-			$authItem .= '.'.ucfirst($action->id);
+			$authItem .= '.'.$this->lcfirst($action->id);
 
 			if( $user->checkAccess($authItem)!==true )
 				$allow = false;
@@ -184,13 +184,13 @@ class Controller extends CController
 				array(
 				array('label' => '系统', 'itemOptions' => array('class' => 'nav-header')),
 				array('label' => '栏目', 'url' => array('/channel/index'), 'icon' => 'fixed-width list'),
-				//array('label' => '分类', 'url' => array('/taxonomy/index'), 'icon' => 'fixed-width tags'),
+				array('label' => '分类', 'url' => array('/taxonomy/index'), 'icon' => 'fixed-width tags'),
 				array('label' => '链接', 'url' => array('/link/index'), 'icon' => 'fixed-width link'),
 				array('label' => 'Banner', 'url' => array('/banner/index'), 'icon' => 'fixed-width picture'),
-				//array('label' => '文件', 'url' => array('/file/index'), 'icon' => 'fixed-width file'),
+				array('label' => '文件', 'url' => array('/file/index'), 'icon' => 'fixed-width file'),
 				array('label' => '用户', 'url' => array('/user/index'), 'icon' => 'fixed-width user'),
-				//array('label' => '角色', 'url' => array('/role/index'), 'icon' => 'fixed-width group'),
-				//array('label' => '权限', 'url' => array('/permission/index'), 'icon' => 'fixed-width lock'),
+				array('label' => '角色', 'url' => array('/role/index'), 'icon' => 'fixed-width group'),
+				array('label' => '权限', 'url' => array('/permission/index'), 'icon' => 'fixed-width lock'),
 				array('label' => '设置', 'url' => array('/site/setting'), 'icon' => 'fixed-width cog'),
 			));
 
@@ -217,12 +217,20 @@ class Controller extends CController
 
 			$parts = explode('/', trim($item['url'][0], '/'));
 
-			if (empty($parts))
+			if (empty($parts) || count($parts) < 2)
 				continue;
 
-			if ($user->checkAccess(ucfirst($parts[0]) . '.*') === false)
+			$parts = array_map(array($this, 'lcfirst'), $parts);
+			if (count($parts) > 2) {
+				$controller  = $parts[0] .  '.' . $parts[1];
+				$action = $parts[2];
+			} else {
+				$controller = $parts[0];
+				$action = $parts[1];
+			}
+			if ($user->checkAccess($controller . '.*') === false)
 			{
-				if (isset($parts[1]) && ($user->checkAccess(ucfirst($parts[0]) . '.' . ucfirst($parts[1])) === true))
+				if (isset($parts[1]) && ($user->checkAccess($controller . '.' . $action) === true))
 					continue;
 				unset($items[$index]);
 			}

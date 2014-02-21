@@ -1,35 +1,72 @@
 @CHARSET "UTF-8";
 html {
-	min-height: 100%;
-	position: relative;
+	height: 100%;
 }
 
 body {
 	backgrond-color: #fff;
-	min-height: 100%;
+	height: 100%;
 	position: relative;
+}
+
+.navbar-inverse .navbar-inner {
+	background: #1B1B1B;
+	border: 0;
 }
 
 .main-container {
-	padding-top: 40px;
+	height: auto;
+	min-height: 100%;
+	position: relative;
+	width: 100%;
 }
 
-.main-container > .main-container-inner {
-	position: relative;
-	min-height: 100%;
+.sidebarback {
+	background-color: #1B1B1B;
+	bottom: 0;
+	position: absolute;
+	top: 0;
+	z-index: 100;
+	width: 160px;
 }
 
 .sidebar {
-	position: fixed;
+	position: relative;
+	z-index: 101;
+	background-color: #1B1B1B;
 	float: left;
-	background-color: #f2f2f2;
-	border-right: 1px solid #ccc;
-	width: 150px;
-	top: 40px;
-	bottom: 0;
-	left: 0;
-	padding-top: 40px;
-	transition: display 0.3s ease 0s;
+	width: 160px;
+	padding-top: 20px;
+}
+
+.sticky-menu .sidebar {
+	position: fixed;
+}
+
+.sidebar .nav a {
+	text-shadow: none;
+}
+
+.sidebar .nav a,
+.sidebar .nav-header {
+	text-shadow: none;
+}
+
+.sidebar .nav li {
+	position: relative;
+}
+
+.sidebar .nav .active a:after  {
+	border: 8px solid rgba(0, 0, 0, 0);
+	content: " ";
+	height: 0;
+	margin-top: -8px;
+	pointer-events: none;
+	position: absolute;
+	right: -15px;
+	top: 50%;
+	width: 0;
+	border-right-color: #fff;
 }
 
 .btn-layout-full {
@@ -40,12 +77,33 @@ body {
 }
 
 .main-content {
-	margin-left: 150px;
+	margin-left: 160px;
 	min-height: 100%;
-	transition: margin-left 0.3s ease 0s;
+}
+
+.breadcrumbs  {
+	width: 100%;
+	position: fixed;
+	top: 40px;
+	background-color: #f5f5f5;
+	border-bottom: 1px solid #e5e5e5;
+	line-height: 40px;
+	min-height: 41px;
+	padding: 0 12px 0 0;
+	z-index: 99;
+}
+
+.breadcrumbs .breadcrumb {
+	margin-left: 160px;
+	margin-bottom: 0;
+	line-height: 24px;
 }
 
 .layout-full .sidebar {
+	display: none;
+}
+
+.layout-full .sidebarback {
 	display: none;
 }
 
@@ -53,8 +111,15 @@ body {
 	margin-left: 0;
 }
 
+.layout-full .breadcrumb {
+	margin-left: 0;
+}
+
 .page-content {
-	padding: 10px 20px 20px;
+	width: 100%;
+	height: 100%;
+	padding-top: 81px;
+	float: left;
 }
 
 .page-content h1 {
@@ -104,19 +169,6 @@ body {
 
 .page-header .pull-right {
 	margin-left: 9px;
-}
-
-.breadcrumbs  {
-	background-color: #f5f5f5;
-	border-bottom: 1px solid #e5e5e5;
-	line-height: 40px;
-	min-height: 41px;
-	padding: 0 12px 0 0;
-}
-
-.breadcrumbs .breadcrumb {
-	margin-bottom: 0;
-	line-height: 24px;
 }
 
 .grid-view {

@@ -57,7 +57,7 @@ return array(
 			'from'=>'zhuanjiao.test@foxmail.com',
 		),
 		'format'=>array(
-			'datetimeFormat'=>'Y-m-d h:i:s',
+			'datetimeFormat'=>'Y-m-d H:i:s',
 			'dateFormat'=>'Y-m-d',
 			'booleanFormat'=>array('否','是'),
 		),
