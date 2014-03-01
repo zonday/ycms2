@@ -13,6 +13,9 @@
  */
 class YController extends CController
 {
+	/**
+	 * @var string 布局
+	 */
 	public $layout='//layouts/main';
 
 	/**

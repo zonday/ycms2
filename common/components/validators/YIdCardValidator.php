@@ -1,12 +1,37 @@
 <?php
+/**
+ * YIdCardValidator class file
+ *
+ * @author Yang <css3@qq.com>
+ */
+
+/**
+ * YIdCardValidator
+ * 用于身份证号码的验证
+ *
+ * @author Yang <css3@qq.com>
+ * @package common.components.validators
+ */
 class YIdCardValidator extends CValidator
 {
+	/**
+	 * @var string
+	 */
 	public $message = '{attribute} 格式不正确';
 
+	/**
+	 * @var integer
+	 */
 	public $allowLength = 18;
 
+	/**
+	 * @var boolean
+	 */
 	public $allowEmpty = true;
 
+	/**
+	 * @see CValidator::validateAttribute()
+	 */
 	public function validateAttribute($object, $attribute) {
 		$value = $object->$attribute;
 		if($this->allowEmpty && $this->isEmpty($value))

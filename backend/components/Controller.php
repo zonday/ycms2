@@ -149,6 +149,7 @@ class Controller extends CController
 
 	/**
 	 * 获取扩展导航
+	 * @return array
 	 */
 	public function getExtendNavTtems()
 	{
@@ -162,6 +163,11 @@ class Controller extends CController
 		return $items;
 	}
 
+	/**
+	 * 首字母小写
+	 * @param string $upper
+	 * @return string
+	 */
 	protected function lcfirst($upper) {
 		return strtolower(substr($upper,0,1)) . substr($upper,1);
 	}
@@ -201,6 +207,10 @@ class Controller extends CController
 		return $items;
 	}
 
+	/**
+	 * 过滤餐单项目 根据权限过滤
+	 * @param array $items
+	 */
 	protected function filterNavItems(&$items)
 	{
 		if (Yii::app()->getUser()->getId() == User::SUPERADMIN_ID)

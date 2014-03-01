@@ -13,6 +13,9 @@
  */
 class YContentUrlRule extends CBaseUrlRule
 {
+	/**
+	 * @var 排除的路径
+	 */
 	public $exclude = array();
 
 	/**
@@ -20,6 +23,9 @@ class YContentUrlRule extends CBaseUrlRule
 	 */
 	public $combinedPath = true;
 
+	/**
+	 * @see CBaseUrlRule::createUrl()
+	 */
 	public function createUrl($manager,$route,$params,$ampersand)
 	{
 		if (in_array($route, array('content/index', 'content/view')) &&
@@ -61,6 +67,9 @@ class YContentUrlRule extends CBaseUrlRule
 		return false;
 	}
 
+	/**
+	 * @see CBaseUrlRule::parseUrl()
+	 */
 	public function parseUrl($manager,$request,$pathInfo,$rawPathInfo)
 	{
 		if (preg_match('#(?P<path>[a-z\-\/]+)/(?P<id>\d+)#i', $pathInfo, $matches)) {
@@ -80,6 +89,11 @@ class YContentUrlRule extends CBaseUrlRule
 		return false;
 	}
 
+	/**
+	 * 验证是否是栏目
+	 * @param string $path
+	 * @return boolean
+	 */
 	protected function isValidChannel($path)
 	{
 		if (in_array($path, $this->exclude))
