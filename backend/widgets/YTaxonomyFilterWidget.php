@@ -28,13 +28,13 @@ class YTaxonomyFilterWidget extends CWidget
 			return;
 
 		$data = array();
-		foreach ($this->model->prepareTaxonomies() as $params) {
+		foreach ($this->model->prepareTaxonomies() as $taxonomy => $params) {
 			$htmlOptions = array();
 			if ($params['cascade'] && $params['taxonomy']->hierarchy == Taxonomy::HIERARCHY_MULTIPLE) {
 				$attribute = "taxonomy[{$taxonomy}]";
 				$list = CHtml::listData(Term::model()->getTree($params['taxonomy']->id, 0, 1), 'id', 'name');
 				$params['many']=false;
-				CHtml::resolveNameID($model, $attribute, $htmlOptions);
+				CHtml::resolveNameID($this->model, $attribute, $htmlOptions);
 				$this->registerCascadeScript($htmlOptions['id'], $params['allowEmpty']);
 			} elseif (!empty($params['channel'])) {
 				$termSlug = $this->getOwner()->getChannel()->name;

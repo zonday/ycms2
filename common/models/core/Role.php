@@ -118,6 +118,10 @@ class Role extends CActiveRecord
 		return $list;
 	}
 
+	public static function systemRoles() {
+		return array();
+	}
+
 	/**
 	 * 删除缓存
 	 */
@@ -128,7 +132,7 @@ class Role extends CActiveRecord
 
 	/**
 	 * 根据id更新权重
-	 * @param integer $id
+	 * @param $pk
 	 * @param integer $weight
 	 */
 	public static function updateWeightByPk($pk, $weight) {

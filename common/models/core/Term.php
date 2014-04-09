@@ -154,7 +154,7 @@ class Term extends CActiveRecord
 	 * @param mixed $taxonomy_id
 	 * @return integer
 	 */
-	public function getCountbyTaxonomy($taxonomy_id=null)
+	public function getCountByTaxonomy($taxonomy_id=null)
 	{
 		if ($taxonomy_id === null)
 			$taxonomy_id = $this->taxonomy_id;
@@ -233,7 +233,6 @@ class Term extends CActiveRecord
 	 * 根据id更新术语权重
 	 * @param integer $id
 	 * @param integer $weight
-	 * @param integer $taxonomy_id
 	 */
 	public static function updateWeightByPk($id, $weight)
 	{
@@ -249,7 +248,7 @@ class Term extends CActiveRecord
 
 	/**
 	 * 设置父节点Ids
-	 * @param array $parents
+	 * @param $parentIds
 	 */
 	public function setParentIds($parentIds)
 	{
@@ -507,8 +506,9 @@ class Term extends CActiveRecord
 
 	/**
 	 * 根据分类名，动态插入术语
+	 * @param $termNames
+	 * @param $taxonomyIdName
 	 * @param array|string 条目名称
-	 * @param integer|string 分类别名或id
 	 * @return array 保存后的术语ids
 	 */
 	public static function custom($termNames, $taxonomyIdName, $maxCount=null)
@@ -523,7 +523,7 @@ class Term extends CActiveRecord
 			return array();
 
 		if (is_numeric($maxCount) && $maxCount > 0) {
-			$termNews = array_slice($array, 0, $maxCount);
+			$termNames = array_slice($termNames, 0, $maxCount);
 		}
 
 		$connection = self::model()->getDbConnection();

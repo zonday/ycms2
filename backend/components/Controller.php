@@ -151,7 +151,7 @@ class Controller extends CController
 	 * 获取扩展导航
 	 * @return array
 	 */
-	public function getExtendNavTtems()
+	public function getExtendNavItems()
 	{
 		$items = array();
 		if (isset(Yii::app()->params['extendNav'])) {
@@ -186,7 +186,7 @@ class Controller extends CController
 				,
 				$this->getContentItems(),
 				$this->getOtherNavItems(),
-				$this->getExtendNavTtems(),
+				$this->getExtendNavItems(),
 				array(
 				array('label' => '系统', 'itemOptions' => array('class' => 'nav-header')),
 				array('label' => '栏目', 'url' => array('/channel/index'), 'icon' => 'fixed-width list'),

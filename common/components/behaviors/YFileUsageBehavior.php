@@ -80,7 +80,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 
 	/**
 	 * 获取上传文件字段列表（已预处理过）
-	 * @param array $fields
+	 * @return
 	 */
 	public function getUploadFields()
 	{
@@ -300,7 +300,7 @@ class YFileUsageBehavior extends CActiveRecordBehavior
 
 	/**
 	 * 解析ids
-	 * @param mixed $field
+	 * @param $ids
 	 * @return array
 	 */
 	public function parseIds($ids)

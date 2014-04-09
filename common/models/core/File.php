@@ -15,6 +15,8 @@
  * @property integer $status
  * @property string $create_time
  * @property string $update_time
+ * @property string filename
+ * @property string filemime
  *
  * @author Yang <css3@qq.com>
  * @package backend.models.core
@@ -261,7 +263,7 @@ class File extends CActiveRecord
 
 	/**
 	 * 设置图片替代文本
-	 * @param unknown_type $value
+	 * @param string $value
 	 */
 	public function setAlt($value)
 	{
@@ -331,7 +333,7 @@ class File extends CActiveRecord
 	/**
 	 * 删除下载数目缓存
 	 */
-	public function deleteDownlodCountCache()
+	public function deleteDownloadCountCache()
 	{
 		$cacheKey = "file_{$this->id}_download_count";
 		Yii::app()->getCache()->delete($cacheKey);
@@ -499,6 +501,7 @@ class File extends CActiveRecord
 	/**
 	 * 检测文件是否有相关的图片尺寸
 	 * @param string $name
+	 * @return bool
 	 */
 	public function hasImage($name)
 	{

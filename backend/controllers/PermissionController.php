@@ -171,7 +171,7 @@ class PermissionController extends Controller
 				$authManager->saveAuthItem($newAuthItem, $authItem->getName());
 				if ($model->getType() == CAuthItem::TYPE_OPERATION && !empty($model->task)) {
 					$taskAuthItem = $authManager->getAuthItem($model->task);
-					if ($taskAuthItem && $taskAuthItem->getType() == CAuthItem::TYPE_TASK)
+					if ($taskAuthItem && !$taskAuthItem->hasChild($model->name) && $taskAuthItem->getType() == CAuthItem::TYPE_TASK)
 						$taskAuthItem->addChild($newAuthItem->getName());
 				}
 				Yii::app()->getUser()->setFlash('success', $model->typeNames[$model->getType()] . '更新成功');

@@ -95,7 +95,7 @@ class Channel extends CActiveRecord
 						'image' => array(
 							'location' => 'public://term',
 							'type' => 'image',
-							'resize'=>isset($channelImage['resize']) ? $termImage['resize'] : null,
+							'resize'=>isset($channelImage['resize']) ? $channelImage['resize'] : null,
 						),
 					),
 				)
@@ -169,6 +169,7 @@ class Channel extends CActiveRecord
 	{
 		return array(
 			'id'=>'ID',
+			'image' => '图片',
 			'title'=>'标题',
 			'name'=>'名称',
 			'keywords'=>'栏目关键字',

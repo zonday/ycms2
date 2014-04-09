@@ -17,6 +17,7 @@
  * @property integer $create_time 创建时间
  * @property Term $category 分类
  * @property integer visible 可见性
+ * @property string update_time
  *
  * @author Yang <css3@qq.com>
  * @package backend.models.core
@@ -136,7 +137,7 @@ class Link extends CActiveRecord
 
 	/**
 	 * 获取链接Target列表
-	 * @return multitype:string
+	 * @return array
 	 */
 	public function getTargetList()
 	{

@@ -99,23 +99,24 @@ class UserController extends Controller
 		$this->render('view', array('model' => $this->loadModel($id)));
 	}
 
-	public function actionCannel($id)
+	public function actionCancel($id)
 	{
 		$model = $this->loadModel($id);
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$method = isset($_POST['method']) ? $_POST['method'] : null;
-			if ($model->cannel($method)) {
+			if ($model->cancel($method)) {
 				Yii::app()->getUser()->setFlash('success', '操作已执行');
 				$this->redirect(array('index'));
 			}
 		} else {
-			$this->render('cannel', array('model'=>$model));
+			$this->render('cancel', array('model'=>$model));
 		}
 	}
 
 	/**
 	 * 删除用户
 	 * @param integer $id
+	 * @throws CHttpException
 	 */
 	public function _actionDelete($id)
 	{

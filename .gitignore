@@ -2,6 +2,7 @@
 .externalToolBuilders
 .buildpath
 .settings/
+.idea
 *.swp
 *~
 /assets

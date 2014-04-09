@@ -18,6 +18,7 @@
  * @property integer $create_time 创建时间
  * @property Term $category 分类
  * @property integer visible 可见性
+ * @property mixed update_time
  *
  * @author Yang <css3@qq.com>
  * @package backend.models.core

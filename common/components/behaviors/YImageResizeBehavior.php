@@ -114,12 +114,10 @@ class YImageResizeBehavior extends CActiveRecordBehavior
 		$metaSizes = array();
 
 		$parts = pathinfo($filePath);
-		$dirname = $parts['dirname'];
 		$filename = $parts['filename'];
 		$ext = $parts['extension'];
 		$image = Yii::app()->image->load($filePath);
 
-		$scheme = $owner->uriScheme($owner->uri);
 		$baseUri = str_replace(basename($owner->uri), '', $owner->uri);
 		if (substr($baseUri, -1) !== '/')
 			$baseUri .= '/';

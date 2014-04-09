@@ -198,7 +198,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 
 	/**
 	 * 解析ids
-	 * @param mixed $field
+	 * @param $ids
 	 * @return array
 	 */
 	public function parseIds($ids)
@@ -215,6 +215,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	/**
 	 * 获取分类
 	 * @param mixed $taxSlug
+	 * @throws CException
 	 * @return mixed
 	 */
 	public function getTaxonomy($taxSlug=null)
@@ -321,7 +322,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 
 	/**
 	 * by Term IN 操作
-	 * @param mxied $term
+	 * @param mixed $term
 	 * @param integer $limit
 	 * @return CActiveRecord
 	 */
@@ -356,7 +357,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 
 	/**
 	 * by Term AND 操作
-	 * @param mxied $term
+	 * @param $termIds
 	 * @param integer $limit
 	 * @return CActiveRecord
 	 */
@@ -394,9 +395,10 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 
 	/**
 	 * by TermSlug
-	 * @param mxied $taxonomy
-	 * @param mxied $termSlug
+	 * @param mixed $taxonomy
+	 * @param mixed $termSlug
 	 * @param integer $limit
+	 * @throws CException
 	 * @return CActiveRecord
 	 */
 	public function byTermSlug($taxonomy, $termSlug, $limit=-1)
@@ -439,8 +441,10 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 
 	/**
 	 * by Taxonomy IN 操作
-	 * @param mxied $term
-	 * @param mxied $limit
+	 * @param $taxonomy
+	 * @param mixed $limit
+	 * @throws CException
+	 * @internal param mixed $term
 	 * @return CActiveRecord
 	 */
 	public function byTaxonomy($taxonomy, $limit=-1)
@@ -475,6 +479,7 @@ class YTaxonomyBehavior extends CActiveRecordBehavior
 	/**
 	 * 搜索ByTaxonomy
 	 * @param mixed $criteria
+	 * @return \CActiveRecord
 	 */
 	public function searchByTaxonomy($criteria=null)
 	{

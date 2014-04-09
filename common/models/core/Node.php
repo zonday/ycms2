@@ -61,6 +61,7 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * @param string $className
+	 * @throws CException
 	 * @return Node
 	 */
 	public static function model($className=__CLASS__)
@@ -189,7 +190,7 @@ abstract class Node extends CActiveRecord
 	 * @param string $modelClass
 	 * @param mixed $channels
 	 * @param boolean $static
-	 * @param string $scenario
+	 * @throws CException
 	 * @return Node
 	 */
 	public static function get($modelClass, $channels=null, $static=true)
@@ -224,7 +225,7 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 根据栏目获取内容模型
-	 * @param $mixed $channel 栏目 栏目对象 栏目别名 栏目id
+	 * @param $channel
 	 * @param boolean $static 是否是静态对象
 	 * @param boolean $applyChannel 是否要应用栏目
 	 * @throws CException
@@ -249,7 +250,9 @@ abstract class Node extends CActiveRecord
 	 * 根据栏目获取内容模型
 	 * @deprecated
 	 * @param mixed $channel
+	 * @param bool $static
 	 * @param boolean $applyChannel
+	 * @throws CException
 	 * @return Node|null
 	 */
 	public static function getByChannel($channel, $static=true, $applyChannel=true)
@@ -408,10 +411,10 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 下一个
-	 * @param array $newCondtion
+	 * @param array $newCondition
 	 * @return Node
 	 */
-	public function next($newCondtion=array())
+	public function next($newCondition=array())
 	{
 		$condition = 'status=:status AND id<:id';
 		$params = array(':status'=>self::STATUS_PUBLIC, ':id'=>$this->id);
@@ -422,7 +425,7 @@ abstract class Node extends CActiveRecord
 			$params[':channel_id'] = $this->channel_id;
 		}
 
-		return $this->find(array_merge($newCondtion, array(
+		return $this->find(array_merge($newCondition, array(
 			'condition'=>$condition,
 			'order'=>'id DESC',
 			'params'=>$params,
@@ -431,10 +434,10 @@ abstract class Node extends CActiveRecord
 
 	/**
 	 * 上一个
-	 * @param array $newCondtion
+	 * @param array $newCondition
 	 * @return Node
 	 */
-	public function prev($newCondtion=array())
+	public function prev($newCondition=array())
 	{
 		$condition = 'status=:status AND id>:id';
 		$params = array(':status'=>self::STATUS_PUBLIC, ':id'=>$this->id);
@@ -444,7 +447,7 @@ abstract class Node extends CActiveRecord
 			$params[':channel_id'] = $this->channel_id;
 		}
 
-		return $this->find(array_merge($newCondtion, array(
+		return $this->find(array_merge($newCondition, array(
 			'condition'=>$condition,
 			'order'=>'id ASC',
 			'params'=>$params,

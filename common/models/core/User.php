@@ -17,6 +17,7 @@
  * @property string $create_time
  * @property string $update_time
  * @property string $login_time
+ * @property string nickname
  *
  * @author Yang <css3@qq.com>
  * @package backend.models.core
@@ -284,6 +285,7 @@ class User extends CActiveRecord
 	/**
 	 * 是否拥有角色$name
 	 * @param string $name
+	 * @return bool
 	 */
 	public function hasRole($name)
 	{
@@ -335,7 +337,7 @@ class User extends CActiveRecord
 		$authManager = Yii::app()->getAuthManager();
 		foreach ((array) $names as $name) {
 			if ($name instanceof CAuthItem) {
-				$this->_roles[] = $role;
+				$this->_roles[] = $name;
 			} else {
 				if ($role = $authManager->getAuthItem($name)) {
 					$this->_roles[] = $role;
@@ -366,14 +368,13 @@ class User extends CActiveRecord
 	/**
 	 * 取消账户
 	 * @param string $method
+	 * @return bool
 	 */
-	public function cannel($method)
+	public function cancel($method)
 	{
 		if (!in_array($method, array('block', 'block_unpublish', 'reassign', 'delete'))) {
 			return false;
 		}
-
-		$connection = $this->getDbConnection();
 
 		switch ($method) {
 			case 'block':
